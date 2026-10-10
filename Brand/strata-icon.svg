@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+	<defs>
+		<linearGradient id="tile" x1="76" y1="28" x2="422" y2="488" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#203B41"/>
+			<stop offset=".48" stop-color="#10292E"/>
+			<stop offset="1" stop-color="#0A151F"/>
+		</linearGradient>
+		<radialGradient id="light" cx="0" cy="0" r="1" gradientTransform="translate(238 72) rotate(90) scale(388)" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#54F1BA" stop-opacity=".12"/>
+			<stop offset="1" stop-color="#54F1BA" stop-opacity="0"/>
+		</radialGradient>
+		<linearGradient id="rim" x1="88" y1="24" x2="418" y2="488" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#B8FBE0" stop-opacity=".32"/>
+			<stop offset=".48" stop-color="#B8FBE0" stop-opacity=".06"/>
+			<stop offset="1" stop-color="#1B5063" stop-opacity=".5"/>
+		</linearGradient>
+		<linearGradient id="strata" x1="198" y1="88" x2="306" y2="416" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#C2FFDE"/>
+			<stop offset=".36" stop-color="#6BF3BB"/>
+			<stop offset=".72" stop-color="#27D7B1"/>
+			<stop offset="1" stop-color="#25BBD0"/>
+		</linearGradient>
+		<linearGradient id="fold" x1="128" y1="180" x2="256" y2="306" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#34CDA7"/>
+			<stop offset="1" stop-color="#119BA6"/>
+		</linearGradient>
+	</defs>
+	<rect x="16" y="16" width="480" height="480" rx="112" fill="url(#tile)"/>
+	<rect x="16" y="16" width="480" height="480" rx="112" fill="url(#light)"/>
+	<rect x="17.5" y="17.5" width="477" height="477" rx="110.5" stroke="url(#rim)" stroke-width="3"/>
+	<g transform="translate(-25.6 -25.6) scale(1.1)">
+		<path d="M394 168 256 88 118 168V224L304 332 256 360 166 308 118 336 256 416 394 336V280L208 172 256 144 346 196Z" fill="#050F19" opacity=".35" transform="translate(0 8)"/>
+		<path d="M394 168 256 88 118 168V224L304 332 256 360 166 308 118 336 256 416 394 336V280L208 172 256 144 346 196Z" fill="url(#strata)"/>
+		<path d="M118 168 256 248V304L118 224Z" fill="url(#fold)"/>
+		<path d="M256 360 394 280V336L256 416Z" fill="#138B9D" opacity=".64"/>
+		<path d="M119 168 256 89 393 168M209 173 393 280M119 336 256 415" stroke="#DBFFEE" stroke-opacity=".32" stroke-width="2"/>
+	</g>
+</svg>

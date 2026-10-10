@@ -1,0 +1,30 @@
+# Toolchains y artefactos de compilación locales
+.cargo-home/
+.rustup-home/
+.build-tools/
+target/
+rustup-init.exe
+*.log
+
+# Entregables y datos de prueba (no son código fuente)
+Entrega/
+QA/
+*.sqlite
+*.sqlite-journal
+
+# Notas de trabajo locales
+INTEGRACION.md
+
+# Dependencias y cachés
+node_modules/
+.turbo/
+
+# Claves de firma de actualizaciones: NUNCA al repositorio
+*.key
+*.key.pub
+.tauri/
+
+# Vídeos promocionales de Modrinth (marca ajena, no necesarios para compilar el launcher)
+*.mp4
+*.webm
+*.mov

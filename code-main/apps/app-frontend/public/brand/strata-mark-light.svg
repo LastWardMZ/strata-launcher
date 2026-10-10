@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="80 64 352 376" fill="none">
+	<defs>
+		<linearGradient id="strata" x1="198" y1="88" x2="306" y2="416" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#188A72"/>
+			<stop offset=".42" stop-color="#15967E"/>
+			<stop offset="1" stop-color="#137D96"/>
+		</linearGradient>
+	</defs>
+	<path d="M394 168 256 88 118 168V224L304 332 256 360 166 308 118 336 256 416 394 336V280L208 172 256 144 346 196Z" fill="url(#strata)"/>
+	<path d="M118 168 256 248V304L118 224Z" fill="#0B686D"/>
+	<path d="M256 360 394 280V336L256 416Z" fill="#138B9D" opacity=".64"/>
+</svg>
