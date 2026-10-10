@@ -459,10 +459,10 @@
 		"message": "มันอาจแตกต่างจากชื่อในเกม Minecraft ของพวกเขา!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "กรอกชื่อผู้ใช้ catálogo..."
+		"message": "กรอกชื่อผู้ใช้ Modrinth..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "เพื่อนของคุณมีชื่อผู้ใช้ catálogo ว่าอะไร?"
+		"message": "เพื่อนของคุณมีชื่อผู้ใช้ Modrinth ว่าอะไร?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>เพิ่มเพื่อน</link> เพื่อเห็นว่าพวกเขากำลังเล่นอะไรอยู่!"
@@ -504,7 +504,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>ล็อกอินเข้าบัญชี catálogo</link> เพื่อเพิ่มเพื่อนและเห็นว่าพวกเขากำลังเล่นอะไรอยู่!"
+		"message": "<link>ล็อกอินเข้าบัญชี Modrinth</link> เพื่อเพิ่มเพื่อนและเห็นว่าพวกเขากำลังเล่นอะไรอยู่!"
 	},
 	"instance.add-server.add-and-play": {
 		"message": "เพิ่มและเล่นทันที"

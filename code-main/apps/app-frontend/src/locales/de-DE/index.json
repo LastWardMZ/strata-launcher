@@ -3546,10 +3546,10 @@
 		"message": "Er kann vom Minecraft-Nutzernamen abweichen!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "catálogo-Benutzernamen eingeben..."
+		"message": "Modrinth-Benutzernamen eingeben..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "Wie lautet der catálogo-Benutzername deines Freundes?"
+		"message": "Wie lautet der Modrinth-Benutzername deines Freundes?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>Freunde hinzufügen</link>, um zu sehen, was sie spielen!"
@@ -3594,7 +3594,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Melde dich bei einem catálogo-Konto an</link>, um Freunde hinzuzufügen und zu sehen, was sie gerade spielen!"
+		"message": "<link>Melde dich bei einem Modrinth-Konto an</link>, um Freunde hinzuzufügen und zu sehen, was sie gerade spielen!"
 	},
 	"installation-settings.shared-instance.linked-title": {
 		"message": "Verknüpfte geteilte Instanz"

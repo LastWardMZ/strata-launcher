@@ -16,8 +16,16 @@ import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 
+import { syncModrinthFriendsToP2p } from '@/helpers/modrinth-p2p-sync'
+
 type FriendStatus = 'outgoing' | 'incoming' | 'accepted' | 'blocked'
-type Friend = { id: string; name: string; status: FriendStatus; synced: boolean }
+type Friend = {
+	id: string
+	name: string
+	status: FriendStatus
+	synced: boolean
+	via_modrinth?: boolean
+}
 type InviteInfo = {
 	share_id: string
 	kind: 'world' | 'server'
@@ -295,6 +303,7 @@ let unlisten: (() => void) | undefined
 let timer: ReturnType<typeof setInterval> | undefined
 let lanTimer: ReturnType<typeof setInterval> | undefined
 onMounted(async () => {
+	void syncModrinthFriendsToP2p().then(() => loadFriends().catch(() => {}))
 	try {
 		me.value = await call('p2p_info')
 		nameDraft.value = me.value.name
@@ -420,7 +429,8 @@ onUnmounted(() => {
 					Amigos · {{ accepted.length }}
 				</h2>
 				<p v-if="!accepted.length" class="m-0 px-2 py-1 text-sm text-secondary">
-					Aún no tienes amigos. Comparte tu código o pega el de alguien.
+					Aún no tienes amigos para jugar. Tus amigos de Modrinth aparecen aquí cuando publican su
+					código de partidas (Ajustes → Perfil), o puedes pegar un código a mano.
 				</p>
 				<button
 					v-for="f in accepted"
@@ -443,7 +453,8 @@ onUnmounted(() => {
 					<div class="min-w-0 flex-1">
 						<div class="truncate font-semibold text-contrast">{{ f.name }}</div>
 						<div class="text-xs text-secondary">
-							{{ online[f.id] ? 'Conectado' : 'Desconectado' }}
+							{{ online[f.id] ? 'Conectado' : 'Desconectado'
+							}}<template v-if="f.via_modrinth"> · Modrinth</template>
 						</div>
 					</div>
 				</button>

@@ -1845,10 +1845,10 @@
 		"message": "Může se lišit od jejich Minecraft přezdívky!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Zadej přezdívku na catálogou..."
+		"message": "Zadej přezdívku na Modrinthu..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "Jaká je přezdívka tvého přítele na catálogou?"
+		"message": "Jaká je přezdívka tvého přítele na Modrinthu?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>Přidej si přátele</link>, abys viděl, co hrají!"
@@ -1893,7 +1893,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Přihlas se k catálogo účtu</link>, abys mohl přidávat přátele a vidět, co hrají!"
+		"message": "<link>Přihlas se k Modrinth účtu</link>, abys mohl přidávat přátele a vidět, co hrají!"
 	},
 	"installation-settings.shared-instance.unlinking-button": {
 		"message": "Odpojování..."

@@ -3441,10 +3441,10 @@
 		"message": "Más is lehet, mint a Minecraft felhasználóneve!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Barát catálogo felhasználóneve..."
+		"message": "Barát Modrinth felhasználóneve..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "Mi a barátod catálogo felhasználóneve?"
+		"message": "Mi a barátod Modrinth felhasználóneve?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>Vegyél fel barátokat</link>, hogy lásd mivel játszanak!"
@@ -3489,7 +3489,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Lépj be catálogo fiókodba</link>, hogy felvehess barátokat és lásd mivel játszanak!"
+		"message": "<link>Lépj be Modrinth fiókodba</link>, hogy felvehess barátokat és lásd mivel játszanak!"
 	},
 	"installation-settings.shared-instance.linked-title": {
 		"message": "Összekapcsolt megosztott példány"

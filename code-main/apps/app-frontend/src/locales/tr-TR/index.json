@@ -2628,10 +2628,10 @@
 		"message": "Minecraft kullanıcı adıyla aynı olmayabilir!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "catálogo kullanıcı adını girin..."
+		"message": "Modrinth kullanıcı adını girin..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "Arkadaşının catálogo kullanıcı adı nedir?"
+		"message": "Arkadaşının Modrinth kullanıcı adı nedir?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>Arkadaş ekleyerek</link> ne oynadıklarını gör!"
@@ -2676,7 +2676,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "Arkadaş eklemek ve ne oynadıklarını görmek için bir <link>catálogo hesabına giriş yap</link>!"
+		"message": "Arkadaş eklemek ve ne oynadıklarını görmek için bir <link>Modrinth hesabına giriş yap</link>!"
 	},
 	"installation-settings.shared-instance.linked-title": {
 		"message": "Bağlantılı paylaşımlı örnek"

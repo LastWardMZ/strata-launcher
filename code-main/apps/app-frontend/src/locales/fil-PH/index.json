@@ -342,10 +342,10 @@
 		"message": "Maaaraing hindi pareho sa kanilang pangalan sa Minecraft!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Ilagay ang username sa catálogo..."
+		"message": "Ilagay ang username sa Modrinth..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "Ano ang pangalan ng iyong kaibigan sa catálogo?"
+		"message": "Ano ang pangalan ng iyong kaibigan sa Modrinth?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>Magdagdag ng mga kaibigan</link> upang makita ang kanilang nilalaro!"
@@ -387,7 +387,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Mag-sign in sa catálogo account</link> upang maidagdag ang mga kaibigan at malaman ang kanilang nilalaro!"
+		"message": "<link>Mag-sign in sa Modrinth account</link> upang maidagdag ang mga kaibigan at malaman ang kanilang nilalaro!"
 	},
 	"instance.add-server.add-and-play": {
 		"message": "Idagdag at laruin"

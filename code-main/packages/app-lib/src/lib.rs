@@ -31,11 +31,14 @@ pub use state::State;
 pub use util::fetch::DownloadReason;
 
 pub fn launcher_user_agent() -> String {
+    // La API de Modrinth exige un User-Agent que identifique de forma única a cada aplicación
+    // y que incluya un contacto. Strata es un proyecto distinto de la app de Modrinth y no debe
+    // hacerse pasar por ella ni usar su correo de soporte.
     const LAUNCHER_BASE_USER_AGENT: &str =
-        concat!("modrinth/theseus/", env!("CARGO_PKG_VERSION"),);
+        concat!("LastWardMZ/strata-launcher/", env!("CARGO_PKG_VERSION"),);
 
     format!(
-        "{} ({}; support@modrinth.com)",
+        "{} ({}; https://github.com/LastWardMZ/strata-launcher)",
         LAUNCHER_BASE_USER_AGENT,
         std::env::consts::OS
     )

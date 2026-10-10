@@ -12,6 +12,7 @@ pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
     tauri::plugin::Builder::new("mr-auth")
         .invoke_handler(tauri::generate_handler![
             modrinth_login,
+            modrinth_login_with_token,
             logout,
             get,
             get_all,
@@ -74,6 +75,14 @@ pub async fn modrinth_login<R: Runtime>(
     }
 
     Ok(credentials)
+}
+
+/// Conecta una cuenta de Modrinth con un token personal pegado por el usuario.
+#[tauri::command]
+pub async fn modrinth_login_with_token(
+    token: String,
+) -> Result<ModrinthCredentials> {
+    Ok(mr_auth::authenticate_with_token(&token).await?)
 }
 
 #[tauri::command]

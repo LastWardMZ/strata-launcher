@@ -3546,10 +3546,10 @@
 		"message": "這可能與對方的 Minecraft 使用者名稱不同！"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "輸入 catálogo 使用者名稱..."
+		"message": "輸入 Modrinth 使用者名稱..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "你好友的 catálogo 使用者名稱是什麼？"
+		"message": "你好友的 Modrinth 使用者名稱是什麼？"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>新增好友</link>即可查看他們正在玩什麼！"
@@ -3594,7 +3594,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>登入 catálogo 帳號</link>即可新增好友並查看他們正在玩什麼！"
+		"message": "<link>登入 Modrinth 帳號</link>即可新增好友並查看他們正在玩什麼！"
 	},
 	"installation-settings.shared-instance.linked-title": {
 		"message": "已連結的共用實例"

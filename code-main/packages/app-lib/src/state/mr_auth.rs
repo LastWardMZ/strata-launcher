@@ -222,6 +222,46 @@ pub async fn finish_login_flow(
     })
 }
 
+/// Credenciales a partir de un token personal (PAT) creado por el usuario en su cuenta de
+/// Modrinth. Un token personal no se renueva con `session/refresh`, así que no se le pone una
+/// caducidad local corta: si el token caduca o se revoca en Modrinth, las peticiones
+/// devolverán 401 y la interfaz pedirá conectarlo de nuevo.
+pub async fn login_with_token(
+    token: &str,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+) -> crate::Result<ModrinthCredentials> {
+    let token = token.trim();
+    if token.len() < 8
+        || token.len() > 256
+        || !token.chars().all(|c| c.is_ascii_graphic())
+    {
+        return Err(crate::ErrorKind::InputError(
+            "El token no es válido: cópialo entero desde tu cuenta de Modrinth"
+                .to_string(),
+        )
+        .as_error());
+    }
+
+    // El error de la API es interno y poco útil para el usuario ("flattening v2 not-found
+    // response"): se registra y se muestra un mensaje que dice qué comprobar.
+    let info = fetch_info(token, semaphore, exec).await.map_err(|error| {
+        tracing::warn!("No se pudo verificar el token de Modrinth: {error}");
+        crate::ErrorKind::InputError(
+            "Modrinth no ha aceptado el token. Comprueba que lo has copiado entero, que no ha caducado y que tienes conexión a Internet."
+                .to_string(),
+        )
+        .as_error()
+    })?;
+
+    Ok(ModrinthCredentials {
+        session: token.to_string(),
+        expires: Utc::now() + Duration::days(36_500),
+        user_id: info.id,
+        active: true,
+    })
+}
+
 async fn fetch_info(
     token: &str,
     semaphore: &FetchSemaphore,

@@ -546,10 +546,10 @@
 		"message": "Se ei voi olla eri kuin heidän Minecraft-käyttäjänimi!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Syötä catálogo-käyttäjätunnus..."
+		"message": "Syötä Modrinth-käyttäjätunnus..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "Mikä on ystäväsi catálogo-käyttäjänimi?"
+		"message": "Mikä on ystäväsi Modrinth-käyttäjänimi?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>Lisää kavereita</link> nähdäksesi mitä he pelaavat!"
@@ -591,7 +591,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Kirjaudu catálogo-tilille</link> lisätäksesi ystäviä ja nähdäksesi mitä he pelaavat!"
+		"message": "<link>Kirjaudu Modrinth-tilille</link> lisätäksesi ystäviä ja nähdäksesi mitä he pelaavat!"
 	},
 	"instance.action.create-shortcut": {
 		"message": "Luo pikakuvake"

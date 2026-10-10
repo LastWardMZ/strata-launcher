@@ -2907,10 +2907,10 @@
 		"message": "Peut être différent de leur pseudo Minecraft !"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Entrez un pseudo catálogo..."
+		"message": "Entrez un pseudo Modrinth..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "Quel est le pseudo catálogo de votre ami ?"
+		"message": "Quel est le pseudo Modrinth de votre ami ?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>Ajoutez des amis</link> pour voir à quoi ils jouent !"
@@ -2955,7 +2955,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Créer un compte catálogo</link> pour ajouter des amis et voir à quoi ils jouent !"
+		"message": "<link>Créer un compte Modrinth</link> pour ajouter des amis et voir à quoi ils jouent !"
 	},
 	"installation-settings.shared-instance.linked-title": {
 		"message": "Instance partagée liée"

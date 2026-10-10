@@ -3525,10 +3525,10 @@
 		"message": "Оно может быть не таким, как в Minecraft!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Введите имя с catálogo..."
+		"message": "Введите имя с Modrinth..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "Какое имя у друга на catálogo?"
+		"message": "Какое имя у друга на Modrinth?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>Добавьте друзей</link> и следите за ними!"
@@ -3573,7 +3573,7 @@
 		"message": "{title} — {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Войдите в аккаунт catálogo</link>, чтобы добавлять друзей и следить за ними!"
+		"message": "<link>Войдите в аккаунт Modrinth</link>, чтобы добавлять друзей и следить за ними!"
 	},
 	"installation-settings.shared-instance.linked-title": {
 		"message": "Отвязка совместной сборки"

@@ -23,19 +23,20 @@ import {
 	RefreshCwIcon,
 	RightArrowIcon,
 	ServerStackIcon,
-	UsersIcon,
 	SettingsIcon,
 	ShirtIcon,
 	SpinnerIcon,
 	ToggleRightIcon,
 	UserIcon,
 	UserPlusIcon,
+	UsersIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
 	AccountSwitchOverlay,
 	Admonition,
 	Avatar,
+	Button,
 	ButtonLink,
 	commonMessages,
 	commonSettingsMessages,
@@ -55,7 +56,6 @@ import {
 	providePageContext,
 	providePopupNotificationManager,
 	TeleportOverflowMenu,
-	
 	TooltipDirective,
 	useDebugLogger,
 	useFormatBytes,
@@ -77,11 +77,10 @@ import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import AccountsCard from '@/components/ui/AccountsCard.vue'
-import StrataBrand from '@/components/ui/StrataBrand.vue'
 import AppActionBar from '@/components/ui/AppActionBar.vue'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
-import StrataAccount from '@/components/ui/settings/account/StrataAccount.vue'
+import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import HostingUpdateRequired from '@/components/ui/HostingUpdateRequired.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
@@ -99,6 +98,7 @@ import PrideFundraiserBanner from '@/components/ui/PrideFundraiserBanner.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import SharedInstanceInviteHandler from '@/components/ui/shared-instances/shared-instance-invite-handler/index.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
+import StrataBrand from '@/components/ui/StrataBrand.vue'
 import SurveyPopup from '@/components/ui/SurveyPopup.vue'
 import SyncInstancesUpdateModal from '@/components/ui/sync-instances-update-modal/index.vue'
 import {
@@ -135,11 +135,12 @@ import {
 	set_global_synced_option,
 } from '@/helpers/instance'
 import { maxMemoryQueryOptions } from '@/helpers/jre.js'
+import { syncModrinthFriendsToP2p } from '@/helpers/modrinth-p2p-sync'
 import {
 	get as getCreds,
 	getAll as getAllCreds,
-	login,
 	logout,
+	MODRINTH_AUTH_CHANGED,
 	removeUser,
 	setActive,
 } from '@/helpers/mr_auth.ts'
@@ -324,7 +325,8 @@ useAppEvent('ads_consent_required', handleAdsConsentRequired, appEvents)
 
 const appVersion = getVersion()
 const tauriApiClient = new TauriModrinthClient({
-	userAgent: async () => `modrinth/theseus/${await appVersion} (support@modrinth.com)`,
+	userAgent: async () =>
+		`LastWardMZ/strata-launcher/${await appVersion} (https://github.com/LastWardMZ/strata-launcher)`,
 	labrinthBaseUrl: config.labrinthBaseUrl,
 	archonBaseUrl: config.archonBaseUrl,
 	sharedInstancesBaseUrl: config.sharedInstancesBaseUrl,
@@ -533,7 +535,10 @@ function handleEditMenuAction(action) {
 	if (document.dispatchEvent(event)) document.execCommand(action)
 }
 
+let p2pLinkTimer
 onMounted(async () => {
+	window.addEventListener(MODRINTH_AUTH_CHANGED, fetchCredentials)
+	p2pLinkTimer = setInterval(() => void syncModrinthFriendsToP2p(), 5 * 60 * 1000)
 	try {
 		const listeners = await Promise.all([
 			listen('edit-menu://undo', () => handleEditMenuAction('undo')),
@@ -560,6 +565,8 @@ onMounted(async () => {
 })
 
 onUnmounted(async () => {
+	window.removeEventListener(MODRINTH_AUTH_CHANGED, fetchCredentials)
+	if (p2pLinkTimer) clearInterval(p2pLinkTimer)
 	document.querySelector('body').removeEventListener('click', handleClick)
 	document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
 	document.querySelector('body').removeEventListener('contextmenu', handleContextMenu)
@@ -1007,7 +1014,6 @@ watch(stateInitialized, (ready) => {
 			loading.end(routerToken)
 			routerToken = null
 		}
-
 	}
 })
 
@@ -1300,6 +1306,7 @@ async function validateSession(sessionToken) {
 }
 
 async function fetchCredentials() {
+	void syncModrinthFriendsToP2p()
 	const hadSession = !!credentials.value?.session
 	const refreshId = ++credentialsRefreshId
 	credentials.value = undefined
@@ -1334,21 +1341,10 @@ async function fetchCredentials() {
 	await traceStartupStep('Load stored account profiles', fetchStoredModrinthAccounts)
 }
 
-async function signIn(flow = 'sign-in', addAccount = false) {
-	try {
-		await login(flow, addAccount)
-		await fetchCredentials()
-	} catch (error) {
-		if (
-			typeof error === 'object' &&
-			typeof error['message'] === 'string' &&
-			error.message.includes('Login canceled')
-		) {
-			// user closed the login window
-		} else {
-			handleError(error)
-		}
-	}
+async function signIn() {
+	// Strata no usa el inicio de sesión web de Modrinth: la cuenta se conecta con un token personal
+	// desde Ajustes > Perfil.
+	appSettingsModal.value?.showProfile()
 }
 
 async function requestSignIn(flow = 'sign-in', addAccount = false) {
@@ -2248,7 +2244,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				<UsersIcon />
 			</NavButton>
-<suspense>
+			<suspense>
 				<QuickInstanceSwitcher>
 					<NavButton
 						v-tooltip.right="formatMessage(messages.createNewInstance)"
@@ -2387,26 +2383,29 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<div
 				v-overlay-scrollbars="sidebarOverlayScrollbarsOptions"
 				class="app-sidebar-scrollable flex-grow shrink relative"
-				
 				data-overlayscrollbars-initialize
 			>
 				<div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>
 				<div class="sidebar-default-content" :class="{ 'sidebar-enabled': sidebarVisible }">
-					<div
-						class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
-					>
+					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
 						<h3 class="text-base text-primary font-medium m-0">
 							{{ formatMessage(messages.playingAs) }}
 						</h3>
-						
-<suspense>
+
+						<suspense>
 							<AccountsCard ref="accounts" />
 						</suspense>
 					</div>
-					<StrataAccount social-mode compact />
+					<div class="flex flex-col gap-3 p-4">
+						<suspense>
+							<FriendsList ref="friendsList" :credentials="credentials" :sign-in="signIn" />
+						</suspense>
+						<Button type="outlined" size="sm" @click="router.push('/friends')">
+							<UsersIcon /> Chat y partidas
+						</Button>
+					</div>
 				</div>
 			</div>
-
 		</div>
 	</div>
 	<I18nDebugPanel />
@@ -2696,6 +2695,3 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	}
 }
 </style>
-
-
-

@@ -774,10 +774,10 @@
 		"message": "Det er muligvis anderledes end deres Minecraft brugernavn!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Indskriv catálogo brugernavn..."
+		"message": "Indskriv Modrinth brugernavn..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "Hvad er din vens catálogo brugernavn?"
+		"message": "Hvad er din vens Modrinth brugernavn?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>Tilføj venner</link> for at se hvad de spiller!"
@@ -819,7 +819,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Log ind på en catálogo konto</link> for at tilføje venner og se hvad de spiller!"
+		"message": "<link>Log ind på en Modrinth konto</link> for at tilføje venner og se hvad de spiller!"
 	},
 	"instance.action.create-shortcut": {
 		"message": "Opret genvej"

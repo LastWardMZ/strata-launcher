@@ -3540,10 +3540,10 @@
 		"message": "Potrebbe essere diverso dal nome utente di Minecraft!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Nome utente di catálogo..."
+		"message": "Nome utente di Modrinth..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "Con quale utente di catálogo vuoi stringere amicizia?"
+		"message": "Con quale utente di Modrinth vuoi stringere amicizia?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>Stringi un''amicizia</link> per sapere a cosa stanno giocando!"
@@ -3588,7 +3588,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Accedi a un account catálogo</link> per stringere amicizie e sapere a cosa stanno giocando!"
+		"message": "<link>Accedi a un account Modrinth</link> per stringere amicizie e sapere a cosa stanno giocando!"
 	},
 	"installation-settings.shared-instance.linked-title": {
 		"message": "Istanza condivisa collegata"

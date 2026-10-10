@@ -3534,7 +3534,7 @@
 		"message": "Może różnić się od nazwy użytkownika Minecraft!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Wprowadź nazwę użytkownika catálogo..."
+		"message": "Wprowadź nazwę użytkownika Modrinth..."
 	},
 	"friends.add-friend.username.title": {
 		"message": "Jaka jest nazwa użytkownika Twojego znajomego?"
@@ -3582,7 +3582,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Zaloguj się na konto catálogo</link> by dodać znajomych i widzieć, w co grają!"
+		"message": "<link>Zaloguj się na konto Modrinth</link> by dodać znajomych i widzieć, w co grają!"
 	},
 	"installation-settings.shared-instance.linked-title": {
 		"message": "Powiązana udostępniona instancja"

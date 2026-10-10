@@ -2220,10 +2220,10 @@
 		"message": "これはMinecraftのユーザー名とは異なる可能性があります！"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "catálogoユーザー名を入力…"
+		"message": "Modrinthユーザー名を入力…"
 	},
 	"friends.add-friend.username.title": {
-		"message": "あなたのフレンドのcatálogoユーザー名は何ですか？"
+		"message": "あなたのフレンドのModrinthユーザー名は何ですか？"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>友達を追加</link>して、彼らが何をしているか見てみよう！"
@@ -2268,7 +2268,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>catálogoアカウントにサインイン</link>して友達を追加し、彼らがプレイしているゲームをチェックしよう！"
+		"message": "<link>Modrinthアカウントにサインイン</link>して友達を追加し、彼らがプレイしているゲームをチェックしよう！"
 	},
 	"installation-settings.shared-instance.linked-title": {
 		"message": "リンク済の共有インスタンス"

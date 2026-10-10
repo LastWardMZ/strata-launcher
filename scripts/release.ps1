@@ -13,6 +13,7 @@ param(
 	[Parameter(Mandatory = $true)][string]$Version,
 	[string]$Notes = 'Mejoras y correcciones.',
 	[switch]$Publish,
+	[switch]$Rebuild,
 	[string]$Repo = 'LastWardMZ/strata-launcher'
 )
 
@@ -31,7 +32,7 @@ if (Get-Process Strata -ErrorAction SilentlyContinue | Where-Object { $_.Path -l
 # 1. Versión (la fuente de verdad es el package.json del frontend)
 $json = Get-Content $app -Raw
 $current = [regex]::Match($json, '"version":\s*"([^"]+)"').Groups[1].Value
-if ([version]$Version -le [version]$current) { throw "La versión $Version debe ser mayor que la actual ($current): si no, los clientes no la verán como actualización." }
+if ([version]$Version -lt [version]$current -or ([version]$Version -eq [version]$current -and -not $Rebuild)) { throw "La versión $Version debe ser mayor que la actual ($current): si no, los clientes no la verán como actualización (usa -Rebuild para recompilar la misma versión sin publicarla)." }
 # UTF-8 SIN BOM: Tauri no puede leer un package.json con BOM.
 $utf8 = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText($app, [regex]::Replace($json, '"version":\s*"[^"]+"', "`"version`": `"$Version`"", 1), $utf8)

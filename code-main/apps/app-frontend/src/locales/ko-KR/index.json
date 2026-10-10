@@ -2943,10 +2943,10 @@
 		"message": "Minecraft 사용자명과 다를 수 있습니다!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "catálogo 사용자명 입력..."
+		"message": "Modrinth 사용자명 입력..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "친구의 catálogo 사용자명이 무엇인가요?"
+		"message": "친구의 Modrinth 사용자명이 무엇인가요?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>친구 추가</link>를 통해 친구들이 무엇을 하는지 확인해 보세요!"
@@ -2988,7 +2988,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>catálogo 계정으로 로그인</link>하여 친구를 추가하고 무엇을 플레이 중인지 확인하세요!"
+		"message": "<link>Modrinth 계정으로 로그인</link>하여 친구를 추가하고 무엇을 플레이 중인지 확인하세요!"
 	},
 	"installation-settings.shared-instance.linked-title": {
 		"message": "연동된 공유 인스턴스"

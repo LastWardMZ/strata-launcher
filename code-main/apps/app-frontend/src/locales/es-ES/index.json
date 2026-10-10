@@ -3543,10 +3543,10 @@
 		"message": "¡Puede ser diferente de su apodo en Minecraft!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Escribe su apodo en catálogo..."
+		"message": "Escribe su apodo en Modrinth..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "¿Cuál es el apodo de tu amigo en catálogo?"
+		"message": "¿Cuál es el apodo de tu amigo en Modrinth?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "¡<link>Añade amigos</link> para ver a qué están jugando!"
@@ -3591,7 +3591,7 @@
 		"message": "{title}: {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "¡<link>Inicia sesión en una cuenta catálogo</link> para añadir amigos y ver a qué están jugando!"
+		"message": "¡<link>Inicia sesión en una cuenta Modrinth</link> para añadir amigos y ver a qué están jugando!"
 	},
 	"installation-settings.shared-instance.linked-title": {
 		"message": "Instancia compartida enlazada"

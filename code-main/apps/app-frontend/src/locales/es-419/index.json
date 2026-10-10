@@ -3546,10 +3546,10 @@
 		"message": "¡Podría ser distinto a su nombre de usuario de Minecraft!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Introduce el nombre de usuario de catálogo..."
+		"message": "Introduce el nombre de usuario de Modrinth..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "¿Cuál es el nombre de usuario de catálogo de tu amigo?"
+		"message": "¿Cuál es el nombre de usuario de Modrinth de tu amigo?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>¡Añade amigos</link> para ver qué están jugando!"
@@ -3594,7 +3594,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>¡Inicia sesión en una cuenta de catálogo</link> para añadir amigos y ver qué están jugando!"
+		"message": "<link>¡Inicia sesión en una cuenta de Modrinth</link> para añadir amigos y ver qué están jugando!"
 	},
 	"installation-settings.shared-instance.linked-title": {
 		"message": "Vincular instancia compartida"

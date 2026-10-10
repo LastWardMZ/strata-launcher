@@ -1536,10 +1536,10 @@
 		"message": "זה יכול להיות שונה מהמשתמש Minecraft!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "שם משתמש catálogo..."
+		"message": "שם משתמש Modrinth..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "מה השם משתמש של החבר שלך בcatálogo?"
+		"message": "מה השם משתמש של החבר שלך בModrinth?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "ניתן <link>להוסיף חברים</link> כדי לראות במה הם משחקים!"
@@ -1581,7 +1581,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "אפשר <link>להתחבר לחשבון catálogo</link> כדי להוסיף חברים ולראות במה הם משחקים!"
+		"message": "אפשר <link>להתחבר לחשבון Modrinth</link> כדי להוסיף חברים ולראות במה הם משחקים!"
 	},
 	"instance.add-server.add-and-play": {
 		"message": "הוסף ושחק"

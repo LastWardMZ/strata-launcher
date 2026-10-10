@@ -426,10 +426,10 @@
 		"message": "Ia mungkin memiliki nama yang berbeda dari nama pengguna Minecraft!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Masukkan nama pengguna catálogo..."
+		"message": "Masukkan nama pengguna Modrinth..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "Apa nama pengguna catálogo teman Anda?"
+		"message": "Apa nama pengguna Modrinth teman Anda?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>Tambah teman</link> untuk melihat apa yang mereka mainkan!"
@@ -471,7 +471,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Masuk ke akun catálogo</link> untuk menambah teman dan melihat apa yang mereka mainkan!"
+		"message": "<link>Masuk ke akun Modrinth</link> untuk menambah teman dan melihat apa yang mereka mainkan!"
 	},
 	"instance.add-server.add-and-play": {
 		"message": "Tambah dan mainkan"

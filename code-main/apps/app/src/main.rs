@@ -316,6 +316,7 @@ fn main() {
             api::p2p::p2p_info,
             api::p2p::p2p_set_name,
             api::p2p::p2p_set_bio,
+            api::p2p::p2p_sync_modrinth_friends,
             api::p2p::p2p_friends,
             api::p2p::p2p_add_friend,
             api::p2p::p2p_accept_friend,

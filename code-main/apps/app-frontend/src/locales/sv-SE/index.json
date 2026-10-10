@@ -2658,10 +2658,10 @@
 		"message": "Det kan vara annorlunda från deras Minecraft-användarnamn!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Ange catálogo-användarnamn..."
+		"message": "Ange Modrinth-användarnamn..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "Vad är din väns catálogo-användarnamn?"
+		"message": "Vad är din väns Modrinth-användarnamn?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>Lägg till vänner</link> för att se vad de spelar!"
@@ -2706,7 +2706,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Logga in på ett catálogo-konto</link> för att lägga till vänner och se vad de spelar!"
+		"message": "<link>Logga in på ett Modrinth-konto</link> för att lägga till vänner och se vad de spelar!"
 	},
 	"installation-settings.shared-instance.linked-title": {
 		"message": "Länkad delad instans"

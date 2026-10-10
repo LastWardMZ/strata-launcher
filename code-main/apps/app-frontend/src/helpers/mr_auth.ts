@@ -21,6 +21,18 @@ export async function login(
 	return await invoke('plugin:mr-auth|modrinth_login', { flow, addAccount })
 }
 
+/** Conecta la cuenta de Modrinth con un token personal que el usuario ha creado en su cuenta. */
+export async function loginWithToken(token: string): Promise<ModrinthCredentials> {
+	return await invoke('plugin:mr-auth|modrinth_login_with_token', { token })
+}
+
+/** Evento de ventana que avisa a la app de que la cuenta de Modrinth se ha conectado o desconectado. */
+export const MODRINTH_AUTH_CHANGED = 'strata:modrinth-auth-changed'
+
+export function notifyModrinthAuthChanged(): void {
+	window.dispatchEvent(new CustomEvent(MODRINTH_AUTH_CHANGED))
+}
+
 export async function logout(): Promise<void> {
 	return await invoke('plugin:mr-auth|logout')
 }

@@ -3540,7 +3540,7 @@
 		"message": "Уведіть ім’я користувача…"
 	},
 	"friends.add-friend.username.title": {
-		"message": "Яке ім’я користувача catálogo у вашого друга?"
+		"message": "Яке ім’я користувача Modrinth у вашого друга?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>Додайте друзів</link>, щоб бачити, у що вони грають!"
@@ -3585,7 +3585,7 @@
 		"message": "{title} — {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Увійдіть в обліковий запис catálogo</link>, щоб додати друзів і бачити, у що вони грають!"
+		"message": "<link>Увійдіть в обліковий запис Modrinth</link>, щоб додати друзів і бачити, у що вони грають!"
 	},
 	"installation-settings.shared-instance.linked-title": {
 		"message": "Пов'язаний спільний примірник"

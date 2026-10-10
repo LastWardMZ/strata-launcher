@@ -855,10 +855,10 @@
 		"message": "Nó có thể khác với tên người dùng Minecraft của họ!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Nhập tên người dùng catálogo..."
+		"message": "Nhập tên người dùng Modrinth..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "Tên người dùng catálogo của bạn của bạn là gì?"
+		"message": "Tên người dùng Modrinth của bạn của bạn là gì?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "Hãy <link>thêm bạn bè</link> để biết họ đang chơi gì!"
@@ -900,7 +900,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Đăng nhập bằng tài khoản catálogo</link> để kết bạn và xem họ đang chơi gì!"
+		"message": "<link>Đăng nhập bằng tài khoản Modrinth</link> để kết bạn và xem họ đang chơi gì!"
 	},
 	"instance.add-server.add-and-play": {
 		"message": "Thêm và chơi"

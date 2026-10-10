@@ -729,10 +729,10 @@
 		"message": "Pode ser diferente do nome no Minecraft!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Insere o nome do utilizador no catálogo..."
+		"message": "Insere o nome do utilizador no Modrinth..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "Qual é o nome de utilizador do teu amigo no catálogo?"
+		"message": "Qual é o nome de utilizador do teu amigo no Modrinth?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>Adiciona amigos</link> para ver o que estão a jogar!"
@@ -774,7 +774,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Inicia a sessão com uma conta catálogo</link> para adicionar amigos e ver o que estão a jogar!"
+		"message": "<link>Inicia a sessão com uma conta Modrinth</link> para adicionar amigos e ver o que estão a jogar!"
 	},
 	"instance.add-server.add-and-play": {
 		"message": "Adicionar e jogar"

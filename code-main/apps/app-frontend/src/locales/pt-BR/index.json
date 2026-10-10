@@ -3549,7 +3549,7 @@
 		"message": "Insira o nome de usuário..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "Qual o nome de usuário do seu amigo no catálogo?"
+		"message": "Qual o nome de usuário do seu amigo no Modrinth?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>Adicione amigos</link> para ver o que eles estão jogando!"
@@ -3594,7 +3594,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Inicie uma sessão com o catálogo</link> para adicionar amigos e ver o que eles estão jogando!"
+		"message": "<link>Inicie uma sessão com o Modrinth</link> para adicionar amigos e ver o que eles estão jogando!"
 	},
 	"installation-settings.shared-instance.linked-title": {
 		"message": "Instância compartilhada vinculada"

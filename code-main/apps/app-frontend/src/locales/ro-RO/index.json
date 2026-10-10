@@ -531,10 +531,10 @@
 		"message": "Poate fi diferit de numele lor de utilizator Minecraft!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Introduceți numele de utilizator catálogo..."
+		"message": "Introduceți numele de utilizator Modrinth..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "Care este numele de utilizator catálogo al prietenului tău?"
+		"message": "Care este numele de utilizator Modrinth al prietenului tău?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>Adaugă prieteni</link> pentru a vedea ce joacă!"
@@ -576,7 +576,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Conectează-te la un cont catálogo</link> pentru a adăuga prieteni și a vedea ce joacă!"
+		"message": "<link>Conectează-te la un cont Modrinth</link> pentru a adăuga prieteni și a vedea ce joacă!"
 	},
 	"instance.add-server.add-and-play": {
 		"message": "Adaugă și joacă"

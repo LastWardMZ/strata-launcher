@@ -132,6 +132,7 @@ fn main() {
                 InlinedPlugin::new()
                     .commands(&[
                         "modrinth_login",
+                        "modrinth_login_with_token",
                         "logout",
                         "get",
                         "get_all",

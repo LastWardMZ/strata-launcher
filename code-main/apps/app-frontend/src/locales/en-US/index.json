@@ -3555,10 +3555,10 @@
 		"message": "It may be different from their Minecraft username!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Enter catálogo username..."
+		"message": "Enter Modrinth username..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "What's your friend's catálogo username?"
+		"message": "What's your friend's Modrinth username?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>Add friends</link> to see what they're playing!"
@@ -3603,7 +3603,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Sign in to a catálogo account</link> to add friends and see what they're playing!"
+		"message": "<link>Sign in to a Modrinth account</link> to add friends and see what they're playing!"
 	},
 	"installation-settings.shared-instance.linked-title": {
 		"message": "Linked shared instance"

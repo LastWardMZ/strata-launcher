@@ -666,10 +666,10 @@
 		"message": "Možda se razlikuje od njihovog korisničkog imena za Minecraft!"
 	},
 	"friends.add-friend.username.placeholder": {
-		"message": "Unesite korisničko ime za catálogou..."
+		"message": "Unesite korisničko ime za Modrinthu..."
 	},
 	"friends.add-friend.username.title": {
-		"message": "Koje je korisničko ime tvog prijatelja u catálogou?"
+		"message": "Koje je korisničko ime tvog prijatelja u Modrinthu?"
 	},
 	"friends.add-friends-to-share": {
 		"message": "<link>Dodaj prijatelje</link> da vidiš šta igraju!"
@@ -711,7 +711,7 @@
 		"message": "{title} - {count}"
 	},
 	"friends.sign-in-to-add-friends": {
-		"message": "<link>Prijavi se na catálogo račun</link> da bi dodao prijatelje i vidio šta igraju!"
+		"message": "<link>Prijavi se na Modrinth račun</link> da bi dodao prijatelje i vidio šta igraju!"
 	},
 	"instance.add-server.add-and-play": {
 		"message": "Dodaj i igraj"
