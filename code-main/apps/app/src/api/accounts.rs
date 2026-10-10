@@ -1,32 +1,36 @@
-//! Cliente del servicio de cuentas de Strata (usuarios únicos, búsqueda, amigos y privacidad).
+//! Cliente del servicio de cuentas de Strata (nombres únicos, búsqueda, amigos y privacidad).
 //!
-//! Las peticiones se hacen desde Rust, no desde la interfaz web: así no dependen de CORS ni de la CSP
-//! y el servidor se puede cambiar sin recompilar. La sesión se guarda en el equipo; el chat y las
-//! partidas NO pasan por el servidor, solo la lista de amigos y el código de partidas de cada uno.
+//! No hay contraseñas ni sesiones: la cuenta ES la clave pública del launcher (la misma identidad
+//! del P2P) y cada petición va firmada con ella. Las peticiones salen de Rust, no de la interfaz
+//! web, así que no dependen de CORS ni de la CSP y el servidor se puede cambiar sin recompilar. El
+//! chat y las partidas NO pasan por el servidor, solo los nombres, las amistades y los ajustes.
 
 use crate::api::p2p::{self, P2pState};
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
-use std::{fs, path::PathBuf, time::Duration};
+use sha2::{Digest, Sha256};
+use std::{
+    fs,
+    path::PathBuf,
+    time::{Duration, SystemTime, UNIX_EPOCH},
+};
 use tauri::Manager;
 use tokio::sync::Mutex;
 
 /// Servidor por defecto. Se puede fijar al compilar con la variable `STRATA_ACCOUNTS_URL`.
 pub const DEFAULT_SERVER: &str = match option_env!("STRATA_ACCOUNTS_URL") {
     Some(url) => url,
-    None => "http://127.0.0.1:32145",
+    None => "http://127.0.0.1:8787",
 };
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(15);
-const SYNC_EVERY: Duration = Duration::from_secs(60);
+/// El plan gratuito de Cloudflare admite 100.000 peticiones al día: se sincroniza poco.
+const SYNC_EVERY: Duration = Duration::from_secs(180);
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 struct Stored {
     #[serde(default)]
     server_url: String,
-    /// Token de sesión (en este equipo, como las credenciales de cualquier launcher).
-    #[serde(default)]
-    token: String,
 }
 
 pub struct AccountsState {
@@ -46,6 +50,23 @@ impl Default for AccountsState {
     }
 }
 
+/// Error de una petición: el mensaje (en español, apto para mostrar) y el código que manda el servidor.
+struct Failure {
+    message: String,
+    code: Option<String>,
+}
+
+impl Failure {
+    fn plain(message: impl Into<String>) -> Self {
+        Self { message: message.into(), code: None }
+    }
+}
+impl From<String> for Failure {
+    fn from(message: String) -> Self {
+        Self::plain(message)
+    }
+}
+
 /// Valida la dirección del servidor: HTTPS, o HTTP solo hacia este mismo equipo.
 fn normalize_server_url(input: &str) -> Result<String, String> {
     let url = url::Url::parse(input.trim()).map_err(|_| "La dirección del servidor no es válida".to_string())?;
@@ -57,6 +78,15 @@ fn normalize_server_url(input: &str) -> Result<String, String> {
         return Err("La dirección del servidor no es válida".into());
     }
     Ok(url.as_str().trim_end_matches('/').to_string())
+}
+
+/// Mensaje que se firma en cada petición; debe coincidir con `requestMessage` del servicio.
+fn request_message(method: &str, path_and_query: &str, ts: u64, body: &str) -> String {
+    format!("strata-req\n{method}\n{path_and_query}\n{ts}\n{}", hex(&Sha256::digest(body.as_bytes())))
+}
+
+fn hex(bytes: &[u8]) -> String {
+    bytes.iter().map(|b| format!("{b:02x}")).collect()
 }
 
 fn store_path<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> Result<PathBuf, String> {
@@ -91,88 +121,72 @@ impl AccountsState {
         Ok(())
     }
 
-    async fn set_token<R: tauri::Runtime>(&self, app: &tauri::AppHandle<R>, token: &str) -> Result<(), String> {
-        let mut stored = self.load(app).await;
-        stored.token = token.to_string();
-        self.save(app, stored).await
-    }
-
     async fn request<R: tauri::Runtime>(
         &self,
         app: &tauri::AppHandle<R>,
+        p2p_state: &P2pState,
         method: Method,
-        path: &str,
+        path_and_query: &str,
         body: Option<Value>,
-        authenticated: bool,
-    ) -> Result<Value, String> {
+    ) -> Result<Value, Failure> {
         let stored = self.load(app).await;
-        if authenticated && stored.token.is_empty() {
-            return Err("Inicia sesión con tu cuenta de Strata.".into());
-        }
+        let core = p2p::core(app, p2p_state).await?;
+        let text = body.map(|b| b.to_string()).unwrap_or_default();
+        let ts = SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_millis() as u64).unwrap_or(0);
+        let signature = core.sign_message(request_message(method.as_str(), path_and_query, ts, &text).as_bytes());
         let mut request = self
             .client
-            .request(method, format!("{}{path}", stored.server_url))
+            .request(method, format!("{}{path_and_query}", stored.server_url))
+            .header("Authorization", format!("Strata {}.{ts}.{signature}", core.info().id))
             .timeout(REQUEST_TIMEOUT);
-        if authenticated {
-            request = request.bearer_auth(&stored.token);
+        if !text.is_empty() {
+            request = request.header("Content-Type", "application/json").body(text);
         }
-        if let Some(body) = body {
-            request = request.json(&body);
-        }
-        let response = request
-            .send()
-            .await
-            .map_err(|_| format!("No se pudo conectar con el servidor de cuentas de Strata ({})", stored.server_url))?;
+        let response = request.send().await.map_err(|_| {
+            Failure::plain(format!("No se pudo conectar con el servidor de cuentas de Strata ({})", stored.server_url))
+        })?;
         let status = response.status();
         let value: Value = response.json().await.unwrap_or(Value::Null);
         if status.is_success() {
             return Ok(value);
         }
-        if status.as_u16() == 401 && authenticated {
-            // La sesión caducó o se cerró en otro sitio.
-            let _ = self.set_token(app, "").await;
-        }
-        Err(value["error"].as_str().unwrap_or("No se pudo completar la acción.").to_string())
+        Err(Failure {
+            message: value["error"].as_str().unwrap_or("No se pudo completar la acción.").to_string(),
+            code: value["code"].as_str().map(str::to_owned),
+        })
     }
 }
 
-/// Lleva a este launcher los datos de la cuenta: nombre P2P, enlace del código (firmado),
-/// ajustes de privacidad y amigos. Es idempotente y se repite cada minuto.
+/// Lleva a este launcher los datos de la cuenta (nombre P2P, privacidad y amigos) y devuelve el
+/// perfil y las listas sociales. Es idempotente y se repite cada pocos minutos.
 async fn sync_account<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
     accounts: &AccountsState,
     p2p_state: &P2pState,
-) -> Result<(), String> {
-    let me = accounts.request(app, Method::GET, "/me", None, true).await?;
+) -> Result<Value, Failure> {
+    let data = accounts.request(app, p2p_state, Method::GET, "/sync", None).await?;
     let core = p2p::core(app, p2p_state).await?;
-    let (id, username) = (me["id"].as_str().unwrap_or_default(), me["username"].as_str().unwrap_or_default());
+    let username = data["profile"]["username"].as_str().unwrap_or_default();
     if !username.is_empty() && core.info().name != username {
         core.set_name(username)?;
     }
-    let (code, ts, sig) = core.sign_link(id);
-    if me["p2p_code"].as_str() != Some(code.as_str()) {
-        accounts
-            .request(app, Method::POST, "/me/p2p", Some(json!({"code": code, "ts": ts, "sig": sig})), true)
-            .await?;
-    }
-    core.set_privacy(
-        me["settings"]["friend_privacy"].as_str() == Some("none"),
-        me["settings"]["invite_privacy"].as_str() == Some("none"),
-    );
-    let social = accounts.request(app, Method::GET, "/social", None, true).await?;
-    let peers: Vec<(String, String)> = social["friends"]
+    let settings = &data["profile"]["settings"];
+    core.set_privacy(settings["friend_privacy"].as_str() == Some("none"), settings["invite_privacy"].as_str() == Some("none"));
+    // Cada amigo trae su clave pública, que es su código de partidas.
+    let peers: Vec<(String, String)> = data["social"]["friends"]
         .as_array()
         .map(|friends| {
             friends
                 .iter()
-                .filter_map(|f| Some((f["p2p_code"].as_str()?.to_string(), f["username"].as_str()?.to_string())))
+                .filter_map(|f| Some((f["id"].as_str()?.to_string(), f["username"].as_str()?.to_string())))
                 .collect()
         })
         .unwrap_or_default();
-    core.sync_account_friends(peers).await
+    core.sync_account_friends(peers).await?;
+    Ok(data)
 }
 
-/// Cierra la parte P2P de la sesión: retira los amigos que venían de la cuenta.
+/// Retira de este launcher lo que venía de la cuenta (amigos de la cuenta y ajustes de privacidad).
 async fn clear_account_links<R: tauri::Runtime>(app: &tauri::AppHandle<R>, p2p_state: &P2pState) {
     if let Ok(core) = p2p::core(app, p2p_state).await {
         let _ = core.sync_account_friends(Vec::new()).await;
@@ -180,18 +194,17 @@ async fn clear_account_links<R: tauri::Runtime>(app: &tauri::AppHandle<R>, p2p_s
     }
 }
 
-/// Sincroniza cada minuto mientras haya sesión iniciada.
+/// Sincroniza cada pocos minutos mientras este launcher tenga cuenta.
 pub fn start_in_background<R: tauri::Runtime>(app: tauri::AppHandle<R>) {
     tauri::async_runtime::spawn(async move {
         loop {
             tokio::time::sleep(SYNC_EVERY).await;
             let accounts = app.state::<AccountsState>();
-            if accounts.load(&app).await.token.is_empty() {
-                continue;
-            }
             let p2p_state = app.state::<P2pState>();
-            if let Err(error) = sync_account(&app, &accounts, &p2p_state).await {
-                tracing::debug!("Sincronización de la cuenta: {error}");
+            if let Err(error) = sync_account(&app, &accounts, &p2p_state).await
+                && error.code.as_deref() != Some("no-account")
+            {
+                tracing::debug!("Sincronización de la cuenta: {}", error.message);
             }
         }
     });
@@ -200,84 +213,65 @@ pub fn start_in_background<R: tauri::Runtime>(app: tauri::AppHandle<R>) {
 #[derive(Serialize)]
 pub struct AccountStatus {
     server_url: String,
-    logged_in: bool,
-    /// Perfil de la cuenta, o `None` si no hay sesión o no se pudo contactar con el servidor.
+    /// Este launcher tiene una cuenta registrada en el servidor.
+    registered: bool,
     profile: Option<Value>,
-    /// `true` si hay sesión guardada pero el servidor no respondió.
+    social: Option<Value>,
+    /// No se pudo hablar con el servidor, así que no se sabe si hay cuenta.
     offline: bool,
+    /// Mensaje del servidor si el fallo no es de red (p. ej. la hora del equipo está desajustada).
+    problem: Option<String>,
     default_server: bool,
 }
 
 #[tauri::command]
-pub async fn accounts_status<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>) -> Result<AccountStatus, String> {
-    let stored = state.load(&app).await;
-    if stored.token.is_empty() {
-        return Ok(AccountStatus { default_server: stored.server_url == DEFAULT_SERVER, server_url: stored.server_url, logged_in: false, profile: None, offline: false });
-    }
-    let result = state.request(&app, Method::GET, "/me", None, true).await;
-    let now = state.load(&app).await;
-    Ok(match result {
-        Ok(profile) => AccountStatus { default_server: now.server_url == DEFAULT_SERVER, server_url: now.server_url, logged_in: true, profile: Some(profile), offline: false },
-        // Con un 401 `request` ya borró la sesión; si no, es un fallo de red.
-        Err(_) => AccountStatus { default_server: now.server_url == DEFAULT_SERVER, server_url: now.server_url, logged_in: !now.token.is_empty(), profile: None, offline: !now.token.is_empty() },
+pub async fn accounts_status<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, p2p_state: tauri::State<'_, P2pState>) -> Result<AccountStatus, String> {
+    let server_url = state.load(&app).await.server_url;
+    let default_server = server_url == DEFAULT_SERVER;
+    let base = |registered, offline, problem| AccountStatus { server_url: server_url.clone(), registered, profile: None, social: None, offline, problem, default_server };
+    Ok(match sync_account(&app, &state, &p2p_state).await {
+        Ok(data) => AccountStatus { profile: Some(data["profile"].clone()), social: Some(data["social"].clone()), ..base(true, false, None) },
+        Err(error) if error.code.as_deref() == Some("no-account") => {
+            clear_account_links(&app, &p2p_state).await;
+            base(false, false, None)
+        }
+        Err(error) if error.code.is_some() => base(false, false, Some(error.message)),
+        Err(_) => base(false, true, None),
     })
 }
 
-async fn authenticate<R: tauri::Runtime>(
-    app: &tauri::AppHandle<R>,
-    state: &AccountsState,
-    p2p_state: &P2pState,
-    path: &str,
-    username: String,
-    password: String,
-) -> Result<Value, String> {
-    let result = state
-        .request(app, Method::POST, path, Some(json!({"username": username, "password": password})), false)
-        .await?;
-    let token = result["token"].as_str().ok_or("Respuesta del servidor no válida")?;
-    state.set_token(app, token).await?;
-    if let Err(error) = sync_account(app, state, p2p_state).await {
-        tracing::warn!("No se pudo sincronizar tras iniciar sesión: {error}");
-    }
-    Ok(result["user"].clone())
-}
-
+/// Crea la cuenta de este launcher con el nombre de usuario elegido.
 #[tauri::command]
-pub async fn accounts_register<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, p2p_state: tauri::State<'_, P2pState>, username: String, password: String) -> Result<Value, String> {
-    authenticate(&app, &state, &p2p_state, "/register", username, password).await
-}
-
-#[tauri::command]
-pub async fn accounts_login<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, p2p_state: tauri::State<'_, P2pState>, username: String, password: String) -> Result<Value, String> {
-    authenticate(&app, &state, &p2p_state, "/login", username, password).await
-}
-
-#[tauri::command]
-pub async fn accounts_logout<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, p2p_state: tauri::State<'_, P2pState>) -> Result<(), String> {
-    // Si el servidor no responde, la sesión se cierra igualmente en este equipo.
-    let _ = state.request(&app, Method::POST, "/logout", Some(json!({})), true).await;
-    state.set_token(&app, "").await?;
-    clear_account_links(&app, &p2p_state).await;
-    Ok(())
+pub async fn accounts_register<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, p2p_state: tauri::State<'_, P2pState>, username: String) -> Result<Value, String> {
+    let profile = state.request(&app, &p2p_state, Method::POST, "/register", Some(json!({"username": username}))).await.map_err(|e| e.message)?;
+    let _ = sync_account(&app, &state, &p2p_state).await;
+    Ok(profile)
 }
 
 /// Actualiza la biografía y/o los ajustes de privacidad (`{"bio": …, "settings": {…}}`).
 #[tauri::command]
 pub async fn accounts_update<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, p2p_state: tauri::State<'_, P2pState>, changes: Value) -> Result<Value, String> {
-    let profile = state.request(&app, Method::PATCH, "/me", Some(changes), true).await?;
+    let profile = state.request(&app, &p2p_state, Method::PATCH, "/me", Some(changes)).await.map_err(|e| e.message)?;
     let _ = sync_account(&app, &state, &p2p_state).await;
     Ok(profile)
 }
 
 #[tauri::command]
-pub async fn accounts_search<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, query: String) -> Result<Value, String> {
-    let path = format!("/users/search?q={}", urlencoding::encode(query.trim()));
-    state.request(&app, Method::GET, &path, None, true).await
+pub async fn accounts_rename<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, p2p_state: tauri::State<'_, P2pState>, username: String) -> Result<Value, String> {
+    let profile = state.request(&app, &p2p_state, Method::POST, "/me/rename", Some(json!({"username": username}))).await.map_err(|e| e.message)?;
+    let _ = sync_account(&app, &state, &p2p_state).await;
+    Ok(profile)
 }
 
 #[tauri::command]
-pub async fn accounts_social<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>) -> Result<Value, String> {
-    state.request(&app, Method::GET, "/social", None, true).await
+pub async fn accounts_search<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, p2p_state: tauri::State<'_, P2pState>, query: String) -> Result<Value, String> {
+    // El servicio solo busca por letras, números y guiones bajos; se filtra aquí para que la ruta
+    // firmada sea idéntica a la que llega al servidor.
+    let query: String = query.chars().filter(|c| c.is_ascii_alphanumeric() || *c == '_').take(24).collect();
+    if query.len() < 2 {
+        return Ok(json!({"users": []}));
+    }
+    state.request(&app, &p2p_state, Method::GET, &format!("/users/search?q={query}"), None).await.map_err(|e| e.message)
 }
 
 /// Solicitudes, aceptaciones, bajas y bloqueos: `action` es `request`, `accept`, `remove`, `block` o `unblock`.
@@ -291,58 +285,52 @@ pub async fn accounts_friend_action<R: tauri::Runtime>(app: tauri::AppHandle<R>,
         "unblock" => "/unblock",
         _ => return Err("Acción no válida".into()),
     };
-    state.request(&app, Method::POST, path, Some(json!({"username": username})), true).await?;
+    state.request(&app, &p2p_state, Method::POST, path, Some(json!({"username": username}))).await.map_err(|e| e.message)?;
     let _ = sync_account(&app, &state, &p2p_state).await;
     Ok(())
 }
 
+/// Elimina la cuenta del servidor (nombre, amistades y bloqueos). La clave del launcher no cambia.
 #[tauri::command]
-pub async fn accounts_sync<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, p2p_state: tauri::State<'_, P2pState>) -> Result<(), String> {
-    if state.load(&app).await.token.is_empty() {
-        return Ok(());
-    }
-    sync_account(&app, &state, &p2p_state).await
-}
-
-#[tauri::command]
-pub async fn accounts_change_password<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, password: String, new_password: String) -> Result<(), String> {
-    state
-        .request(&app, Method::POST, "/me/password", Some(json!({"password": password, "newPassword": new_password})), true)
-        .await
-        .map(|_| ())
-}
-
-#[tauri::command]
-pub async fn accounts_delete<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, p2p_state: tauri::State<'_, P2pState>, password: String) -> Result<(), String> {
-    state.request(&app, Method::POST, "/me/delete", Some(json!({"password": password})), true).await?;
-    state.set_token(&app, "").await?;
+pub async fn accounts_delete<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, p2p_state: tauri::State<'_, P2pState>) -> Result<(), String> {
+    state.request(&app, &p2p_state, Method::POST, "/me/delete", Some(json!({}))).await.map_err(|e| e.message)?;
     clear_account_links(&app, &p2p_state).await;
     Ok(())
 }
 
-/// Cambia el servidor de cuentas. Cierra la sesión, porque pertenece al servidor anterior.
+/// Cambia el servidor de cuentas. La cuenta pertenece al servidor anterior, así que se retiran sus amigos.
 #[tauri::command]
 pub async fn accounts_set_server<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, p2p_state: tauri::State<'_, P2pState>, url: String) -> Result<(), String> {
     let normalized = if url.trim().is_empty() { DEFAULT_SERVER.to_string() } else { normalize_server_url(&url)? };
-    state.save(&app, Stored { server_url: normalized, token: String::new() }).await?;
+    state.save(&app, Stored { server_url: normalized }).await?;
     clear_account_links(&app, &p2p_state).await;
     Ok(())
 }
 
 #[cfg(test)]
 mod tests {
-    use super::normalize_server_url;
+    use super::{normalize_server_url, request_message};
 
     #[test]
     fn server_url_must_be_https_or_local() {
         assert_eq!(normalize_server_url("https://cuentas.example.com/").unwrap(), "https://cuentas.example.com");
         assert_eq!(normalize_server_url(" https://cuentas.example.com:8443 ").unwrap(), "https://cuentas.example.com:8443");
-        assert_eq!(normalize_server_url("http://127.0.0.1:32145").unwrap(), "http://127.0.0.1:32145");
+        assert_eq!(normalize_server_url("http://127.0.0.1:8787").unwrap(), "http://127.0.0.1:8787");
         assert_eq!(normalize_server_url("http://localhost:3000").unwrap(), "http://localhost:3000");
         assert!(normalize_server_url("http://cuentas.example.com").is_err(), "http solo en local");
         assert!(normalize_server_url("ftp://cuentas.example.com").is_err());
         assert!(normalize_server_url("https://usuario:clave@cuentas.example.com").is_err());
         assert!(normalize_server_url("https://cuentas.example.com/?x=1").is_err());
         assert!(normalize_server_url("no es una url").is_err());
+    }
+
+    #[test]
+    fn signed_message_matches_the_service_format() {
+        // El hash de un cuerpo vacío es el SHA-256 de "" (el mismo que calcula el servicio para los GET).
+        assert_eq!(
+            request_message("GET", "/sync", 1700000000000, ""),
+            "strata-req\nGET\n/sync\n1700000000000\ne3b0c44298fc1c149afbf4c8996fb924\
+27ae41e4649b934ca495991b7852b855"
+        );
     }
 }

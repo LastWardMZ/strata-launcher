@@ -9,10 +9,14 @@ Launcher de Minecraft Java con servidores personales, amigos y partidas P2P, bas
 
 - **Servidores personales**: crea y gestiona servidores locales (vanilla, Paper, Folia, Velocity, Purpur,
   Fabric, Forge, NeoForge, BungeeCord), con consola en vivo, copias de seguridad y modpacks `.mrpack`.
-- **Amigos y partidas P2P** sin servidor propio: tu identidad es una clave pública, los amigos se añaden
-  intercambiando códigos, y el chat, las invitaciones y los túneles TCP viajan por conexión directa entre
-  launchers ([iroh](https://github.com/n0-computer/iroh); si no hay conexión directa, por relays públicos
-  cifrados). Puedes invitar a un mundo abierto a LAN o a un servidor personal.
+- **Cuenta propia de Strata**, sin contraseña: tu cuenta es la clave de tu launcher. Nombres de usuario únicos,
+  buscador de amigos, solicitudes con privacidad (todos / amigos de amigos / nadie) y bloqueos. El servicio
+  (`code-main/apps/strata-accounts`) corre en Cloudflare Workers + D1, gratis y sin servidor propio; guarda solo
+  nombres y amistades.
+- **Chat y partidas P2P** directos entre launchers (el chat y las partidas no pasan por el servidor):
+  invitaciones, túneles TCP y mundos LAN o servidores personales compartidos con amigos
+  ([iroh](https://github.com/n0-computer/iroh); si no hay conexión directa, por relays públicos cifrados). Sin
+  cuenta también se puede añadir amigos pegando su código.
 - **Color de acento** a elección del usuario en *Ajustes → Apariencia*.
 - **Sin telemetría** de terceros: sin anuncios, analítica ni informes de errores a servicios externos.
 - **Actualizaciones automáticas** firmadas desde las Releases de este repositorio.

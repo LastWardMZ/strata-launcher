@@ -30,9 +30,9 @@ const searchable = computed(() => (profile.value?.settings.searchable ? 'yes' : 
 		v-if="!loggedIn"
 		class="flex flex-col gap-2 rounded-2xl bg-surface-3 p-4 ring-1 ring-inset ring-surface-5"
 	>
-		<h3 class="m-0 text-lg font-bold text-contrast">Inicia sesión para gestionar tu privacidad</h3>
+		<h3 class="m-0 text-lg font-bold text-contrast">Crea tu cuenta para gestionar tu privacidad</h3>
 		<p class="m-0 text-secondary">
-			Las opciones sociales pertenecen a tu cuenta de Strata. Entra o crea tu cuenta en la pestaña
+			Las opciones sociales pertenecen a tu cuenta de Strata. Créala en la pestaña
 			<strong class="text-contrast">Perfil</strong>.
 		</p>
 	</div>

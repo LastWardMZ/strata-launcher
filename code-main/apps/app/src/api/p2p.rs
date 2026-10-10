@@ -685,14 +685,15 @@ impl Core {
         self.invites_none.store(invites_none, Ordering::Relaxed);
     }
 
-    /// Firma con la clave de este launcher el enlace con una cuenta, para que el servidor pueda
-    /// comprobar que quien lo pide posee el código. Devuelve `(código, ts, firma)`.
-    pub fn sign_link(&self, account_id: &str) -> (String, u64, String) {
-        let code = self.endpoint.id().to_string();
-        let ts = SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_millis() as u64).unwrap_or(0);
-        let message = format!("strata-link:{account_id}:{code}:{ts}");
-        let signature = self.endpoint.secret_key().sign(message.as_bytes());
-        (code, ts, to_hex(&signature.to_bytes()))
+    /// Firma un mensaje con la clave de este launcher (identidad de la cuenta de Strata).
+    /// Devuelve la firma Ed25519 en hexadecimal.
+    pub fn sign_message(&self, message: &[u8]) -> String {
+        to_hex(&self.endpoint.secret_key().sign(message).to_bytes())
+    }
+
+    /// Archivo donde se guarda la clave de este launcher.
+    pub fn identity_path(&self) -> PathBuf {
+        self.dir.join("identity.key")
     }
 
     pub fn set_bio(&self, bio: &str) -> Result<(), String> {
@@ -1096,6 +1097,35 @@ pub fn start_in_background<R: tauri::Runtime>(app: tauri::AppHandle<R>) {
     });
 }
 
+/// Guarda una copia de la clave del launcher (que es la identidad de tu cuenta) en el archivo indicado.
+#[tauri::command]
+pub async fn p2p_export_identity<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>, path: String) -> Result<(), String> {
+    let core = core(&app, &state).await?;
+    let destination = PathBuf::from(path);
+    if destination.exists() {
+        return Err("Ya existe un archivo con ese nombre".into());
+    }
+    fs::copy(core.identity_path(), destination).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+/// Sustituye la clave del launcher por la de una copia de seguridad. Surte efecto al reiniciar.
+#[tauri::command]
+pub async fn p2p_import_identity<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>, path: String) -> Result<(), String> {
+    let core = core(&app, &state).await?;
+    let source = PathBuf::from(path);
+    if !source.is_file() || source.metadata().map_err(|e| e.to_string())?.len() > 1024 {
+        return Err("Ese archivo no es una copia de seguridad válida".into());
+    }
+    let text = fs::read_to_string(&source).map_err(|e| e.to_string())?;
+    let key = from_hex(text.trim()).ok_or("Ese archivo no es una copia de seguridad válida")?;
+    let target = core.identity_path();
+    let backup = target.with_extension(format!("key.bak-{}", now()));
+    fs::copy(&target, backup).map_err(|e| e.to_string())?;
+    fs::write(&target, to_hex(&SecretKey::from_bytes(&key).to_bytes())).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
 #[tauri::command]
 pub async fn p2p_info<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>) -> Result<P2pInfo, String> {
     Ok(core(&app, &state).await?.info())
@@ -1450,16 +1480,18 @@ mod tests {
     }
 
     #[tokio::test(flavor = "multi_thread")]
-    async fn link_signature_proves_possession_of_the_p2p_key() {
+    async fn signatures_prove_possession_of_the_account_key() {
         let core = Core::start(temp("sign"), silent(), false).await.unwrap();
-        let (code, ts, sig) = core.sign_link("cuenta-123");
-        assert_eq!(code, core.info().id);
-        let bytes: [u8; 64] = from_hex_n::<64>(&sig).expect("firma hex de 64 bytes");
+        let message = b"strata-req
+GET
+/sync
+1700000000000
+e3b0c44298fc1c149afbf4c8996fb924";
+        let bytes: [u8; 64] = from_hex_n::<64>(&core.sign_message(message)).expect("firma hex de 64 bytes");
         let signature = iroh::Signature::from_bytes(&bytes);
-        let message = format!("strata-link:cuenta-123:{code}:{ts}");
-        assert!(core.endpoint.id().verify(message.as_bytes(), &signature).is_ok());
-        let other = format!("strata-link:otra-cuenta:{code}:{ts}");
-        assert!(core.endpoint.id().verify(other.as_bytes(), &signature).is_err(), "no vale para otra cuenta");
+        assert!(core.endpoint.id().verify(message, &signature).is_ok());
+        assert!(core.endpoint.id().verify(b"otro mensaje", &signature).is_err(), "no vale para otro mensaje");
+        assert_eq!(core.identity_path().file_name().unwrap(), "identity.key");
         core.shutdown().await;
     }
 

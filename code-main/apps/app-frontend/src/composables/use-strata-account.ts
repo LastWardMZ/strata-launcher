@@ -2,8 +2,9 @@ import { invoke } from '@tauri-apps/api/core'
 import { computed, ref } from 'vue'
 
 /**
- * Cuenta de Strata: usuarios únicos, búsqueda, amigos y privacidad. Las peticiones al servicio de
- * cuentas las hace Rust (`accounts_*`); aquí solo vive el estado compartido de la interfaz.
+ * Cuenta de Strata: nombre de usuario único, búsqueda, amigos y privacidad. No hay contraseña: la
+ * cuenta es la clave de este launcher. Las peticiones al servicio las hace Rust (`accounts_*`);
+ * aquí solo vive el estado compartido de la interfaz.
  */
 export type FriendPrivacy = 'everyone' | 'mutual' | 'none'
 export type InvitePrivacy = 'friends' | 'none'
@@ -12,14 +13,14 @@ export type AccountSettings = {
 	invite_privacy: InvitePrivacy
 	searchable: boolean
 }
+/** `id` es la clave pública de la cuenta, que también es su código de partidas. */
 export type Profile = {
 	id: string
 	username: string
 	bio: string
-	p2p_code: string | null
 	settings: AccountSettings
 }
-export type Member = { id: string; username: string; bio?: string; p2p_code?: string | null }
+export type Member = { id: string; username: string; bio?: string }
 export type Social = {
 	friends: Member[]
 	incoming: Member[]
@@ -31,19 +32,25 @@ export type SearchHit = { id: string; username: string; relation: Relation }
 export type FriendAction = 'request' | 'accept' | 'remove' | 'block' | 'unblock'
 type Status = {
 	server_url: string
-	logged_in: boolean
+	/** Este launcher tiene una cuenta registrada. */
+	registered: boolean
 	profile: Profile | null
+	social: Social | null
+	/** No se pudo hablar con el servidor. */
 	offline: boolean
+	/** Mensaje del servidor si el fallo no es de red (p. ej. la hora del equipo no coincide). */
+	problem: string | null
 	default_server: boolean
 }
 
 const emptySocial = (): Social => ({ friends: [], incoming: [], outgoing: [], blocked: [] })
 const status = ref<Status | null>(null)
-const social = ref<Social>(emptySocial())
 const error = ref('')
 const busy = ref(false)
 let started = false
 let timer: ReturnType<typeof setInterval> | undefined
+// El plan gratuito de Cloudflare admite 100.000 peticiones al día: se consulta poco.
+const REFRESH_MS = 120_000
 
 const messageOf = (cause: unknown) =>
 	typeof cause === 'string'
@@ -52,30 +59,21 @@ const messageOf = (cause: unknown) =>
 			? cause.message
 			: 'No se pudo completar la acción.'
 
-async function refreshStatus() {
-	status.value = await invoke<Status>('accounts_status')
-	if (!status.value.logged_in) social.value = emptySocial()
-}
-async function refreshSocial() {
-	if (!status.value?.logged_in) return
-	try {
-		social.value = await invoke<Social>('accounts_social')
-	} catch {
-		// Sin conexión con el servidor: se conserva la última lista.
-	}
+/** Pide al servidor el estado (perfil y listas); además sincroniza el P2P. */
+async function refresh() {
+	const next = await invoke<Status>('accounts_status')
+	// Con el servidor caído se conserva lo último que se sabía, en vez de vaciar las listas.
+	status.value =
+		next.offline && status.value?.registered
+			? { ...status.value, offline: true, problem: null }
+			: next
 }
 
 export function useStrataAccount() {
 	if (!started) {
 		started = true
-		void refreshStatus()
-			.then(refreshSocial)
-			.catch((cause) => (error.value = messageOf(cause)))
-		timer = setInterval(() => {
-			void refreshStatus()
-				.then(refreshSocial)
-				.catch(() => {})
-		}, 30_000)
+		void refresh().catch((cause) => (error.value = messageOf(cause)))
+		timer = setInterval(() => void refresh().catch(() => {}), REFRESH_MS)
 	}
 
 	/** Ejecuta una acción mostrando el error en `error`; devuelve `true` si salió bien. */
@@ -93,34 +91,28 @@ export function useStrataAccount() {
 			busy.value = false
 		}
 	}
-	const reload = async () => {
-		await refreshStatus()
-		await refreshSocial()
-	}
+	const reload = () => refresh()
 
 	return {
 		status,
-		social,
 		error,
 		busy,
 		profile: computed(() => status.value?.profile ?? null),
-		loggedIn: computed(() => !!status.value?.logged_in),
-		pendingRequests: computed(() => social.value.incoming.length),
+		social: computed(() => status.value?.social ?? emptySocial()),
+		/** Este launcher tiene cuenta (se mantiene el nombre antiguo `loggedIn` en los componentes). */
+		registered: computed(() => !!status.value?.registered),
+		loggedIn: computed(() => !!status.value?.registered),
+		pendingRequests: computed(() => status.value?.social?.incoming.length ?? 0),
 		clearError: () => (error.value = ''),
 		reload,
-		login: (username: string, password: string) =>
+		register: (username: string) =>
 			run(async () => {
-				await invoke('accounts_login', { username, password })
+				await invoke('accounts_register', { username })
 				await reload()
 			}),
-		register: (username: string, password: string) =>
+		rename: (username: string) =>
 			run(async () => {
-				await invoke('accounts_register', { username, password })
-				await reload()
-			}),
-		logout: () =>
-			run(async () => {
-				await invoke('accounts_logout')
+				await invoke('accounts_rename', { username })
 				await reload()
 			}),
 		update: (changes: { bio?: string; settings?: Partial<AccountSettings> }) =>
@@ -133,11 +125,9 @@ export function useStrataAccount() {
 				await invoke('accounts_friend_action', { action, username })
 				await reload()
 			}),
-		changePassword: (password: string, newPassword: string) =>
-			run(() => invoke('accounts_change_password', { password, newPassword })),
-		deleteAccount: (password: string) =>
+		deleteAccount: () =>
 			run(async () => {
-				await invoke('accounts_delete', { password })
+				await invoke('accounts_delete')
 				await reload()
 			}),
 		setServer: (url: string) =>
@@ -145,6 +135,8 @@ export function useStrataAccount() {
 				await invoke('accounts_set_server', { url })
 				await reload()
 			}),
+		exportIdentity: (path: string) => run(() => invoke('p2p_export_identity', { path })),
+		importIdentity: (path: string) => run(() => invoke('p2p_import_identity', { path })),
 		/** Búsqueda por nombre; los errores (p. ej. demasiadas búsquedas) se devuelven al llamador. */
 		search: (query: string) => invoke<{ users: SearchHit[] }>('accounts_search', { query }),
 		stop: () => {

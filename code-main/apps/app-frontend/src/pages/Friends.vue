@@ -357,10 +357,10 @@ onUnmounted(() => {
 					<span class="min-w-0 flex-1 truncate font-semibold text-contrast">{{
 						account.profile.value.username
 					}}</span>
-					<span class="text-sm text-secondary">Conectada</span>
+					<span class="text-sm text-secondary">Cuenta creada</span>
 				</div>
 				<p v-else class="m-0 text-sm text-secondary">
-					Sin iniciar sesión. Entra en Ajustes → Perfil para que tus amigos te encuentren por
+					Aún no tienes cuenta. Créala en Ajustes → Perfil para que tus amigos te encuentren por
 					nombre; mientras tanto puedes usar códigos.
 				</p>
 			</div>

@@ -155,7 +155,7 @@ const exactInResults = () =>
 		>
 		<template v-else>
 			<span class="font-semibold text-brand cursor-pointer" @click="emit('signIn')"
-				>Inicia sesión en tu cuenta de Strata</span
+				>Crea tu cuenta de Strata</span
 			>
 			para añadir amigos y jugar con ellos.
 		</template>

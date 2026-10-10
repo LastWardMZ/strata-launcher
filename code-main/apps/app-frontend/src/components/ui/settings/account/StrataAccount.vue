@@ -1,24 +1,29 @@
 <script setup lang="ts">
-import { CheckIcon, CopyIcon, LogInIcon, LogOutIcon, TrashIcon, UserIcon } from '@modrinth/assets'
+import {
+	CheckIcon,
+	CopyIcon,
+	DownloadIcon,
+	TrashIcon,
+	UploadIcon,
+	UserIcon,
+} from '@modrinth/assets'
 import { Admonition, Button, Input, Textarea } from '@modrinth/ui'
-import { ask } from '@tauri-apps/plugin-dialog'
+import { confirm, open, save } from '@tauri-apps/plugin-dialog'
 import { computed, ref, watch } from 'vue'
 
 import { useStrataAccount } from '@/composables/use-strata-account'
+import { restartApp } from '@/helpers/utils'
 
 const account = useStrataAccount()
-const { status, profile, loggedIn, busy, error } = account
+const { status, profile, registered, busy, error } = account
 
-const mode = ref<'login' | 'register'>('login')
 const username = ref('')
-const password = ref('')
+const newName = ref('')
 const bio = ref(profile.value?.bio ?? '')
 const copied = ref(false)
 const showSecurity = ref(false)
 const showServer = ref(false)
-const currentPassword = ref('')
-const newPassword = ref('')
-const deletePassword = ref('')
+const showRename = ref(false)
 const serverUrl = ref('')
 const notice = ref('')
 
@@ -45,40 +50,63 @@ defineExpose({
 	save: () => account.update({ bio: bio.value }),
 })
 
-async function submit() {
-	if (!username.value.trim() || !password.value) return
-	const action = mode.value === 'login' ? account.login : account.register
-	if (await action(username.value.trim(), password.value)) password.value = ''
+async function createAccount() {
+	if (!username.value.trim()) return
+	if (await account.register(username.value.trim())) username.value = ''
+}
+async function rename() {
+	if (newName.value.trim() && (await account.rename(newName.value.trim()))) {
+		newName.value = ''
+		showRename.value = false
+		notice.value = 'Nombre cambiado.'
+	}
 }
 async function copyCode() {
-	if (!profile.value?.p2p_code) return
+	if (!profile.value) return
 	try {
-		await navigator.clipboard.writeText(profile.value.p2p_code)
+		await navigator.clipboard.writeText(profile.value.id)
 		copied.value = true
 		setTimeout(() => (copied.value = false), 2000)
 	} catch {
 		copied.value = false
 	}
 }
-async function changePassword() {
-	if (await account.changePassword(currentPassword.value, newPassword.value)) {
-		currentPassword.value = ''
-		newPassword.value = ''
-		notice.value = 'Contraseña cambiada. Se han cerrado tus otras sesiones.'
-	}
-}
 async function deleteAccount() {
-	if (!deletePassword.value) return
-	const confirmed = await ask(
-		'¿Eliminar tu cuenta de Strata? Se borrarán tu nombre, tus amigos y tus bloqueos. No se puede deshacer.',
+	const confirmed = await confirm(
+		'¿Eliminar tu cuenta de Strata? Se borrarán tu nombre, tus amigos y tus bloqueos, y tu nombre quedará libre para otras personas. No se puede deshacer.',
 		{ title: 'Eliminar cuenta', kind: 'warning', okLabel: 'Eliminar', cancelLabel: 'Cancelar' },
 	)
-	if (confirmed && (await account.deleteAccount(deletePassword.value))) deletePassword.value = ''
+	if (confirmed) await account.deleteAccount()
+}
+async function exportIdentity() {
+	const path = await save({
+		defaultPath: 'strata-copia-de-seguridad.key',
+		title: 'Guardar copia de seguridad',
+	})
+	if (path && (await account.exportIdentity(path))) {
+		notice.value =
+			'Copia guardada. Guárdala en un sitio seguro y no la compartas: quien la tenga es tú.'
+	}
+}
+async function importIdentity() {
+	const selected = await open({ multiple: false, title: 'Elegir copia de seguridad' })
+	const path = Array.isArray(selected) ? selected[0] : selected
+	if (!path) return
+	const confirmed = await confirm(
+		'Este launcher pasará a usar la identidad de la copia (tu cuenta y tu código cambiarán) y se reiniciará. La identidad actual se guarda por si acaso. ¿Continuar?',
+		{
+			title: 'Restaurar copia de seguridad',
+			kind: 'warning',
+			okLabel: 'Restaurar y reiniciar',
+			cancelLabel: 'Cancelar',
+		},
+	)
+	if (confirmed && (await account.importIdentity(path))) await restartApp()
 }
 async function saveServer() {
 	if (await account.setServer(serverUrl.value)) {
 		serverUrl.value = status.value?.server_url ?? ''
-		notice.value = 'Servidor cambiado. Inicia sesión de nuevo.'
+		notice.value = 'Servidor cambiado.'
 	}
 }
 </script>
@@ -106,56 +134,27 @@ async function saveServer() {
 		<Admonition
 			v-if="status?.offline"
 			type="warning"
-			body="No se pudo conectar con el servidor de cuentas. Tu sesión sigue guardada; se reintentará solo."
+			body="No se pudo conectar con el servidor de cuentas. Se reintentará solo."
 		/>
+		<Admonition v-else-if="status?.problem" type="warning" :body="status.problem" />
 
-		<!-- Sin sesión -->
+		<!-- Sin cuenta -->
 		<div
-			v-if="!loggedIn"
+			v-if="!registered && !status?.offline"
 			class="flex flex-col gap-4 rounded-2xl bg-surface-3 p-4 ring-1 ring-inset ring-surface-5"
 		>
 			<p class="m-0 text-secondary">
-				Con tu cuenta reservas un nombre de usuario único, tus amigos pueden encontrarte en el
-				buscador y podéis chatear y jugar juntos.
+				Crea tu cuenta para reservar un nombre de usuario único, que tus amigos te encuentren en el
+				buscador y podáis chatear y jugar juntos. No hay contraseña: tu cuenta es la clave de este
+				launcher, así que conviene que hagas una copia de seguridad (más abajo).
 			</p>
-			<div class="flex gap-2">
-				<Button
-					:type="mode === 'login' ? 'colored' : 'outlined'"
-					:color="mode === 'login' ? 'brand' : undefined"
-					size="sm"
-					@click="mode = 'login'"
-				>
-					Iniciar sesión
-				</Button>
-				<Button
-					:type="mode === 'register' ? 'colored' : 'outlined'"
-					:color="mode === 'register' ? 'brand' : undefined"
-					size="sm"
-					@click="mode = 'register'"
-				>
-					Crear cuenta
-				</Button>
-			</div>
-			<form class="flex flex-col gap-3" @submit.prevent="submit">
+			<form class="flex flex-col gap-3" @submit.prevent="createAccount">
 				<div class="flex flex-col gap-1.5">
 					<label for="acc-user" class="font-semibold text-contrast">Nombre de usuario</label>
-					<Input id="acc-user" v-model="username" :maxlength="24" autocomplete="username" />
-					<span v-if="mode === 'register'" class="text-sm text-secondary">
+					<Input id="acc-user" v-model="username" :maxlength="24" autocomplete="off" />
+					<span class="text-sm text-secondary">
 						De 3 a 24 letras, números o guiones bajos. Nadie más podrá usar el mismo nombre (sin
 						distinguir mayúsculas).
-					</span>
-				</div>
-				<div class="flex flex-col gap-1.5">
-					<label for="acc-pass" class="font-semibold text-contrast">Contraseña</label>
-					<Input
-						id="acc-pass"
-						v-model="password"
-						type="password"
-						:maxlength="128"
-						:autocomplete="mode === 'login' ? 'current-password' : 'new-password'"
-					/>
-					<span v-if="mode === 'register'" class="text-sm text-secondary">
-						Mínimo 12 caracteres. No hay recuperación de contraseña: guárdala en un lugar seguro.
 					</span>
 				</div>
 				<div>
@@ -163,15 +162,15 @@ async function saveServer() {
 						type="colored"
 						color="brand"
 						native-type="submit"
-						:disabled="busy || !username.trim() || !password"
+						:disabled="busy || !username.trim()"
 					>
-						<LogInIcon /> {{ mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta' }}
+						<CheckIcon /> Crear cuenta
 					</Button>
 				</div>
 			</form>
 		</div>
 
-		<!-- Con sesión -->
+		<!-- Con cuenta -->
 		<template v-else-if="profile">
 			<div
 				class="flex flex-wrap items-center gap-3 rounded-2xl bg-surface-3 p-4 ring-1 ring-inset ring-surface-5"
@@ -187,9 +186,24 @@ async function saveServer() {
 						Tu nombre de usuario es único y no se puede repetir.
 					</div>
 				</div>
-				<Button type="outlined" :disabled="busy" @click="account.logout()"
-					><LogOutIcon /> Cerrar sesión</Button
+				<Button type="outlined" @click="showRename = !showRename">Cambiar nombre</Button>
+			</div>
+			<div
+				v-if="showRename"
+				class="flex gap-2 rounded-2xl bg-surface-3 p-4 ring-1 ring-inset ring-surface-5"
+			>
+				<Input
+					v-model="newName"
+					:maxlength="24"
+					placeholder="Nuevo nombre"
+					autocomplete="off"
+					wrapper-class="flex-grow min-w-0"
+					@keyup.enter="rename"
+				/>
+				<Button type="colored" color="brand" :disabled="busy || !newName.trim()" @click="rename"
+					>Cambiar</Button
 				>
+				<span class="self-center text-sm text-secondary">Una vez al día.</span>
 			</div>
 
 			<div
@@ -217,89 +231,69 @@ async function saveServer() {
 			>
 				<h3 class="m-0 text-lg font-bold text-contrast">Chat y partidas</h3>
 				<p class="m-0 text-secondary">
-					Tu launcher se enlaza con tu cuenta con una clave pública. Tus amigos la reciben solos del
-					servidor: no tienes que pasar códigos a mano.
+					Tu cuenta es la clave pública de este launcher. Tus amigos la reciben solos del servidor:
+					no tienes que pasar códigos a mano.
 				</p>
 				<div class="flex gap-2">
-					<Input
-						:model-value="profile.p2p_code ?? 'Enlazando con tu cuenta…'"
-						readonly
-						wrapper-class="flex-grow min-w-0"
-					/>
-					<Button type="outlined" :disabled="!profile.p2p_code" @click="copyCode">
+					<Input :model-value="profile.id" readonly wrapper-class="flex-grow min-w-0" />
+					<Button type="outlined" @click="copyCode">
 						<CheckIcon v-if="copied" /><CopyIcon v-else />
 						{{ copied ? 'Copiado' : 'Copiar' }}
 					</Button>
 				</div>
 				<span class="text-sm text-secondary">
-					Solo te sirve si quieres añadir a alguien sin cuenta. Esta clave no da acceso a tu cuenta
-					de Minecraft ni a tus archivos.
+					Solo te hace falta si quieres añadir a alguien que no tiene cuenta. No da acceso a tu
+					cuenta de Minecraft ni a tus archivos.
 				</span>
 			</div>
-
-			<div
-				class="flex flex-col gap-3 rounded-2xl bg-surface-3 p-4 ring-1 ring-inset ring-surface-5"
-			>
-				<button
-					class="flex cursor-pointer items-center justify-between border-0 bg-transparent p-0 text-left"
-					@click="showSecurity = !showSecurity"
-				>
-					<h3 class="m-0 text-lg font-bold text-contrast">Seguridad</h3>
-					<span class="text-sm text-secondary">{{ showSecurity ? 'Ocultar' : 'Mostrar' }}</span>
-				</button>
-				<template v-if="showSecurity">
-					<div class="flex flex-col gap-2">
-						<label class="font-semibold text-contrast" for="acc-cur">Cambiar contraseña</label>
-						<Input
-							id="acc-cur"
-							v-model="currentPassword"
-							type="password"
-							placeholder="Contraseña actual"
-							autocomplete="current-password"
-						/>
-						<Input
-							v-model="newPassword"
-							type="password"
-							placeholder="Contraseña nueva (mínimo 12 caracteres)"
-							autocomplete="new-password"
-						/>
-						<div>
-							<Button
-								type="outlined"
-								:disabled="busy || !currentPassword || newPassword.length < 12"
-								@click="changePassword"
-							>
-								Cambiar contraseña
-							</Button>
-						</div>
-					</div>
-					<div class="flex flex-col gap-2">
-						<label class="font-semibold text-contrast" for="acc-del">Eliminar cuenta</label>
-						<span class="text-sm text-secondary">
-							Borra tu nombre, tus amigos y tus bloqueos. Tu nombre quedará libre para otras
-							personas.
-						</span>
-						<Input
-							id="acc-del"
-							v-model="deletePassword"
-							type="password"
-							placeholder="Tu contraseña"
-							autocomplete="current-password"
-						/>
-						<div>
-							<Button
-								type="outlined"
-								color="red"
-								:disabled="busy || !deletePassword"
-								@click="deleteAccount"
-							>
-								<TrashIcon /> Eliminar cuenta
-							</Button>
-						</div>
-					</div>
-				</template>
-			</div>
 		</template>
+
+		<div
+			v-if="!status?.offline"
+			class="flex flex-col gap-2 rounded-2xl bg-surface-3 p-4 ring-1 ring-inset ring-surface-5"
+		>
+			<h3 class="m-0 text-lg font-bold text-contrast">Copia de seguridad de tu cuenta</h3>
+			<p class="m-0 text-secondary">
+				Tu cuenta vive en un archivo de este equipo y
+				<strong class="text-contrast">no se puede recuperar si se pierde</strong> (no hay contraseña
+				ni correo). Guarda una copia, y úsala para llevar tu cuenta a otro ordenador.
+			</p>
+			<div class="flex flex-wrap gap-2">
+				<Button type="outlined" :disabled="busy" @click="exportIdentity"
+					><DownloadIcon /> Guardar copia</Button
+				>
+				<Button type="outlined" :disabled="busy" @click="importIdentity"
+					><UploadIcon /> Restaurar copia</Button
+				>
+			</div>
+			<span class="text-sm text-secondary">
+				La copia da acceso total a tu cuenta: no la compartas ni la subas a ningún sitio público.
+			</span>
+		</div>
+
+		<div
+			v-if="registered"
+			class="flex flex-col gap-3 rounded-2xl bg-surface-3 p-4 ring-1 ring-inset ring-surface-5"
+		>
+			<button
+				class="flex cursor-pointer items-center justify-between border-0 bg-transparent p-0 text-left"
+				@click="showSecurity = !showSecurity"
+			>
+				<h3 class="m-0 text-lg font-bold text-contrast">Eliminar cuenta</h3>
+				<span class="text-sm text-secondary">{{ showSecurity ? 'Ocultar' : 'Mostrar' }}</span>
+			</button>
+			<template v-if="showSecurity">
+				<span class="text-sm text-secondary">
+					Borra tu nombre, tus amigos y tus bloqueos del servidor, y libera tu nombre. Tu clave del
+					launcher no cambia.
+				</span>
+				<div>
+					<Button type="outlined" color="red" :disabled="busy" @click="deleteAccount"
+						><TrashIcon /> Eliminar cuenta</Button
+					>
+				</div>
+			</template>
+		</div>
 
 		<div class="flex flex-col gap-2 rounded-2xl bg-surface-3 p-4 ring-1 ring-inset ring-surface-5">
 			<button
@@ -311,8 +305,9 @@ async function saveServer() {
 			</button>
 			<template v-if="showServer">
 				<span class="text-sm text-secondary">
-					Dirección del servicio que guarda los nombres de usuario y las amistades. Cambiarla cierra
-					tu sesión. Deja el campo vacío para volver al servidor por defecto.
+					Dirección del servicio que guarda los nombres de usuario y las amistades. Cambiarla retira
+					de este launcher los amigos de la cuenta actual. Deja el campo vacío para volver al
+					servidor por defecto.
 				</span>
 				<div class="flex gap-2">
 					<Input v-model="serverUrl" placeholder="https://…" wrapper-class="flex-grow min-w-0" />

@@ -1,0 +1,12 @@
+# Servicio de cuentas de Strata en Cloudflare Workers + D1. Despliegue guiado: scripts/deploy-accounts.ps1
+name = "strata-accounts"
+main = "src/worker.mjs"
+compatibility_date = "2025-09-01"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "strata-accounts"
+# Lo rellena scripts/deploy-accounts.ps1 al crear la base de datos (wrangler d1 create).
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
