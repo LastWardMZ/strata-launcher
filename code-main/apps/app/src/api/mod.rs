@@ -3,6 +3,7 @@ use serde::{Serialize, Serializer};
 use thiserror::Error;
 
 pub mod local_servers;
+pub mod accounts;
 pub mod p2p;
 pub mod local_server_packs;
 pub mod auth;

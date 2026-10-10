@@ -1,47 +1,153 @@
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
-import { AccountSocialSettings, injectAuth, injectModrinthClient } from '@modrinth/ui'
-import { inject, onBeforeUnmount, onMounted, ref } from 'vue'
+import { Admonition, Button, Chips } from '@modrinth/ui'
+import { computed } from 'vue'
 
-import ModrinthConnection from '@/components/ui/settings/account/ModrinthConnection.vue'
-import { appSettingsModalContextKey } from '@/providers/app-settings-modal'
+import {
+	type FriendPrivacy,
+	type InvitePrivacy,
+	useStrataAccount,
+} from '@/composables/use-strata-account'
 
-const auth = injectAuth()
-const client = injectModrinthClient()
-const modal = inject(appSettingsModalContextKey, null)
-const social = ref<InstanceType<typeof AccountSocialSettings> | null>(null)
+const account = useStrataAccount()
+const { profile, loggedIn, social, busy, error } = account
 
-function getBlockedUsers(): Promise<Labrinth.BlockedUsers.v3.BlockedUserId[]> {
-	return client.labrinth.blocked_users_v3.list()
+const friendOptions: FriendPrivacy[] = ['everyone', 'mutual', 'none']
+const friendLabels: Record<FriendPrivacy, string> = {
+	everyone: 'Todos',
+	mutual: 'Amigos de amigos',
+	none: 'Nadie',
 }
-function getUsers(userIds: string[]): Promise<Labrinth.Users.v2.User[]> {
-	return client.labrinth.users_v2.getMultiple(userIds)
-}
-function unblockUser(userId: string): Promise<void> {
-	return client.labrinth.blocked_users_v3.unblock(userId)
-}
+const inviteOptions: InvitePrivacy[] = ['friends', 'none']
+const inviteLabels: Record<InvitePrivacy, string> = { friends: 'Amigos', none: 'Nadie' }
+const searchableOptions = ['yes', 'no'] as const
+const searchableLabels = { yes: 'Sí', no: 'No' }
 
-onMounted(() =>
-	modal?.registerUnsavedChangesController({
-		hasChanges: () => social.value?.hasChanges ?? false,
-		getOriginal: () => social.value?.originalState ?? {},
-		getModified: () => social.value?.modifiedState ?? {},
-		isSaving: () => social.value?.saving ?? false,
-		reset: () => social.value?.reset(),
-		save: () => social.value?.save(),
-	}),
-)
-onBeforeUnmount(() => modal?.registerUnsavedChangesController(null))
+const searchable = computed(() => (profile.value?.settings.searchable ? 'yes' : 'no'))
 </script>
 
 <template>
-	<!-- Sin cuenta de Modrinth conectada se muestra la conexión, en vez del aviso genérico de inicio de sesión. -->
-	<ModrinthConnection v-if="!auth.user.value" />
-	<AccountSocialSettings
-		v-else
-		ref="social"
-		:get-blocked-users="getBlockedUsers"
-		:get-users="getUsers"
-		:unblock-user="unblockUser"
-	/>
+	<div
+		v-if="!loggedIn"
+		class="flex flex-col gap-2 rounded-2xl bg-surface-3 p-4 ring-1 ring-inset ring-surface-5"
+	>
+		<h3 class="m-0 text-lg font-bold text-contrast">Inicia sesión para gestionar tu privacidad</h3>
+		<p class="m-0 text-secondary">
+			Las opciones sociales pertenecen a tu cuenta de Strata. Entra o crea tu cuenta en la pestaña
+			<strong class="text-contrast">Perfil</strong>.
+		</p>
+	</div>
+
+	<div v-else-if="profile" class="flex flex-col gap-8">
+		<Admonition
+			v-if="error"
+			type="critical"
+			:body="error"
+			dismissible
+			@dismiss="account.clearError()"
+		/>
+
+		<section class="flex flex-col gap-6">
+			<div class="flex flex-col gap-2.5">
+				<h2 class="m-0 text-lg font-semibold text-contrast">Solicitudes de amistad</h2>
+				<Chips
+					:model-value="profile.settings.friend_privacy"
+					:items="friendOptions"
+					:format-label="(value: FriendPrivacy) => friendLabels[value]"
+					:disabled-items="busy ? friendOptions : undefined"
+					:capitalize="false"
+					aria-label="Solicitudes de amistad"
+					@update:model-value="
+						(value: FriendPrivacy | null) =>
+							value && account.update({ settings: { friend_privacy: value } })
+					"
+				/>
+				<p class="m-0 text-secondary">
+					Controla quién puede enviarte solicitudes de amistad en Strata.
+				</p>
+			</div>
+
+			<div class="flex flex-col gap-2.5">
+				<h2 class="m-0 text-lg font-semibold text-contrast">Invitaciones a partidas</h2>
+				<Chips
+					:model-value="profile.settings.invite_privacy"
+					:items="inviteOptions"
+					:format-label="(value: InvitePrivacy) => inviteLabels[value]"
+					:disabled-items="busy ? inviteOptions : undefined"
+					:capitalize="false"
+					aria-label="Invitaciones a partidas"
+					@update:model-value="
+						(value: InvitePrivacy | null) =>
+							value && account.update({ settings: { invite_privacy: value } })
+					"
+				/>
+				<p class="m-0 text-secondary">
+					Controla quién puede invitarte a mundos o servidores compartidos. «Nadie» desactiva las
+					invitaciones, aunque seáis amigos.
+				</p>
+			</div>
+
+			<div class="flex flex-col gap-2.5">
+				<h2 class="m-0 text-lg font-semibold text-contrast">Aparecer en el buscador</h2>
+				<Chips
+					:model-value="searchable"
+					:items="[...searchableOptions]"
+					:format-label="(value: 'yes' | 'no') => searchableLabels[value]"
+					:disabled-items="busy ? [...searchableOptions] : undefined"
+					:capitalize="false"
+					aria-label="Aparecer en el buscador"
+					@update:model-value="
+						(value: 'yes' | 'no' | null) =>
+							value && account.update({ settings: { searchable: value === 'yes' } })
+					"
+				/>
+				<p class="m-0 text-secondary">
+					Si lo desactivas, nadie te encontrará buscando por nombre; solo podrán añadirte quienes
+					sepan tu nombre de usuario exacto.
+				</p>
+			</div>
+		</section>
+
+		<section class="flex flex-col gap-3">
+			<div class="flex flex-col gap-1">
+				<h2 class="m-0 text-lg font-semibold text-contrast">Usuarios bloqueados</h2>
+				<p class="m-0 text-secondary">
+					Estos son los usuarios que bloqueaste en Strata. Ellos no pueden:
+				</p>
+				<ul class="m-0 flex list-disc flex-col gap-1 pl-5 text-secondary">
+					<li>Enviarte solicitudes de amistad</li>
+					<li>Aparecer en tus búsquedas ni encontrarte</li>
+					<li>Invitarte a partidas</li>
+				</ul>
+			</div>
+
+			<div class="overflow-hidden rounded-2xl border border-solid border-surface-4">
+				<div
+					class="flex items-center justify-between bg-surface-3 px-4 py-2.5 font-semibold text-contrast"
+				>
+					<span>Usuario</span><span>Acciones</span>
+				</div>
+				<div
+					v-if="!social.blocked.length"
+					class="flex h-32 items-center justify-center px-4 text-center text-secondary"
+				>
+					No bloqueaste a nadie.
+				</div>
+				<div
+					v-for="user in social.blocked"
+					:key="user.id"
+					class="flex items-center justify-between gap-3 border-0 border-t border-solid border-surface-4 px-4 py-2.5"
+				>
+					<span class="min-w-0 truncate font-semibold text-contrast">{{ user.username }}</span>
+					<Button
+						type="outlined"
+						size="sm"
+						:disabled="busy"
+						@click="account.friendAction('unblock', user.username)"
+					>
+						Desbloquear
+					</Button>
+				</div>
+			</div>
+		</section>
+	</div>
 </template>

@@ -16,7 +16,10 @@ use std::{
     collections::{HashMap, HashSet},
     fs,
     path::{Path, PathBuf},
-    sync::{Arc, Mutex},
+    sync::{
+        Arc, Mutex,
+        atomic::{AtomicBool, Ordering},
+    },
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 use tokio::{
@@ -54,10 +57,10 @@ pub struct Friend {
     /// (solicitud enviada o aceptación); se reintenta en segundo plano.
     #[serde(default)]
     pub synced: bool,
-    /// `true` si es amigo por la cuenta de Modrinth (y no por haber intercambiado códigos a mano):
-    /// su acceso depende de que la amistad de Modrinth siga existiendo.
-    #[serde(default)]
-    pub via_modrinth: bool,
+    /// `true` si es amigo por la cuenta de Strata (y no por haber intercambiado códigos a mano):
+    /// su acceso depende de que la amistad de la cuenta siga existiendo.
+    #[serde(default, alias = "via_account")]
+    pub via_account: bool,
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
@@ -143,8 +146,11 @@ pub struct Core {
     tunnels: Mutex<HashMap<String, usize>>,
     conns: tokio::sync::Mutex<HashMap<String, Connection>>,
     hints: Mutex<HashMap<String, EndpointAddr>>,
-    /// Códigos de amigos de Modrinth que han publicado el suyo: se aceptan sin pedir confirmación.
+    /// Códigos de los amigos de la cuenta de Strata: se aceptan sin pedir confirmación.
     trusted: Mutex<HashSet<String>>,
+    /// Ajustes de privacidad de la cuenta que se aplican aquí, en el extremo que recibe.
+    friend_requests_none: AtomicBool,
+    invites_none: AtomicBool,
     notify: Notify,
 }
 
@@ -242,6 +248,8 @@ impl Core {
             conns: tokio::sync::Mutex::new(HashMap::new()),
             hints: Mutex::new(HashMap::new()),
             trusted: Mutex::new(HashSet::new()),
+            friend_requests_none: AtomicBool::new(false),
+            invites_none: AtomicBool::new(false),
             notify,
         });
         let accepting = core.clone();
@@ -378,19 +386,22 @@ impl Core {
                             {
                                 friend.status = FriendStatus::Accepted;
                                 friend.synced = true;
-                                friend.via_modrinth = friend.via_modrinth || trusted;
+                                friend.via_account = friend.via_account || trusted;
                             }
                             friend.status == FriendStatus::Accepted
                         }
                         None => {
+                            if !trusted && self.friend_requests_none.load(Ordering::Relaxed) {
+                                return Err("Este usuario no acepta solicitudes de amistad".into());
+                            }
                             if trusted {
-                                store.friends.push(Friend { id: remote.to_string(), name, status: FriendStatus::Accepted, synced: true, via_modrinth: true });
+                                store.friends.push(Friend { id: remote.to_string(), name, status: FriendStatus::Accepted, synced: true, via_account: true });
                                 true
                             } else {
                                 if pending >= MAX_INCOMING_PENDING {
                                     return Err("Demasiadas solicitudes pendientes".into());
                                 }
-                                store.friends.push(Friend { id: remote.to_string(), name, status: FriendStatus::Incoming, synced: true, via_modrinth: false });
+                                store.friends.push(Friend { id: remote.to_string(), name, status: FriendStatus::Incoming, synced: true, via_account: false });
                                 false
                             }
                         }
@@ -407,7 +418,7 @@ impl Core {
                     if trusted && !store.friends.iter().any(|f| f.id == remote) {
                         let name = clean_name(&name);
                         let name = if name.is_empty() { format!("Strata-{}", &remote[..6.min(remote.len())]) } else { name };
-                        store.friends.push(Friend { id: remote.to_string(), name, status: FriendStatus::Accepted, synced: true, via_modrinth: true });
+                        store.friends.push(Friend { id: remote.to_string(), name, status: FriendStatus::Accepted, synced: true, via_account: true });
                     }
                     let friend = store.friends.iter_mut().find(|f| f.id == remote).ok_or("No hay solicitud")?;
                     match friend.status {
@@ -438,6 +449,9 @@ impl Core {
             }
             Request::Invite { id, info, ts } => {
                 self.require_friend(remote)?;
+                if self.invites_none.load(Ordering::Relaxed) {
+                    return Err("Este usuario no acepta invitaciones".into());
+                }
                 if !["world", "server"].contains(&info.kind.as_str()) {
                     return Err("Invitación no válida".into());
                 }
@@ -665,6 +679,22 @@ impl Core {
         P2pInfo { id: self.endpoint.id().to_string(), name: self.my_name(), bio: self.store.lock().unwrap().bio.clone() }
     }
 
+    /// Aplica los ajustes de privacidad de la cuenta que dependen de este extremo.
+    pub fn set_privacy(&self, friend_requests_none: bool, invites_none: bool) {
+        self.friend_requests_none.store(friend_requests_none, Ordering::Relaxed);
+        self.invites_none.store(invites_none, Ordering::Relaxed);
+    }
+
+    /// Firma con la clave de este launcher el enlace con una cuenta, para que el servidor pueda
+    /// comprobar que quien lo pide posee el código. Devuelve `(código, ts, firma)`.
+    pub fn sign_link(&self, account_id: &str) -> (String, u64, String) {
+        let code = self.endpoint.id().to_string();
+        let ts = SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_millis() as u64).unwrap_or(0);
+        let message = format!("strata-link:{account_id}:{code}:{ts}");
+        let signature = self.endpoint.secret_key().sign(message.as_bytes());
+        (code, ts, to_hex(&signature.to_bytes()))
+    }
+
     pub fn set_bio(&self, bio: &str) -> Result<(), String> {
         let bio: String = bio.chars().filter(|c| !c.is_control() || *c == '\n').collect();
         if bio.chars().count() > MAX_BIO {
@@ -702,7 +732,7 @@ impl Core {
                     FriendStatus::Outgoing => "Ya enviaste una solicitud".to_string(),
                 });
             }
-            let friend = Friend { name: format!("Strata-{}", &id[..6]), id, status: FriendStatus::Outgoing, synced: false, via_modrinth: false };
+            let friend = Friend { name: format!("Strata-{}", &id[..6]), id, status: FriendStatus::Outgoing, synced: false, via_account: false };
             store.friends.push(friend.clone());
             friend
         };
@@ -744,7 +774,7 @@ impl Core {
             if blocked {
                 match store.friends.iter_mut().find(|f| f.id == id) {
                     Some(friend) => friend.status = FriendStatus::Blocked,
-                    None => store.friends.push(Friend { id: parse_id(id)?.to_string(), name: format!("Strata-{}", &id[..6.min(id.len())]), status: FriendStatus::Blocked, synced: true, via_modrinth: false }),
+                    None => store.friends.push(Friend { id: parse_id(id)?.to_string(), name: format!("Strata-{}", &id[..6.min(id.len())]), status: FriendStatus::Blocked, synced: true, via_account: false }),
                 }
             } else {
                 store.friends.retain(|f| !(f.id == id && f.status == FriendStatus::Blocked));
@@ -772,11 +802,11 @@ impl Core {
         }
     }
 
-    /// Sincroniza los amigos de Modrinth que han publicado su código de partidas. Los de la lista
+    /// Sincroniza los amigos de la cuenta que han enlazado su código de partidas. Los de la lista
     /// pasan a ser amigos aceptados (y se les avisa en segundo plano); los que ya no estén y se
-    /// habían añadido por Modrinth se retiran. Los amigos añadidos a mano con un código no se tocan,
+    /// habían añadido por la cuenta se retiran. Los amigos añadidos a mano con un código no se tocan,
     /// y un usuario bloqueado sigue bloqueado.
-    pub async fn sync_modrinth(self: &Arc<Self>, peers: Vec<(String, String)>) -> Result<(), String> {
+    pub async fn sync_account_friends(self: &Arc<Self>, peers: Vec<(String, String)>) -> Result<(), String> {
         let mut valid = Vec::new();
         for (code, name) in peers {
             let id = parse_id(&code)?.to_string();
@@ -798,24 +828,24 @@ impl Core {
                             friend.synced = false;
                             changed = true;
                         }
-                        if !friend.via_modrinth {
-                            friend.via_modrinth = true;
+                        if !friend.via_account {
+                            friend.via_account = true;
                             changed = true;
                         }
-                        if !name.is_empty() && &friend.name != name && friend.via_modrinth {
+                        if !name.is_empty() && &friend.name != name && friend.via_account {
                             friend.name = name.clone();
                             changed = true;
                         }
                     }
                     None => {
                         let name = if name.is_empty() { format!("Strata-{}", &id[..6]) } else { name.clone() };
-                        store.friends.push(Friend { id: id.clone(), name, status: FriendStatus::Accepted, synced: false, via_modrinth: true });
+                        store.friends.push(Friend { id: id.clone(), name, status: FriendStatus::Accepted, synced: false, via_account: true });
                         changed = true;
                     }
                 }
             }
             store.friends.retain(|f| {
-                let keep = !(f.via_modrinth && !trusted.contains(&f.id));
+                let keep = !(f.via_account && !trusted.contains(&f.id));
                 if !keep {
                     removed.push(f.id.clone());
                 }
@@ -979,7 +1009,7 @@ impl P2pState {
     }
 }
 
-async fn core<R: tauri::Runtime>(app: &tauri::AppHandle<R>, state: &tauri::State<'_, P2pState>) -> Result<Arc<Core>, String> {
+pub(crate) async fn core<R: tauri::Runtime>(app: &tauri::AppHandle<R>, state: &P2pState) -> Result<Arc<Core>, String> {
     state
         .core
         .get_or_try_init(|| async {
@@ -1082,18 +1112,18 @@ pub async fn p2p_set_bio<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tau
 }
 
 #[derive(Deserialize)]
-pub struct ModrinthPeer {
+pub struct AccountPeer {
     pub code: String,
     pub name: String,
 }
 
-/// Recibe los amigos de Modrinth que han publicado su código de partidas (ver `Core::sync_modrinth`).
+/// Recibe los amigos de la cuenta con su código de partidas (ver `Core::sync_account_friends`).
 #[tauri::command]
-pub async fn p2p_sync_modrinth_friends<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>, peers: Vec<ModrinthPeer>) -> Result<(), String> {
+pub async fn p2p_sync_account_friends<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>, peers: Vec<AccountPeer>) -> Result<(), String> {
     if peers.len() > 500 {
         return Err("Demasiados amigos".into());
     }
-    core(&app, &state).await?.sync_modrinth(peers.into_iter().map(|p| (p.code, p.name)).collect()).await
+    core(&app, &state).await?.sync_account_friends(peers.into_iter().map(|p| (p.code, p.name)).collect()).await
 }
 
 #[tauri::command]
@@ -1282,7 +1312,7 @@ mod tests {
         settle().await;
         c.add_hint(a.addr());
         a.add_hint(c.addr());
-        c.store.lock().unwrap().friends.push(Friend { id: a.info().id, name: "A".into(), status: FriendStatus::Accepted, synced: true, via_modrinth: false });
+        c.store.lock().unwrap().friends.push(Friend { id: a.info().id, name: "A".into(), status: FriendStatus::Accepted, synced: true, via_account: false });
         let stolen = c.join(&a.info().id, &share.id).await.unwrap();
         let mut intruder = TcpStream::connect(("127.0.0.1", stolen)).await.unwrap();
         let _ = intruder.write_all(b"hola").await;
@@ -1332,23 +1362,23 @@ mod tests {
 
 
     #[tokio::test(flavor = "multi_thread")]
-    async fn modrinth_friends_become_p2p_friends_without_manual_codes() {
+    async fn account_friends_become_p2p_friends_without_manual_codes() {
         let (a, b) = pair().await;
         let (a_id, b_id) = (a.info().id, b.info().id);
-        // Ambos ven el código del otro en el perfil de Modrinth de su amigo.
-        a.sync_modrinth(vec![(b_id.clone(), "Bea".into())]).await.unwrap();
-        b.sync_modrinth(vec![(a_id.clone(), "Ana".into())]).await.unwrap();
+        // Ambos tienen la amistad en su cuenta y el servidor les da el código del otro.
+        a.sync_account_friends(vec![(b_id.clone(), "Bea".into())]).await.unwrap();
+        b.sync_account_friends(vec![(a_id.clone(), "Ana".into())]).await.unwrap();
         a.sync_once().await.unwrap();
         b.sync_once().await.unwrap();
         tokio::time::sleep(Duration::from_millis(800)).await;
         let on_a = a.friends();
-        assert_eq!((on_a[0].status, on_a[0].via_modrinth, on_a[0].name.as_str()), (FriendStatus::Accepted, true, "Bea"));
+        assert_eq!((on_a[0].status, on_a[0].via_account, on_a[0].name.as_str()), (FriendStatus::Accepted, true, "Bea"));
         assert_eq!(b.friends()[0].status, FriendStatus::Accepted);
-        a.send_chat(&b_id, "hola por modrinth").await.unwrap();
-        assert!(b.messages(&a_id).iter().any(|m| m.text == "hola por modrinth"));
+        a.send_chat(&b_id, "hola por la cuenta").await.unwrap();
+        assert!(b.messages(&a_id).iter().any(|m| m.text == "hola por la cuenta"));
 
-        // Si la amistad de Modrinth desaparece, también el acceso P2P (y se cierra la conversación).
-        a.sync_modrinth(vec![]).await.unwrap();
+        // Si la amistad de la cuenta desaparece, también el acceso P2P (y se cierra la conversación).
+        a.sync_account_friends(vec![]).await.unwrap();
         assert!(a.friends().is_empty());
         assert!(a.send_chat(&b_id, "ya no").await.is_err());
         a.shutdown().await;
@@ -1356,19 +1386,19 @@ mod tests {
     }
 
     #[tokio::test(flavor = "multi_thread")]
-    async fn modrinth_sync_keeps_manual_and_blocked_friends_and_only_trusts_listed_codes() {
+    async fn account_sync_keeps_manual_and_blocked_friends_and_only_trusts_listed_codes() {
         let (a, b) = pair().await;
         let c = Core::start(temp("c"), silent(), false).await.unwrap();
         settle().await;
         // B es amigo manual de A (código intercambiado a mano).
         befriend(&a, &b).await;
-        a.sync_modrinth(vec![]).await.unwrap();
+        a.sync_account_friends(vec![]).await.unwrap();
         assert_eq!(a.friends()[0].status, FriendStatus::Accepted, "los amigos manuales no se retiran");
-        assert!(!a.friends()[0].via_modrinth);
+        assert!(!a.friends()[0].via_account);
 
-        // Un bloqueado no se desbloquea por aparecer en la lista de Modrinth.
+        // Un bloqueado no se desbloquea por aparecer en la lista de la cuenta.
         a.set_blocked(&c.info().id, true).await.unwrap();
-        a.sync_modrinth(vec![(c.info().id, "Cris".into())]).await.unwrap();
+        a.sync_account_friends(vec![(c.info().id, "Cris".into())]).await.unwrap();
         assert!(a.friends().iter().any(|f| f.id == c.info().id && f.status == FriendStatus::Blocked));
 
         // Un código que NO está en la lista no se acepta solo: queda como solicitud pendiente.
@@ -1379,10 +1409,69 @@ mod tests {
         d.add_friend(&a.info().id).await.unwrap();
         assert!(a.friends().iter().any(|f| f.id == d.info().id && f.status == FriendStatus::Incoming));
 
-        assert!(a.sync_modrinth(vec![("no-es-un-codigo".into(), "x".into())]).await.is_err());
+        assert!(a.sync_account_friends(vec![("no-es-un-codigo".into(), "x".into())]).await.is_err());
         for core in [&a, &b, &c, &d] {
             core.shutdown().await;
         }
+    }
+
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn privacy_settings_are_enforced_by_the_receiving_launcher() {
+        let (a, b) = pair().await;
+        let (a_id, b_id) = (a.info().id, b.info().id);
+        a.set_privacy(true, true);
+
+        // Un desconocido no puede mandar solicitudes si no se aceptan.
+        let err = b.add_friend(&a_id).await;
+        assert!(err.is_ok(), "enviar la solicitud no falla en el origen");
+        assert!(a.friends().is_empty(), "A no registra la solicitud");
+
+        // Un amigo de la cuenta (de confianza) sí entra y puede chatear, pero no invitar.
+        a.sync_account_friends(vec![(b_id.clone(), "Bea".into())]).await.unwrap();
+        b.sync_account_friends(vec![(a_id.clone(), "Ana".into())]).await.unwrap();
+        a.sync_once().await.unwrap();
+        b.sync_once().await.unwrap();
+        tokio::time::sleep(Duration::from_millis(800)).await;
+        assert!(a.friends().iter().any(|f| f.id == b_id && f.status == FriendStatus::Accepted));
+        b.send_chat(&a_id, "hola").await.unwrap();
+        assert!(a.messages(&b_id).iter().any(|m| m.text == "hola"));
+        let share = b.share_start("world", "Mundo", "1.21", 25565).unwrap();
+        let invite = b.invite(&a_id, &share.id).await.unwrap();
+        assert!(!invite.delivered, "A rechaza las invitaciones");
+        assert!(a.messages(&b_id).iter().all(|m| m.invite.is_none()));
+
+        // Al volver a permitirlas, la invitación pendiente se entrega.
+        a.set_privacy(false, false);
+        b.sync_once().await.unwrap();
+        assert!(a.messages(&b_id).iter().any(|m| m.invite.is_some()));
+        a.shutdown().await;
+        b.shutdown().await;
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn link_signature_proves_possession_of_the_p2p_key() {
+        let core = Core::start(temp("sign"), silent(), false).await.unwrap();
+        let (code, ts, sig) = core.sign_link("cuenta-123");
+        assert_eq!(code, core.info().id);
+        let bytes: [u8; 64] = from_hex_n::<64>(&sig).expect("firma hex de 64 bytes");
+        let signature = iroh::Signature::from_bytes(&bytes);
+        let message = format!("strata-link:cuenta-123:{code}:{ts}");
+        assert!(core.endpoint.id().verify(message.as_bytes(), &signature).is_ok());
+        let other = format!("strata-link:otra-cuenta:{code}:{ts}");
+        assert!(core.endpoint.id().verify(other.as_bytes(), &signature).is_err(), "no vale para otra cuenta");
+        core.shutdown().await;
+    }
+
+    fn from_hex_n<const N: usize>(text: &str) -> Option<[u8; N]> {
+        if text.len() != N * 2 || !text.is_ascii() {
+            return None;
+        }
+        let mut out = [0u8; N];
+        for (i, byte) in out.iter_mut().enumerate() {
+            *byte = u8::from_str_radix(&text[i * 2..i * 2 + 2], 16).ok()?;
+        }
+        Some(out)
     }
 
     #[test]

@@ -80,7 +80,7 @@ import AccountsCard from '@/components/ui/AccountsCard.vue'
 import AppActionBar from '@/components/ui/AppActionBar.vue'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
-import FriendsList from '@/components/ui/friends/FriendsList.vue'
+import StrataFriendsPanel from '@/components/ui/friends/StrataFriendsPanel.vue'
 import HostingUpdateRequired from '@/components/ui/HostingUpdateRequired.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
@@ -135,12 +135,10 @@ import {
 	set_global_synced_option,
 } from '@/helpers/instance'
 import { maxMemoryQueryOptions } from '@/helpers/jre.js'
-import { syncModrinthFriendsToP2p } from '@/helpers/modrinth-p2p-sync'
 import {
 	get as getCreds,
 	getAll as getAllCreds,
 	logout,
-	MODRINTH_AUTH_CHANGED,
 	removeUser,
 	setActive,
 } from '@/helpers/mr_auth.ts'
@@ -535,10 +533,7 @@ function handleEditMenuAction(action) {
 	if (document.dispatchEvent(event)) document.execCommand(action)
 }
 
-let p2pLinkTimer
 onMounted(async () => {
-	window.addEventListener(MODRINTH_AUTH_CHANGED, fetchCredentials)
-	p2pLinkTimer = setInterval(() => void syncModrinthFriendsToP2p(), 5 * 60 * 1000)
 	try {
 		const listeners = await Promise.all([
 			listen('edit-menu://undo', () => handleEditMenuAction('undo')),
@@ -565,8 +560,6 @@ onMounted(async () => {
 })
 
 onUnmounted(async () => {
-	window.removeEventListener(MODRINTH_AUTH_CHANGED, fetchCredentials)
-	if (p2pLinkTimer) clearInterval(p2pLinkTimer)
 	document.querySelector('body').removeEventListener('click', handleClick)
 	document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
 	document.querySelector('body').removeEventListener('contextmenu', handleContextMenu)
@@ -1306,7 +1299,6 @@ async function validateSession(sessionToken) {
 }
 
 async function fetchCredentials() {
-	void syncModrinthFriendsToP2p()
 	const hadSession = !!credentials.value?.session
 	const refreshId = ++credentialsRefreshId
 	credentials.value = undefined
@@ -1342,9 +1334,13 @@ async function fetchCredentials() {
 }
 
 async function signIn() {
-	// Strata no usa el inicio de sesión web de Modrinth: la cuenta se conecta con un token personal
-	// desde Ajustes > Perfil.
-	appSettingsModal.value?.showProfile()
+	// Strata no usa cuentas de Modrinth. Las funciones heredadas que las piden (seguir proyectos,
+	// colecciones…) no están disponibles; la cuenta propia de Strata se gestiona en Ajustes > Perfil.
+	addNotification({
+		type: 'info',
+		title: 'Función no disponible',
+		text: 'Esta función necesita una cuenta de Modrinth, que Strata no utiliza. Tu cuenta de Strata está en Ajustes > Perfil.',
+	})
 }
 
 async function requestSignIn(flow = 'sign-in', addAccount = false) {
@@ -1496,7 +1492,7 @@ const modrinthAccountMenuOptions = computed(() => [
 		id: 'add-friend',
 		label: formatMessage(messages.addFriend),
 		icon: UserPlusIcon,
-		action: () => friendsList.value?.showAddFriendModal(),
+		action: () => friendsList.value?.openAdd(),
 	},
 	{
 		id: 'flags',
@@ -2398,11 +2394,8 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					</div>
 					<div class="flex flex-col gap-3 p-4">
 						<suspense>
-							<FriendsList ref="friendsList" :credentials="credentials" :sign-in="signIn" />
+							<StrataFriendsPanel ref="friendsList" @sign-in="appSettingsModal?.showProfile()" />
 						</suspense>
-						<Button type="outlined" size="sm" @click="router.push('/friends')">
-							<UsersIcon /> Chat y partidas
-						</Button>
 					</div>
 				</div>
 			</div>

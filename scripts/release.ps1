@@ -14,6 +14,7 @@ param(
 	[string]$Notes = 'Mejoras y correcciones.',
 	[switch]$Publish,
 	[switch]$Rebuild,
+	[string]$AccountsUrl = '',
 	[string]$Repo = 'LastWardMZ/strata-launcher'
 )
 
@@ -48,6 +49,15 @@ Get-Content (Join-Path $root 'code-main\packages\app-lib\.env.prod') | ForEach-O
 	if ($_ -match '^\s*([A-Z_0-9]+)=(.*)$') { Set-Item "env:$($Matches[1])" $Matches[2].Trim('"') }
 }
 $env:TAURI_SIGNING_PRIVATE_KEY = $key
+# Servidor de cuentas por defecto de esta versión (se incrusta al compilar). Sin -AccountsUrl, la app
+# apunta al servidor local de pruebas (127.0.0.1) y solo sirve en este equipo.
+if ($AccountsUrl) {
+	if ($AccountsUrl -notmatch '^https://[^/\s]+') { throw "-AccountsUrl debe empezar por https://  (recibido: $AccountsUrl)" }
+	$env:STRATA_ACCOUNTS_URL = $AccountsUrl.TrimEnd('/')
+	Write-Host "Servidor de cuentas por defecto: $($env:STRATA_ACCOUNTS_URL)"
+} elseif ($Publish) {
+	Write-Warning 'Publicas sin -AccountsUrl: la app apuntará a 127.0.0.1 y a tus amigos les fallará la cuenta.'
+}
 
 # 3. Compilar firmado y con el actualizador activado
 # cargo escribe su progreso por stderr: con 'Stop', PowerShell 5.1 lo trataría como un error.

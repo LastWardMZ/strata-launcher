@@ -202,6 +202,7 @@ fn main() {
         .setup(|app| {
             api::local_servers::start_backup_scheduler(app.handle().clone());
             api::p2p::start_in_background(app.handle().clone());
+            api::accounts::start_in_background(app.handle().clone());
             #[cfg(target_os = "macos")]
             {
                 let payload = macos::deep_link::get_or_init_payload(app);
@@ -254,6 +255,7 @@ fn main() {
         .plugin(api::auth::init())
         .manage(api::local_servers::LocalServerState::default())
         .manage(api::p2p::P2pState::default())
+        .manage(api::accounts::AccountsState::default())
         .plugin(api::mr_auth::init())
         .plugin(api::onboarding_checklist::init())
         .plugin(api::import::init())
@@ -313,10 +315,22 @@ fn main() {
             api::local_servers::local_servers_schedule_backup,
             api::local_servers::local_servers_backup_schedules,
             api::local_servers::local_servers_import_nyx,
+            api::accounts::accounts_status,
+            api::accounts::accounts_register,
+            api::accounts::accounts_login,
+            api::accounts::accounts_logout,
+            api::accounts::accounts_update,
+            api::accounts::accounts_search,
+            api::accounts::accounts_social,
+            api::accounts::accounts_friend_action,
+            api::accounts::accounts_sync,
+            api::accounts::accounts_change_password,
+            api::accounts::accounts_delete,
+            api::accounts::accounts_set_server,
             api::p2p::p2p_info,
             api::p2p::p2p_set_name,
             api::p2p::p2p_set_bio,
-            api::p2p::p2p_sync_modrinth_friends,
+            api::p2p::p2p_sync_account_friends,
             api::p2p::p2p_friends,
             api::p2p::p2p_add_friend,
             api::p2p::p2p_accept_friend,

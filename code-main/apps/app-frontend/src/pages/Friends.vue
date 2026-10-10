@@ -16,7 +16,7 @@ import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 
-import { syncModrinthFriendsToP2p } from '@/helpers/modrinth-p2p-sync'
+import { useStrataAccount } from '@/composables/use-strata-account'
 
 type FriendStatus = 'outgoing' | 'incoming' | 'accepted' | 'blocked'
 type Friend = {
@@ -24,7 +24,7 @@ type Friend = {
 	name: string
 	status: FriendStatus
 	synced: boolean
-	via_modrinth?: boolean
+	via_account?: boolean
 }
 type InviteInfo = {
 	share_id: string
@@ -47,7 +47,7 @@ type Instance = { id: string; name: string; game_version: string }
 const call = <T,>(cmd: string, args: Record<string, unknown> = {}) => invoke<T>(cmd, args)
 
 const me = ref<{ id: string; name: string }>({ id: '', name: '' })
-const nameDraft = ref('')
+const account = useStrataAccount()
 const friends = ref<Friend[]>([])
 const online = ref<Record<string, boolean>>({})
 const selectedId = ref('')
@@ -117,15 +117,6 @@ async function select(friend: Friend) {
 	selectedId.value = friend.id
 	messages.value = []
 	await loadMessages().catch(fail)
-}
-async function saveName() {
-	try {
-		await call('p2p_set_name', { name: nameDraft.value })
-		me.value = await call('p2p_info')
-		say('Nombre guardado')
-	} catch (e) {
-		fail(e)
-	}
 }
 async function copyCode() {
 	try {
@@ -303,10 +294,11 @@ let unlisten: (() => void) | undefined
 let timer: ReturnType<typeof setInterval> | undefined
 let lanTimer: ReturnType<typeof setInterval> | undefined
 onMounted(async () => {
-	void syncModrinthFriendsToP2p().then(() => loadFriends().catch(() => {}))
+	void call('accounts_sync')
+		.then(() => loadFriends())
+		.catch(() => {})
 	try {
 		me.value = await call('p2p_info')
-		nameDraft.value = me.value.name
 		await Promise.all([loadFriends(), loadShares()])
 		servers.value = await call<LocalServer[]>('local_servers_list')
 		instances.value = await call<Instance[]>('plugin:instance|instance_list').catch(() => [])
@@ -338,8 +330,9 @@ onUnmounted(() => {
 				<UsersIcon class="size-6" /> Amigos
 			</h1>
 			<p class="m-0 mt-1 text-secondary">
-				Conexión directa entre launchers, sin servidor intermedio. Solo tus amigos aceptados pueden
-				escribirte o unirse a lo que compartas.
+				El chat y las partidas van directos entre launchers: el servidor de cuentas solo guarda tu
+				nombre y tus amistades. Solo tus amigos aceptados pueden escribirte o unirse a lo que
+				compartas.
 			</p>
 		</header>
 
@@ -356,20 +349,23 @@ onUnmounted(() => {
 			class="grid gap-4 rounded-2xl bg-surface-3 p-4 ring-1 ring-inset ring-surface-5 lg:grid-cols-3"
 		>
 			<div class="flex flex-col gap-2">
-				<label for="myname" class="font-semibold text-contrast">Tu nombre</label>
-				<div class="flex gap-2">
-					<Input
-						id="myname"
-						v-model="nameDraft"
-						:maxlength="32"
-						autocomplete="off"
-						wrapper-class="flex-grow"
-					/>
-					<Button type="outlined" @click="saveName"><CheckIcon /> Guardar</Button>
+				<span class="font-semibold text-contrast">Tu cuenta</span>
+				<div
+					v-if="account.profile.value"
+					class="flex items-center gap-2 rounded-xl bg-surface-4 p-2 pl-3"
+				>
+					<span class="min-w-0 flex-1 truncate font-semibold text-contrast">{{
+						account.profile.value.username
+					}}</span>
+					<span class="text-sm text-secondary">Conectada</span>
 				</div>
+				<p v-else class="m-0 text-sm text-secondary">
+					Sin iniciar sesión. Entra en Ajustes → Perfil para que tus amigos te encuentren por
+					nombre; mientras tanto puedes usar códigos.
+				</p>
 			</div>
 			<div class="flex flex-col gap-2">
-				<label for="mycode" class="font-semibold text-contrast">Tu código de amigo</label>
+				<label for="mycode" class="font-semibold text-contrast">Tu código de partidas</label>
 				<div class="flex gap-2">
 					<Input
 						id="mycode"
@@ -381,7 +377,7 @@ onUnmounted(() => {
 				</div>
 			</div>
 			<div class="flex flex-col gap-2">
-				<label for="addcode" class="font-semibold text-contrast">Añadir amigo</label>
+				<label for="addcode" class="font-semibold text-contrast">Añadir por código</label>
 				<div class="flex gap-2">
 					<Input
 						id="addcode"
@@ -429,8 +425,8 @@ onUnmounted(() => {
 					Amigos · {{ accepted.length }}
 				</h2>
 				<p v-if="!accepted.length" class="m-0 px-2 py-1 text-sm text-secondary">
-					Aún no tienes amigos para jugar. Tus amigos de Modrinth aparecen aquí cuando publican su
-					código de partidas (Ajustes → Perfil), o puedes pegar un código a mano.
+					Aún no tienes amigos para jugar. Búscalos por nombre en el panel de la derecha («Añadir un
+					amigo») o pega un código a mano.
 				</p>
 				<button
 					v-for="f in accepted"
@@ -454,7 +450,7 @@ onUnmounted(() => {
 						<div class="truncate font-semibold text-contrast">{{ f.name }}</div>
 						<div class="text-xs text-secondary">
 							{{ online[f.id] ? 'Conectado' : 'Desconectado'
-							}}<template v-if="f.via_modrinth"> · Modrinth</template>
+							}}<template v-if="f.via_account"> · Cuenta</template>
 						</div>
 					</div>
 				</button>

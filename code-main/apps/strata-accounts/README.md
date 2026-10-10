@@ -1,37 +1,70 @@
-# Cuentas de Strata: prueba local
+# Servicio de cuentas de Strata
 
-Servicio propio, independiente del proveedor del catálogo y de Microsoft/Minecraft. Requiere Node.js 24 o posterior con `node:sqlite`. No necesita paquetes externos.
+Guarda **nombres de usuario únicos**, el **buscador**, las **amistades**, los **bloqueos** y los **ajustes de
+privacidad**. El chat y las partidas NO pasan por aquí: van por P2P entre launchers. Sin dependencias
+externas; requiere Node.js 24 o posterior (`node:sqlite`).
 
-Desde `code-main`:
+## Ejecutarlo
 
 ```powershell
-$env:STRATA_ACCOUNTS_DB='C:\ruta\de\datos\strata-accounts.sqlite'
+# En este equipo, para pruebas (escucha solo en 127.0.0.1)
+$env:STRATA_ACCOUNTS_DB='C:\ruta\strata-accounts.sqlite'
 node apps/strata-accounts/server.mjs
 ```
 
-La aplicación de escritorio conecta exclusivamente con `http://127.0.0.1:32145`. El servicio escucha únicamente en la interfaz local. No se inicia automáticamente al instalar el launcher y no permite acceso desde otros ordenadores. Si no está arrancado, la interfaz muestra un error de servicio no disponible.
+Variables de entorno:
 
-## Funciones
+| Variable | Por defecto | Qué hace |
+| --- | --- | --- |
+| `PORT` | `32145` | Puerto |
+| `HOST` | `127.0.0.1` | Interfaz. Usa `0.0.0.0` para aceptar conexiones externas |
+| `STRATA_ACCOUNTS_DB` | `./strata-accounts.sqlite` | Archivo de la base de datos |
+| `STRATA_TRUST_PROXY` | `0` | Pon `1` detrás de un proxy: los límites de uso usan `X-Forwarded-For` |
 
-- Registro con nombre único, sin distinguir mayúsculas, y contraseña de 12–128 caracteres.
-- Inicio de sesión y cierre de sesión. Tokens aleatorios de 256 bits, caducidad de 24 horas y revocación al salir. La aplicación guarda su token solo en memoria: al cerrar Strata hay que volver a entrar.
-- Biografía persistente.
-- Solicitudes recibidas/enviadas, aceptación, rechazo, cancelación y eliminación de amistades.
-- Bloqueo y desbloqueo. Bloquear elimina la relación y evita nuevas solicitudes en ambos sentidos.
-- Separación entre usuarios: todas las operaciones utilizan la identidad autenticada, nunca un identificador de propietario enviado por el cliente.
+Comprobación: `node --test apps/strata-accounts/server.test.mjs`
 
-SQLite conserva perfiles, relaciones y sesiones. Las contraseñas se derivan con scrypt y una sal aleatoria individual; solo se guarda el hash del token. Las respuestas excluyen contraseña y sal. Los orígenes del navegador están limitados a Tauri y al desarrollo local, las solicitudes tienen límite de tamaño y los intentos de autenticación tienen límite por minuto.
+## Alojarlo para que lo usen otras personas
 
-## Comprobación
+1. Despliégalo en cualquier sitio que ejecute Node 24 o Docker (`Dockerfile` incluido; el volumen `/data` guarda la
+   base de datos).
+2. Ponle **HTTPS** delante (Caddy, nginx, Cloudflare…). La app solo acepta `https://` salvo para este mismo equipo.
+3. Activa `STRATA_TRUST_PROXY=1` si va detrás de un proxy.
+4. Haz **copias de seguridad** del archivo SQLite.
+5. Apunta la app a él: al compilar, `STRATA_ACCOUNTS_URL=https://tu-servidor` (con `scripts/release.ps1 -AccountsUrl …`),
+   o por usuario en *Ajustes → Perfil → Servidor de cuentas*.
 
-```powershell
-node --test apps/strata-accounts/server.test.mjs
-```
+## Qué guarda (datos personales)
 
-La prueba usa una base temporal independiente y comprueba autenticación inválida, aislamiento de perfiles, solicitudes, aceptación, bloqueo, cancelación, logout, orígenes no autorizados y persistencia tras reiniciar el servicio.
+Nombre de usuario, hash de la contraseña (scrypt con sal propia), biografía, ajustes de privacidad, fecha de
+creación, la clave pública de partidas del usuario (enlazada con una firma que demuestra que la posee), las
+relaciones de amistad y los bloqueos. **No** guarda correos, direcciones IP (los límites de uso viven en
+memoria), mensajes ni contenido de partidas. Cada usuario puede borrar su cuenta desde la app (`POST /me/delete`),
+lo que elimina todo lo anterior y libera el nombre.
 
-## Trabajo pendiente para usuarios reales
+## Reglas
 
-Esta es una primera fase local. No se ha desplegado un servicio público. Faltan configuración de dominio y HTTPS, operación y copias del servicio, recuperación de cuenta, avatar y edición de nombre, presencia en tiempo real e invitaciones para jugar. El instalador del launcher no incorpora Node.js ni este servicio como servicio de Windows. Las funciones de cuenta del proveedor del catálogo, como instancias compartidas de ese proveedor, mantienen su autenticación separada y no aceptan tokens de Strata.
+- Nombres: de 3 a 24 caracteres (`A-Z a-z 0-9 _`), únicos sin distinguir mayúsculas, con una lista de nombres
+  reservados (`admin`, `strata`, `modrinth`…). Un nombre puede parecerse visualmente a otro (`Erik` / `Erlk`):
+  conviene moderar los nombres.
+- Contraseñas de 12 a 128 caracteres. **No hay recuperación de contraseña** (no se guarda ningún correo).
+- Límites por IP y por usuario en autenticación, creación de cuentas, búsquedas y solicitudes de amistad.
+- Privacidad: solicitudes de amistad (`everyone` / `mutual` = amigos de amigos / `none`), aparecer en el buscador, e
+  invitaciones a partidas (`friends` / `none`, aplicada por el launcher que las recibe).
 
-No apuntar el cliente a un servicio remoto por HTTP ni cambiar la escucha a una dirección pública para distribuir esta prueba.
+## API
+
+Todas las respuestas son JSON. Salvo `register`, `login` y `health`, requieren `Authorization: Bearer <token>`.
+
+| Ruta | Descripción |
+| --- | --- |
+| `GET /health` | Estado del servicio |
+| `POST /register`, `POST /login` | `{username, password}` → `{token, user}` |
+| `POST /logout` | Cierra la sesión |
+| `GET /me`, `PATCH /me` | Perfil, biografía y `settings` |
+| `POST /me/p2p` | Enlaza el código de partidas: `{code, ts, sig}`, firma Ed25519 de `strata-link:<id>:<code>:<ts>` |
+| `POST /me/password`, `POST /me/delete` | Cambio de contraseña y borrado de la cuenta |
+| `GET /users/search?q=` | Búsqueda por prefijo (mínimo 2 caracteres), con la relación de cada resultado |
+| `GET /social` | Amigos (con su código de partidas), solicitudes y bloqueados |
+| `POST /friends/request`, `/friends/accept`, `/friends/remove`, `/block`, `/unblock` | `{username}` |
+
+Las sesiones duran 30 días y solo se guarda el hash SHA-256 del token.

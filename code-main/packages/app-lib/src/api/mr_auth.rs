@@ -59,40 +59,6 @@ pub async fn authenticate_finish_flow(
     Ok(creds)
 }
 
-/// Conecta una cuenta de Modrinth con un token personal. Se comprueba que el token es válido y
-/// que permite leer la lista de amigos; si no, no se guarda nada.
-#[tracing::instrument(skip(token))]
-pub async fn authenticate_with_token(
-    token: &str,
-) -> crate::Result<ModrinthCredentials> {
-    let state = crate::State::get().await?;
-    let previous = ModrinthCredentials::get_active(&state.pool).await?;
-
-    let creds = crate::state::login_with_token(
-        token,
-        &state.api_semaphore,
-        &state.pool,
-    )
-    .await?;
-    creds.upsert(&state.pool).await?;
-
-    if let Err(error) = crate::api::friends::friends().await {
-        // Deshace la conexión: sin permiso de lectura de usuario los amigos no funcionarían.
-        ModrinthCredentials::remove(&creds.user_id, &state.pool).await?;
-        if let Some(previous) = previous {
-            previous.upsert(&state.pool).await?;
-        }
-        return Err(crate::ErrorKind::InputError(format!(
-            "El token es válido pero no permite usar los amigos. Créalo con los permisos \"Leer datos de usuario\" y \"Escribir datos de usuario\" ({error})"
-        ))
-        .as_error());
-    }
-
-    reconnect_friends(&state).await?;
-
-    Ok(creds)
-}
-
 #[tracing::instrument]
 pub async fn logout() -> crate::Result<()> {
     let state = crate::State::get().await?;
