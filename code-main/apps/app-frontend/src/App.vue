@@ -70,6 +70,7 @@ import { convertFileSrc, invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
+import { confirm } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
@@ -1725,6 +1726,17 @@ async function handleCommand(e) {
 	} else if (e.event === 'LaunchInstance') {
 		const instance = await getInstance(e.id).catch(handleError)
 		if (!instance || instance.quarantined) return
+
+		// Un enlace de una web (strata-local://launch/…) puede indicar a qué servidor o mundo entrar: se pide
+		// confirmación mostrando el destino, para que una página no pueda conectar el juego a un servidor ajeno.
+		if (e.server || e.singleplayer_world) {
+			const destination = e.server ? `el servidor ${e.server}` : `el mundo «${e.singleplayer_world}»`
+			const accepted = await confirm(
+				`Un enlace quiere abrir «${instance.name}» y entrar en ${destination}. ¿Quieres continuar?`,
+				{ title: 'Abrir desde un enlace', kind: 'warning', okLabel: 'Abrir', cancelLabel: 'Cancelar' },
+			).catch(() => false)
+			if (!accepted) return
+		}
 
 		if (e.server) {
 			await start_join_server(e.id, e.server).catch(handleError)
