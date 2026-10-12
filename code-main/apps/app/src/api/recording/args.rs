@@ -286,6 +286,49 @@ pub fn trim_args(input: &Path, output: &Path, start: f64, end: f64, mode: TrimMo
     args
 }
 
+/// Un vídeo que entra en una unión.
+pub struct MergeInput<'a> {
+    pub path: &'a Path,
+    pub duration: f64,
+    pub has_audio: bool,
+}
+
+/// Une los vídeos en orden con `concat`: todos se escalan al tamaño del primero (con bandas si cambia la proporción), a
+/// sus FPS y a audio estéreo de 48 kHz; a los que no tienen sonido se les añade silencio de su misma duración.
+pub fn merge_args(inputs: &[MergeInput], output: &Path, size: (u32, u32), fps: u32, encoder: &str, quality: &str, format: &str) -> Vec<String> {
+    let (w, h) = size;
+    let mut args: Vec<String> = ["-hide_banner", "-loglevel", "error", "-nostats", "-n", "-progress", "pipe:1"].map(String::from).to_vec();
+    for input in inputs {
+        args.extend(["-i".to_string(), input.path.to_string_lossy().into_owned()]);
+    }
+    let mut filters: Vec<String> = Vec::new();
+    let mut next_silence = inputs.len();
+    for (i, input) in inputs.iter().enumerate() {
+        filters.push(format!(
+            "[{i}:v:0]scale={w}:{h}:force_original_aspect_ratio=decrease,pad={w}:{h}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps={fps},format=yuv420p[v{i}]"
+        ));
+        if input.has_audio {
+            filters.push(format!("[{i}:a:0]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo[a{i}]"));
+        } else {
+            args.extend(["-f".to_string(), "lavfi".to_string(), "-t".to_string(), format!("{:.3}", input.duration), "-i".to_string(), "anullsrc=r=48000:cl=stereo".to_string()]);
+            filters.push(format!("[{next_silence}:a:0]aformat=sample_fmts=fltp:channel_layouts=stereo[a{i}]"));
+            next_silence += 1;
+        }
+    }
+    let pairs: String = (0..inputs.len()).map(|i| format!("[v{i}][a{i}]")).collect();
+    filters.push(format!("{pairs}concat=n={}:v=1:a=1[v][a]", inputs.len()));
+    args.extend(["-filter_complex".to_string(), filters.join(";")]);
+    args.extend(["-map", "[v]", "-map", "[a]"].map(String::from));
+    args.extend(video_codec_args(encoder, quality, w, h, fps));
+    args.extend(["-c:a", "aac", "-b:a", "160k"].map(String::from));
+    args.extend(["-f".to_string(), container_format(format).to_string()]);
+    if format != "mkv" {
+        args.extend(["-movflags", "+faststart"].map(String::from));
+    }
+    args.push(output.to_string_lossy().into_owned());
+    args
+}
+
 /// Fragmento como GIF animado: 15 fotogramas por segundo, 480 px de ancho y paleta propia (mucha mejor calidad que la fija).
 pub fn gif_args(input: &Path, output: &Path, start: f64, end: f64) -> Vec<String> {
     let mut args: Vec<String> = ["-hide_banner", "-loglevel", "error", "-nostats", "-n", "-progress", "pipe:1"].map(String::from).to_vec();
@@ -417,6 +460,25 @@ mod tests {
             assert!(args.ends_with("-f null -") && args.contains(encoder));
             assert_eq!(args.matches("-pix_fmt").count(), 1, "un único formato de píxel: {args}");
         }
+    }
+
+    #[test]
+    fn merge_scales_everything_to_the_first_video_and_fills_missing_audio() {
+        let a = PathBuf::from("a.mp4");
+        let b = PathBuf::from("b.mp4");
+        let c = PathBuf::from("c.mp4");
+        let inputs = [
+            MergeInput { path: &a, duration: 10.0, has_audio: true },
+            MergeInput { path: &b, duration: 4.5, has_audio: false },
+            MergeInput { path: &c, duration: 2.0, has_audio: true },
+        ];
+        let args = merge_args(&inputs, &PathBuf::from("out.mp4.trimming"), (1920, 1080), 60, "libx264", "medium", "mp4").join(" ");
+        assert!(args.contains("-i a.mp4 -i b.mp4 -i c.mp4 -f lavfi -t 4.500 -i anullsrc"), "el silencio va después de los vídeos: {args}");
+        assert!(args.contains("[1:v:0]scale=1920:1080"), "cada vídeo se escala al del primero");
+        assert!(args.contains("[3:a:0]aformat") && args.contains("[a1]"), "el vídeo sin sonido usa el silencio");
+        assert!(args.contains("[2:a:0]aresample") && !args.contains("[1:a:0]"));
+        assert!(args.contains("[v0][a0][v1][a1][v2][a2]concat=n=3:v=1:a=1[v][a]"));
+        assert!(args.contains("-map [v] -map [a]") && args.contains("-f mp4"));
     }
 
     #[test]

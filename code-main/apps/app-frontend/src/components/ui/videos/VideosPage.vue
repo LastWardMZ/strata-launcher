@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowLeftIcon, FolderOpenIcon, SearchIcon, SettingsIcon, TrashIcon, VideoIcon } from '@modrinth/assets'
+import { ArrowLeftIcon, FolderOpenIcon, SearchIcon, SettingsIcon, TrashIcon, VideoIcon, XIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	Button,
@@ -9,6 +9,7 @@ import {
 	EmptyState,
 	injectNotificationManager,
 	Input,
+	ProgressBar,
 	ReadyTransition,
 	useReadyState,
 } from '@modrinth/ui'
@@ -22,7 +23,9 @@ import {
 	playbackUrl,
 	recording_delete,
 	recording_list,
+	recording_merge_start,
 	recording_reveal,
+	recording_trim_cancel,
 	recordingError,
 	type VideoItem,
 	videoKeys,
@@ -53,6 +56,45 @@ const sortModel = computed<string>({
 const toDelete = ref<VideoItem | null>(null)
 const deleteModal = ref<InstanceType<typeof ConfirmModal>>()
 const playerUrl = ref('')
+
+// Modo «Unir»: los vídeos se marcan en el orden en que se unirán.
+const MAX_MERGE = 8
+const merging = ref(false)
+const mergeOrder = ref<string[]>([])
+const mergeJob = ref<string | null>(null)
+const mergeProgress = ref(0)
+const mergeError = ref('')
+const mergeBusy = computed(() => mergeJob.value !== null)
+function startMerge() {
+	merging.value = true
+	mergeOrder.value = []
+	mergeError.value = ''
+}
+function cancelSelection() {
+	merging.value = false
+	mergeOrder.value = []
+}
+function toggleMerge(video: VideoItem) {
+	if (mergeOrder.value.includes(video.id)) mergeOrder.value = mergeOrder.value.filter((id) => id !== video.id)
+	else if (mergeOrder.value.length < MAX_MERGE) mergeOrder.value = [...mergeOrder.value, video.id]
+}
+async function runMerge() {
+	const chosen = mergeOrder.value
+		.map((id) => videos.value.find((video) => video.id === id))
+		.filter((video): video is VideoItem => !!video)
+	if (chosen.length < 2) return
+	mergeError.value = ''
+	mergeProgress.value = 0
+	try {
+		mergeJob.value = await recording_merge_start(chosen.map((video) => video.path))
+		cancelSelection()
+	} catch (error) {
+		mergeError.value = recordingError(error)
+	}
+}
+async function cancelMergeJob() {
+	if (mergeJob.value) await recording_trim_cancel(mergeJob.value).catch(() => {})
+}
 const playerError = ref('')
 
 const videosQuery = useQuery({
@@ -153,6 +195,20 @@ onMounted(async () => {
 		if (event.type === 'saved' || (event.type === 'trim' && event.state === 'done')) {
 			void queryClient.invalidateQueries({ queryKey: videoKeys.all })
 		}
+		if (event.type === 'trim' && event.job === mergeJob.value) {
+			if (event.state === 'progress') {
+				mergeProgress.value = event.progress ?? 0
+				return
+			}
+			mergeJob.value = null
+			if (event.state === 'done') {
+				addNotification({ type: 'success', title: 'Vídeos unidos', text: 'Se ha guardado un vídeo nuevo. Los originales no se han tocado.' })
+			} else if (event.state === 'error') {
+				mergeError.value = event.message ?? 'No se pudieron unir los vídeos.'
+			} else if (event.state === 'canceled') {
+				addNotification({ type: 'info', title: 'Unión cancelada', text: 'No se ha creado ningún archivo.' })
+			}
+		}
 	})
 })
 onBeforeUnmount(() => unlisten?.())
@@ -217,6 +273,7 @@ onBeforeUnmount(() => unlisten?.())
 					clearable
 					wrapper-class="min-w-[16rem] flex-1"
 				/>
+				<Button :disabled="merging || mergeBusy || videos.length < 2" @click="startMerge">Unir vídeos</Button>
 				<Button @click="openRecordingSettings()"><SettingsIcon /> Ajustes de grabación</Button>
 			</div>
 			<div class="flex flex-wrap items-center gap-3">
@@ -261,6 +318,29 @@ onBeforeUnmount(() => unlisten?.())
 			/>
 
 			<template v-else>
+				<Admonition v-if="mergeError" type="critical" :body="mergeError" dismissible @dismiss="mergeError = ''" />
+				<div
+					v-if="mergeBusy"
+					class="flex flex-col gap-2 rounded-2xl bg-surface-3 p-4 ring-1 ring-inset ring-surface-5"
+				>
+					<div class="flex items-center justify-between gap-3">
+						<span class="font-semibold text-contrast">Uniendo vídeos… {{ Math.round(mergeProgress * 100) }}%</span>
+						<Button type="outlined" @click="cancelMergeJob"><XIcon /> Cancelar</Button>
+					</div>
+					<ProgressBar :progress="mergeProgress" full-width label="Progreso de la unión" />
+				</div>
+				<div
+					v-if="merging"
+					class="flex flex-wrap items-center gap-3 rounded-2xl bg-surface-3 p-3 ring-1 ring-inset ring-surface-5"
+					role="status"
+				>
+					<span class="min-w-0 flex-1 text-sm text-contrast">
+						<template v-if="!mergeOrder.length">Marca los vídeos en el orden en que quieres unirlos (de 2 a {{ MAX_MERGE }}).</template>
+						<template v-else>{{ mergeOrder.length }} marcados: se unirán en el orden de los números.</template>
+					</span>
+					<Button type="colored" color="brand" :disabled="mergeOrder.length < 2" @click="runMerge">Unir</Button>
+					<Button type="outlined" @click="cancelSelection">Cancelar</Button>
+				</div>
 				<Admonition
 					v-if="missingMetadata"
 					type="info"
@@ -272,6 +352,9 @@ onBeforeUnmount(() => unlisten?.())
 						:key="video.id"
 						:video="video"
 						:show-instance="!instanceId"
+						:selectable="merging"
+						:order="mergeOrder.indexOf(video.id) + 1"
+						@toggle="toggleMerge(video)"
 						@play="openPlayer(video)"
 						@trim="openEditor(video)"
 						@reveal="reveal(video)"

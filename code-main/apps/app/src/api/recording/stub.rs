@@ -85,6 +85,11 @@ pub async fn recording_trim_start(_path: String, _start: f64, _end: f64, _precis
 }
 
 #[tauri::command]
+pub async fn recording_merge_start(_paths: Vec<String>) -> Result<String, String> {
+    Err(UNSUPPORTED.into())
+}
+
+#[tauri::command]
 pub async fn recording_trim_cancel(_job: String) -> Result<(), String> {
     Err(UNSUPPORTED.into())
 }

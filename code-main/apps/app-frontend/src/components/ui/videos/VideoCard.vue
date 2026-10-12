@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { EditIcon, FolderOpenIcon, MoreVerticalIcon, PlayIcon, TrashIcon, VideoIcon } from '@modrinth/assets'
+import { CheckIcon, EditIcon, FolderOpenIcon, MoreVerticalIcon, PlayIcon, TrashIcon, VideoIcon } from '@modrinth/assets'
 import { TeleportOverflowMenu, useFormatDateTime } from '@modrinth/ui'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
@@ -12,9 +12,16 @@ import {
 	type VideoItem,
 } from '@/helpers/recording'
 
-const props = defineProps<{ video: VideoItem; showInstance: boolean }>()
+const props = defineProps<{
+	video: VideoItem
+	showInstance: boolean
+	/** Modo «Unir»: pulsar la tarjeta la marca en vez de reproducirla. */
+	selectable?: boolean
+	/** Posición (1, 2…) en la unión, o 0 si no está marcada. */
+	order?: number
+}>()
 const emit = defineEmits<{
-	(e: 'play' | 'trim' | 'reveal' | 'delete'): void
+	(e: 'play' | 'trim' | 'reveal' | 'delete' | 'toggle'): void
 }>()
 
 const card = ref<HTMLElement>()
@@ -61,8 +68,10 @@ onBeforeUnmount(() => observer?.disconnect())
 		<button
 			type="button"
 			class="relative isolate m-0 aspect-video w-full min-w-0 cursor-pointer overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-2 p-0 text-left shadow-sm transition-[filter] hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-			:aria-label="`Reproducir ${video.file_name}`"
-			@click="emit('play')"
+			:aria-label="selectable ? `${order ? 'Quitar' : 'Marcar'} ${video.file_name}` : `Reproducir ${video.file_name}`"
+			:aria-pressed="selectable ? !!order : undefined"
+			:class="{ '!border-brand ring-2 ring-brand': selectable && order }"
+			@click="selectable ? emit('toggle') : emit('play')"
 		>
 			<img
 				v-if="poster"
@@ -88,6 +97,15 @@ onBeforeUnmount(() => observer?.disconnect())
 				<span class="flex size-14 items-center justify-center rounded-full bg-surface-2 text-contrast shadow">
 					<PlayIcon class="size-7" />
 				</span>
+			</span>
+			<span
+				v-if="selectable"
+				class="absolute left-2 top-2 z-[3] flex size-7 items-center justify-center rounded-full border-2 border-solid text-sm font-bold"
+				:class="order ? 'border-brand bg-brand text-brand-contrast' : 'border-contrast bg-surface-2 text-transparent'"
+				aria-hidden="true"
+			>
+				<template v-if="order">{{ order }}</template>
+				<CheckIcon v-else class="size-4" />
 			</span>
 			<span
 				v-if="video.duration !== null"

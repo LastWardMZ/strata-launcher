@@ -342,6 +342,7 @@ fn main() {
             api::recording::recording_reveal,
             api::recording::recording_allow_playback,
             api::recording::recording_trim_start,
+            api::recording::recording_merge_start,
             api::recording::recording_trim_cancel,
             api::p2p::p2p_info,
             api::p2p::p2p_export_identity,

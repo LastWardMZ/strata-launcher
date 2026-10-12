@@ -19,6 +19,8 @@ pub struct Job {
 pub const MIN_CLIP_SECONDS: f64 = 0.5;
 /// Un GIF más largo pesa demasiado (decenas de MB) y casi nadie puede enviarlo.
 pub const MAX_GIF_SECONDS: f64 = 30.0;
+/// Tope de vídeos por unión (cada uno añade una entrada y un filtro a FFmpeg).
+pub const MAX_MERGE_VIDEOS: usize = 8;
 
 /// Comprueba el intervalo elegido y devuelve el final ajustado a la duración real del vídeo.
 pub fn validate_range(start: f64, end: f64, duration: f64) -> Result<f64, String> {
@@ -74,6 +76,24 @@ pub fn gif_path(original: &Path) -> PathBuf {
     dir.join(format!("{stem} (gif {}).gif", uuid::Uuid::new_v4().simple()))
 }
 
+/// Nombre de la unión: `primero (unido).mp4`, `primero (unido 2).mp4`… Nunca existe ya.
+pub fn merged_path(first: &Path, format: &str) -> PathBuf {
+    let dir = first.parent().unwrap_or_else(|| Path::new("."));
+    let stem = first.file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_else(|| "vídeo".into());
+    let free = |p: &PathBuf| !p.exists() && !PathBuf::from(format!("{}.trimming", p.display())).exists();
+    let candidate = dir.join(format!("{stem} (unido).{format}"));
+    if free(&candidate) {
+        return candidate;
+    }
+    for n in 2..10_000 {
+        let candidate = dir.join(format!("{stem} (unido {n}).{format}"));
+        if free(&candidate) {
+            return candidate;
+        }
+    }
+    dir.join(format!("{stem} (unido {}).{format}", uuid::Uuid::new_v4().simple()))
+}
+
 /// Segundos de la línea `out_time_us=…` / `out_time_ms=…` de `-progress`.
 pub fn parse_progress_line(line: &str) -> Option<f64> {
     let value = line.strip_prefix("out_time_us=").or_else(|| line.strip_prefix("out_time_ms="))?;
@@ -119,8 +139,15 @@ impl Service {
 
         let output = if gif { gif_path(&path) } else { clip_path(&path) };
         let temp = PathBuf::from(format!("{}.trimming", output.display()));
-        let mut cmd = ffmpeg::command(&paths.ffmpeg);
         let arguments = if gif { args::gif_args(&path, &temp, start, end) } else { args::trim_args(&path, &temp, start, end, mode, &source) };
+        self.launch_export(arguments, temp, output, end - start).await
+    }
+
+    /// Lanza FFmpeg con los argumentos dados y avisa del progreso (`wanted` = segundos de salida esperados). El archivo se
+    /// escribe como `temp` y solo pasa a `output` si termina bien: nunca queda uno a medias.
+    async fn launch_export(self: &Arc<Self>, arguments: Vec<String>, temp: PathBuf, output: PathBuf, wanted: f64) -> Result<String, String> {
+        let paths = ffmpeg::paths(&self.dir);
+        let mut cmd = ffmpeg::command(&paths.ffmpeg);
         cmd.args(arguments).stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped());
         let mut child = cmd.spawn().map_err(|e| format!("No se pudo iniciar FFmpeg: {e}"))?;
 
@@ -130,7 +157,6 @@ impl Service {
 
         let service = self.clone();
         let id = job_id.clone();
-        let wanted = end - start;
         tokio::spawn(async move {
             let stdout = child.stdout.take();
             let mut stderr = child.stderr.take();
@@ -204,6 +230,53 @@ impl Service {
             }
         });
         Ok(job_id)
+    }
+
+    /// Une varios vídeos (en el orden dado) en uno nuevo con la resolución y los FPS del primero. Recodifica, así que
+    /// admite vídeos de distinto tamaño; los que no tienen sonido se rellenan con silencio.
+    pub(super) async fn merge_start(self: &Arc<Self>, paths_in: Vec<PathBuf>) -> Result<String, String> {
+        if paths_in.len() < 2 || paths_in.len() > MAX_MERGE_VIDEOS {
+            return Err(format!("Elige entre 2 y {MAX_MERGE_VIDEOS} vídeos para unir"));
+        }
+        let roots = self.managed_roots().await;
+        let mut seen = std::collections::HashSet::new();
+        for path in &paths_in {
+            if !library::is_managed(path, &roots) {
+                return Err("Uno de los vídeos no está en una carpeta de grabaciones".into());
+            }
+            if !seen.insert(path.clone()) {
+                return Err("No se puede unir el mismo vídeo dos veces".into());
+            }
+        }
+        if !ffmpeg::is_installed(&self.dir) {
+            return Err("Falta el componente de grabación (FFmpeg): instálalo en Ajustes → Grabación".into());
+        }
+        if !self.trims.lock().unwrap().is_empty() {
+            return Err("Ya hay una exportación en curso: espera a que termine".into());
+        }
+        let ff = ffmpeg::paths(&self.dir);
+        let mut infos = Vec::new();
+        for path in &paths_in {
+            let info = ffmpeg::probe_media(&ff.ffprobe, path).await?;
+            let duration = info.duration.filter(|d| *d > 0.0).ok_or("No se pudo leer la duración de uno de los vídeos")?;
+            infos.push((duration, info));
+        }
+        let total: f64 = infos.iter().map(|(d, _)| *d).sum();
+        let first = &infos[0].1;
+        let size = (first.width.unwrap_or(1280) & !1, first.height.unwrap_or(720) & !1);
+        let fps = first.fps.map_or(30, |f| f.round() as u32).clamp(1, 120);
+        let settings = self.settings();
+        let encoder = self.pick_encoder(&settings.encoder).await?;
+        let format = if paths_in[0].extension().is_some_and(|e| e.eq_ignore_ascii_case("mkv")) { "mkv" } else { "mp4" };
+        let output = merged_path(&paths_in[0], format);
+        let temp = PathBuf::from(format!("{}.trimming", output.display()));
+        let inputs: Vec<args::MergeInput> = paths_in
+            .iter()
+            .zip(&infos)
+            .map(|(path, (duration, info))| args::MergeInput { path, duration: *duration, has_audio: info.has_audio })
+            .collect();
+        let arguments = args::merge_args(&inputs, &temp, size, fps, encoder, &settings.quality, format);
+        self.launch_export(arguments, temp, output, total).await
     }
 }
 

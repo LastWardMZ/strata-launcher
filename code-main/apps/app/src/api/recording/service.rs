@@ -650,6 +650,12 @@ pub async fn recording_trim_start(
 }
 
 #[tauri::command]
+pub async fn recording_merge_start(app: tauri::AppHandle, state: tauri::State<'_, RecordingState>, paths: Vec<String>) -> Result<String, String> {
+    let service = service(&app, &state).await?;
+    service.merge_start(paths.into_iter().map(PathBuf::from).collect()).await
+}
+
+#[tauri::command]
 pub async fn recording_trim_cancel(app: tauri::AppHandle, state: tauri::State<'_, RecordingState>, job: String) -> Result<(), String> {
     let service = service(&app, &state).await?;
     service.trim_cancel(&job);
