@@ -209,8 +209,17 @@ export function createHandler(db) {
 
 		if (request.method === 'POST' && FRIEND_ACTIONS.has(path)) {
 			if (typeof body.username !== 'string') fail(400, 'Indica un nombre de usuario.')
+			// Los límites van ANTES de buscar al destino: sin ellos estas acciones permitían sondear nombres (también los de
+			// usuarios que no quieren aparecer en la búsqueda) a ritmo ilimitado.
+			await limit(`act:${id}`, 60, 3_600_000, 'Has hecho demasiadas acciones de amistad. Inténtalo más tarde.')
+			if (path === '/friends/request') await limit(`req:${id}`, 20, 3_600_000, 'Has enviado demasiadas solicitudes. Inténtalo más tarde.')
 			const target = await userByName(body.username)
-			if (!target || target.id === id) fail(400, 'No se puede realizar esa acción con ese usuario.')
+			if (!target || target.id === id) {
+				// Misma respuesta que si el usuario existiera pero no hubiera nada que hacer (sin relación o sin solicitud).
+				if (path === '/friends/accept') fail(404, 'La solicitud ya no está disponible.')
+				if (path === '/friends/request') fail(400, 'No se puede realizar esa acción con ese usuario.')
+				return { ok: true }
+			}
 			const other = target.id
 			if (path === '/block') {
 				await db.batch([
@@ -230,7 +239,6 @@ export function createHandler(db) {
 						fail(404, 'La solicitud ya no está disponible.')
 					}
 				} else {
-					await limit(`req:${id}`, 20, 3_600_000, 'Has enviado demasiadas solicitudes. Inténtalo más tarde.')
 					if ((await relationTo(id, other)) !== 'none') fail(409, 'Ya existe una amistad o solicitud con ese usuario.')
 					if (target.friend_privacy === 'none') fail(403, 'Este usuario no acepta solicitudes de amistad.')
 					if (target.friend_privacy === 'mutual') {

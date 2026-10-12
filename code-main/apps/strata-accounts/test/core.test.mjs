@@ -217,3 +217,32 @@ test('cuerpos demasiado grandes y rutas desconocidas', async () => {
 	await call(alice, 'GET', '/no-existe', undefined, { expected: 404 })
 	await call(null, 'GET', '/health', undefined)
 })
+
+test('sondeo de nombres [SEC-06]: las acciones de amistad tienen límite y no delatan qué usuarios existen', async () => {
+	const { call, register } = setup()
+	const alice = await register('Alice_QA')
+	const bob = await register('Bob_QA')
+	await call(bob, 'PATCH', '/me', { settings: { searchable: false } })
+
+	// Bloquear, desbloquear, retirar y aceptar dan la misma respuesta si el usuario existe (sin relación) y si no existe.
+	for (const path of ['/unblock', '/friends/remove', '/block']) {
+		const existing = await call(alice, 'POST', path, { username: 'Bob_QA' })
+		const missing = await call(alice, 'POST', path, { username: 'Nadie_QA' })
+		assert.deepEqual(missing, existing, `${path}: misma respuesta exista o no el usuario`)
+	}
+	await call(alice, 'POST', '/unblock', { username: 'Bob_QA' })
+	const noRequest = await call(alice, 'POST', '/friends/accept', { username: 'Bob_QA' }, { expected: 404 })
+	const missingAccept = await call(alice, 'POST', '/friends/accept', { username: 'Nadie_QA' }, { expected: 404 })
+	assert.deepEqual(missingAccept, noRequest, '/friends/accept: misma respuesta')
+
+	// Sondear a ritmo ilimitado ya no es posible: 60 acciones por hora y cuenta (las 8 de arriba cuentan).
+	const carol = await register('Carol_QA')
+	for (let i = 0; i < 60; i++) await call(carol, 'POST', '/unblock', { username: `Prueba_${i}` })
+	const blocked = await call(carol, 'POST', '/unblock', { username: 'Prueba_x' }, { expected: 429 })
+	assert.equal(blocked.code, 'rate-limit')
+
+	// Las solicitudes a nombres inexistentes también cuentan para el límite de 20 por hora.
+	const dave = await register('Dave_QA')
+	for (let i = 0; i < 20; i++) await call(dave, 'POST', '/friends/request', { username: `Nadie_${i}` }, { expected: 400 })
+	assert.equal((await call(dave, 'POST', '/friends/request', { username: 'Nadie_x' }, { expected: 429 })).code, 'rate-limit')
+})
