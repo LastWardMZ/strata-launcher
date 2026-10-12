@@ -90,7 +90,9 @@ fn read_index(bytes: &[u8]) -> Result<PackIndex, String> {
 	let mut entry = archive.by_name("modrinth.index.json").map_err(|_| "El archivo no es un modpack de Modrinth válido")?;
 	if entry.size() > 10_000_000 { return Err("Índice de modpack demasiado grande".into()); }
 	let mut index = Vec::new();
-	entry.read_to_end(&mut index).map_err(|e| e.to_string())?;
+	// Acotado también en la lectura: la cabecera puede declarar menos de lo que realmente descomprime.
+	(&mut entry).take(10_000_001).read_to_end(&mut index).map_err(|e| e.to_string())?;
+	if index.len() > 10_000_000 { return Err("Índice de modpack demasiado grande".into()); }
 	let index: PackIndex = serde_json::from_slice(&index).map_err(|e| e.to_string())?;
 	if index.game != "minecraft" || index.format_version != 1 || index.files.len() > 10000 { return Err("Formato de modpack no compatible".into()); }
 	Ok(index)
@@ -157,12 +159,13 @@ pub async fn local_servers_pack_install<R: tauri::Runtime>(app: tauri::AppHandle
 			let Some(name) = entry.name().strip_prefix(prefix).map(str::to_owned) else { continue };
 			if entry.is_dir() { continue; }
 			let relative = relative_path(&name)?;
-			total = total.saturating_add(entry.size());
+			let entry_size = entry.size();
+			total = total.saturating_add(entry_size);
 			if total > 5_000_000_000 { return Err("Modpack demasiado grande".into()); }
 			let target = staging.path().join(&relative);
 			fs::create_dir_all(target.parent().ok_or("Ruta no válida")?).map_err(|e| e.to_string())?;
 			let mut output = fs::File::create(target).map_err(|e| e.to_string())?;
-			std::io::copy(&mut entry, &mut output).map_err(|e| e.to_string())?;
+			super::local_servers::copy_declared(&mut entry, &mut output, entry_size)?;
 			paths.insert(relative);
 		}
 	}

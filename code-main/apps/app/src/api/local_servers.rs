@@ -240,6 +240,18 @@ pub fn local_servers_java_check(java: String) -> JavaCheck {
     }
 }
 
+/// Copia una entrada de un ZIP sin dejar que escriba más de lo que declara su cabecera. Los topes de tamaño se calculan
+/// con el tamaño declarado, y una cabecera falsificada puede declarar 1 KB y descomprimir gigas (zip bomb): se comprobó
+/// con un archivo fabricado, el crate lee todo sin error.
+pub(super) fn copy_declared(reader: &mut impl std::io::Read, writer: &mut impl std::io::Write, declared: u64) -> Result<u64, String> {
+    let mut limited = std::io::Read::take(&mut *reader, declared.saturating_add(1));
+    let copied = std::io::copy(&mut limited, writer).map_err(|e| e.to_string())?;
+    if copied > declared {
+        return Err("Una entrada del archivo ocupa más de lo que declara (posible zip bomb)".into());
+    }
+    Ok(copied)
+}
+
 #[tauri::command]
 pub fn local_servers_import_zip(zip_path: PathBuf, directory: PathBuf) -> Result<Option<String>, String> {
     if !zip_path.is_file() || !directory.is_absolute() { return Err("ZIP o carpeta no válido".into()); }
@@ -252,7 +264,8 @@ pub fn local_servers_import_zip(zip_path: PathBuf, directory: PathBuf) -> Result
     let mut total = 0_u64;
     for index in 0..archive.len() {
         let mut entry = archive.by_index(index).map_err(|e| e.to_string())?;
-        total = total.saturating_add(entry.size());
+        let entry_size = entry.size();
+        total = total.saturating_add(entry_size);
         if total > 20_000_000_000 { return Err("ZIP demasiado grande".into()); }
         let path = Path::new(entry.name());
         if path.components().any(|c| !matches!(c, Component::Normal(_))) { return Err("Ruta insegura dentro del ZIP".into()); }
@@ -260,7 +273,7 @@ pub fn local_servers_import_zip(zip_path: PathBuf, directory: PathBuf) -> Result
         if entry.is_dir() { fs::create_dir_all(&target).map_err(|e| e.to_string())?; continue; }
         if let Some(parent) = target.parent() { fs::create_dir_all(parent).map_err(|e| e.to_string())?; }
         let mut output = fs::OpenOptions::new().write(true).create_new(true).open(target).map_err(|e| e.to_string())?;
-        std::io::copy(&mut entry, &mut output).map_err(|e| e.to_string())?;
+        copy_declared(&mut entry, &mut output, entry_size)?;
     }
     let entries = fs::read_dir(&directory).map_err(|e| e.to_string())?.collect::<Result<Vec<_>,_>>().map_err(|e| e.to_string())?;
     if entries.len() == 1 && entries[0].file_type().map_err(|e| e.to_string())?.is_dir() {
@@ -1871,5 +1884,54 @@ mod checksum_tests {
         assert!(parse_published_checksum("<html>404</html>", 40).is_none());
         assert!(parse_published_checksum("a9993e364706816aba3e25717850c26c9cd0d89", 40).is_none(), "39 caracteres");
         assert!(parse_published_checksum("zz993e364706816aba3e25717850c26c9cd0d89d", 40).is_none(), "no hexadecimal");
+    }
+}
+
+#[cfg(test)]
+mod zip_bomb_tests {
+    use super::*;
+    use std::io::{Cursor, Read, Write};
+
+    /// ZIP de una entrada con 10 MB de ceros cuya cabecera declara solo `declared` bytes.
+    fn forged_zip(declared: u32) -> Vec<u8> {
+        let mut buffer = Cursor::new(Vec::new());
+        {
+            let mut writer = zip::ZipWriter::new(&mut buffer);
+            let options = zip::write::SimpleFileOptions::default().compression_method(zip::CompressionMethod::Deflated);
+            writer.start_file("big.bin", options).unwrap();
+            writer.write_all(&vec![0u8; 10_000_000]).unwrap();
+            writer.finish().unwrap();
+        }
+        let mut bytes = buffer.into_inner();
+        let local = bytes.windows(4).position(|w| w == [0x50, 0x4b, 0x03, 0x04]).unwrap();
+        bytes[local + 22..local + 26].copy_from_slice(&declared.to_le_bytes());
+        let central = bytes.windows(4).position(|w| w == [0x50, 0x4b, 0x01, 0x02]).unwrap();
+        bytes[central + 24..central + 28].copy_from_slice(&declared.to_le_bytes());
+        bytes
+    }
+
+    /// SEC-08: lo que se escribe nunca supera el tamaño declarado.
+    #[test]
+    fn an_entry_that_lies_about_its_size_is_rejected() {
+        let mut archive = zip::ZipArchive::new(Cursor::new(forged_zip(1000))).unwrap();
+        let mut entry = archive.by_index(0).unwrap();
+        assert_eq!(entry.size(), 1000, "la cabecera miente");
+        let declared = entry.size();
+        let mut sink = Vec::new();
+        let error = copy_declared(&mut entry, &mut sink, declared).unwrap_err();
+        assert!(error.contains("zip bomb"), "{error}");
+        assert!(sink.len() as u64 <= declared + 1, "se detuvo enseguida, no tras escribir 10 MB (escribió {})", sink.len());
+    }
+
+    #[test]
+    fn an_honest_entry_is_copied_whole() {
+        let mut archive = zip::ZipArchive::new(Cursor::new(forged_zip(10_000_000))).unwrap();
+        let mut entry = archive.by_index(0).unwrap();
+        let declared = entry.size();
+        let mut sink = Vec::new();
+        assert_eq!(copy_declared(&mut entry, &mut sink, declared).unwrap(), 10_000_000);
+        let mut again = std::io::empty();
+        assert_eq!(copy_declared(&mut again, &mut Vec::new(), 0).unwrap(), 0);
+        let _ = entry.read(&mut [0u8; 1]);
     }
 }
