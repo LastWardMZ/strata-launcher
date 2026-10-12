@@ -2,7 +2,8 @@
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { open } from '@tauri-apps/plugin-dialog'
-import { SearchIcon, FolderOpenIcon, PlusIcon, BoxesIcon, CompassIcon, UploadIcon, BoxImportIcon } from '@modrinth/assets'
+import { SearchIcon, FolderOpenIcon, PlusIcon, BoxesIcon, CompassIcon, UploadIcon, BoxImportIcon, XIcon } from '@modrinth/assets'
+import { Admonition, Button, Card, Chips, EmptyState, IconButton, Tabs } from '@modrinth/ui'
 import { onMounted, onUnmounted, ref } from 'vue'
 type Server = {
 	id: string
@@ -73,14 +74,14 @@ async function preparePack() {
 		createVersion.value = preview.loader === 'NeoForge' ? preview.loader_version.split('.').slice(0, 2).join('.') : preview.minecraft
 		await loadCatalogBuilds()
 		const wanted = preview.loader === 'Forge' ? `${preview.minecraft}-${preview.loader_version}` : preview.loader === 'vanilla' ? preview.minecraft : preview.loader_version
-		if (!catalogBuilds.value.some(b => b.id === wanted)) throw new Error(`El loader ${wanted} del modpack no está disponible en el catálogo.`)
+		if (!catalogBuilds.value.some(b => b.id === wanted)) throw new Error(`El loader ${wanted} del modpack no está disponible.`)
 		createBuild.value = wanted; buildPolicy.value = 'other'
 		browsePacks.value = false; createStep.value = 0; error.value = ''
 	} catch (e) { error.value = String(e); packPreview.value = null }
 	finally { packLoading.value = false }
 }
 async function uploadPack() {
-	const path = await open({ multiple: false, filters: [{ name: 'Modpack de catálogo', extensions: ['mrpack'] }] })
+	const path = await open({ multiple: false, filters: [{ name: 'Modpack de Modrinth', extensions: ['mrpack'] }] })
 	if (typeof path !== 'string') return
 	packPath.value = path; packVersionId.value = ''; chosenPack.value = null
 	await preparePack()
@@ -256,6 +257,7 @@ const tabs: { id: PanelTab; label: string }[] = [
 	{ id: 'access', label: 'Acceso' },
 	{ id: 'settings', label: 'Ajustes' },
 ]
+const tabItems = tabs.map((tab) => ({ value: tab.id, label: tab.label }))
 async function selectServer(server: Server) {
 	selected.value = server
 	activeTab.value = 'overview'
@@ -697,23 +699,17 @@ onUnmounted(() => {
 				<p class="subtle">Crea y administra tus servidores de Minecraft en este equipo.</p>
 			</div>
 			<div class="head-actions">
-				<button
-					class="button secondary"
-					@click="openCreate('import')"
-				>
+				<Button @click="openCreate('import')">
 					Importar
-				</button>
-				<button
-					class="button primary"
-					@click="openCreate('new')"
-				>
+				</Button>
+				<Button type="colored" color="brand" @click="openCreate('new')">
 					+ Crear servidor
-				</button>
+				</Button>
 			</div>
 		</header>
 
-		<p v-if="error" class="notice error" role="alert">{{ error }}</p>
-		<p v-if="statusMessage" class="notice success" role="status">{{ statusMessage }}</p>
+		<Admonition v-if="error" type="critical" :body="error" class="mb-4" role="alert" />
+		<Admonition v-if="statusMessage" type="success" :body="statusMessage" class="mb-4" role="status" />
 
 		<section v-if="!selected" class="library">
 			<div class="section-heading">
@@ -741,24 +737,15 @@ onUnmounted(() => {
 					<span class="arrow">›</span>
 				</button>
 			</div>
-			<div v-else class="empty-card">
-				<span class="empty-icon">▦</span>
-				<h2>Aún no hay servidores locales</h2>
-				<p>
-					Crea uno nuevo o importa los que ya tienes. Tus carpetas originales permanecerán donde
-					están.
-				</p>
-				<button
-					class="button primary"
-					@click="openCreate('new')"
-				>
-					Crear mi primer servidor
-				</button>
-			</div>
-		</section>
+			<EmptyState v-else type="empty" heading="Aún no hay servidores locales" description="Crea uno nuevo o importa los que ya tienes. Tus carpetas originales permanecerán donde están.">
+					<template #actions>
+						<Button type="colored" color="brand" @click="openCreate('new')">Crear mi primer servidor</Button>
+					</template>
+				</EmptyState>
+			</section>
 
 		<template v-else>
-			<button class="back-link" @click="showServerList">‹ Todos los servidores</button>
+			<Button class="mb-4" type="quiet" size="sm" @click="showServerList">‹ Todos los servidores</Button>
 			<section class="server-hero">
 				<div class="server-identity">
 					<span class="server-avatar large">▦</span>
@@ -776,38 +763,26 @@ onUnmounted(() => {
 				<div class="hero-actions">
 					<span class="status-pill" :class="running ? 'online' : ''"
 						><i />{{ running ? 'En marcha' : 'Detenido' }}</span
-					><button
-						class="button primary"
-						:disabled="running || busy"
-						@click="action('local_servers_start')"
-					>
-						Iniciar</button
-					><button class="button secondary" :disabled="!running || busy" @click="restartServer">
-						Reiniciar</button
-					><button
-						class="button secondary"
-						:disabled="!running || busy"
-						@click="action('local_servers_stop')"
-					>
+					><Button type="colored" color="brand" :disabled="running || busy" @click="action('local_servers_start')">
+						Iniciar</Button><Button :disabled="!running || busy" @click="restartServer">
+						Reiniciar</Button><Button :disabled="!running || busy" @click="action('local_servers_stop')">
 						Detener
-					</button>
+					</Button>
 				</div>
 			</section>
 
-			<nav class="panel-tabs" aria-label="Gestión del servidor">
-				<button
-					v-for="tab in tabs"
-					:key="tab.id"
-					:class="{ active: activeTab === tab.id }"
-					@click="showTab(tab.id)"
-				>
-					{{ tab.label }}
-				</button>
-			</nav>
+			<Tabs
+					class="my-5"
+					color="gray"
+					aria-label="Gestión del servidor"
+					:value="activeTab"
+					:tabs="tabItems"
+					@update:value="showTab($event as PanelTab)"
+				/>
 
 			<div v-if="activeTab === 'overview'" class="panel-layout">
 				<div class="panel-main">
-					<section class="panel-card">
+					<Card class="panel-card">
 						<div class="card-title">
 							<div>
 								<h3>Consola</h3>
@@ -830,12 +805,12 @@ onUnmounted(() => {
 								:disabled="!running"
 								aria-label="Comando"
 								placeholder="Escribe un comando del servidor…"
-							/><button class="button primary" :disabled="!running || !command">Enviar</button>
+							/><Button type="colored" color="brand" native-type="submit" :disabled="!running || !command">Enviar</Button>
 						</form>
-					</section>
+					</Card>
 				</div>
 				<aside class="panel-side">
-					<section class="panel-card">
+					<Card class="panel-card">
 						<h3>Recursos</h3>
 						<div class="metric">
 							<span>CPU</span
@@ -856,17 +831,17 @@ onUnmounted(() => {
 								diskBytes === null ? '—' : (diskBytes / 1048576).toFixed(0) + ' MiB'
 							}}</strong>
 						</div>
-						<button class="text-button" @click="refreshDisk">Calcular uso de disco</button>
-					</section>
-					<section class="panel-card">
+						<Button type="quiet" size="sm" @click="refreshDisk">Calcular uso de disco</Button>
+					</Card>
+					<Card class="panel-card">
 						<h3>Ubicación</h3>
 						<p class="path-block">{{ selected.directory }}</p>
 						<p class="subtle">Archivo de inicio: {{ selected.jar }}</p>
-					</section>
+					</Card>
 				</aside>
 			</div>
 
-			<section v-if="activeTab === 'content'" class="panel-card wide">
+			<Card v-if="activeTab === 'content'" class="panel-card wide">
 				<div class="card-title">
 					<div>
 						<h3>Mods y plugins</h3>
@@ -879,11 +854,11 @@ onUnmounted(() => {
 				<form class="inline-form" @submit.prevent="searchContent">
 					<input
 						v-model="contentQuery"
-						aria-label="Buscar en catálogo"
-						placeholder="Buscar en catálogo…"
-					/><button class="button primary" :disabled="busy || !selected.game_version">
+						aria-label="Buscar en Modrinth"
+						placeholder="Buscar en Modrinth…"
+					/><Button type="colored" color="brand" native-type="submit" :disabled="busy || !selected.game_version">
 						Buscar
-					</button>
+					</Button>
 				</form>
 				<p v-if="!selected.game_version" class="hint">
 					Indica la versión de Minecraft en Ajustes antes de buscar contenido.
@@ -893,9 +868,9 @@ onUnmounted(() => {
 						<strong>{{ hit.title }}</strong
 						><small>{{ hit.description }}</small>
 					</div>
-					<button class="button secondary" :disabled="busy" @click="installContent(hit.project_id)">
+					<Button :disabled="busy" @click="installContent(hit.project_id)">
 						Instalar
-					</button>
+					</Button>
 				</div>
 				<h4>Instalado por Strata</h4>
 				<p v-if="!installed.length" class="subtle">
@@ -906,13 +881,13 @@ onUnmounted(() => {
 						<strong>{{ item.title }}</strong
 						><small>{{ item.file_name }}</small>
 					</div>
-					<button class="button secondary" @click="removeContent(item.project_id)">
+					<Button @click="removeContent(item.project_id)">
 						Desinstalar
-					</button>
+					</Button>
 				</div>
-			</section>
+			</Card>
 
-			<section v-if="activeTab === 'files'" class="panel-card wide">
+			<Card v-if="activeTab === 'files'" class="panel-card wide">
 				<div class="card-title">
 					<div>
 						<h3>Archivos</h3>
@@ -920,13 +895,8 @@ onUnmounted(() => {
 					</div>
 				</div>
 				<div class="file-path">
-					<button
-						v-if="folder"
-						class="text-button"
-						@click="openFolder(folder.split('/').slice(0, -1).join('/'))"
-					>
-						‹ Subir</button
-					><span>/{{ folder }}</span>
+					<Button type="quiet" size="sm" v-if="folder" @click="openFolder(folder.split('/').slice(0, -1).join('/'))">
+						‹ Subir</Button><span>/{{ folder }}</span>
 				</div>
 				<div v-for="file in files" :key="file.name" class="file-row">
 					<button
@@ -944,22 +914,22 @@ onUnmounted(() => {
 				<div v-if="openedFile" class="editor">
 					<div class="card-title">
 						<h4>{{ openedFile }}</h4>
-						<button class="button primary" @click="saveFile">Guardar archivo</button>
+						<Button type="colored" color="brand" @click="saveFile">Guardar archivo</Button>
 					</div>
 					<textarea v-model="contents" aria-label="Contenido del archivo" />
 				</div>
-			</section>
+			</Card>
 
 			<div v-if="activeTab === 'backups'" class="panel-layout">
-				<section class="panel-card">
+				<Card class="panel-card">
 					<h3>Copia manual</h3>
 					<p>Guarda una copia de los archivos del servidor. Detén el servidor antes de crearla.</p>
-					<button class="button primary" :disabled="running" @click="backup">
+					<Button type="colored" color="brand" :disabled="running" @click="backup">
 						Crear copia ahora
-					</button>
+					</Button>
 					<p v-if="backupLocation" class="hint">Copia creada en {{ backupLocation }}</p>
-				</section>
-				<section class="panel-card">
+				</Card>
+				<Card class="panel-card">
 					<h3>Copias programadas</h3>
 					<p>Intervalo en minutos. Usa 0 para desactivar la programación.</p>
 					<label class="field"
@@ -968,25 +938,32 @@ onUnmounted(() => {
 							type="number"
 							min="0"
 							max="43200" /></label
-					><button class="button secondary" @click="saveBackupSchedule">Guardar programa</button>
-				</section>
+					><Button @click="saveBackupSchedule">Guardar programa</Button>
+				</Card>
 			</div>
 
-			<section v-if="activeTab === 'access'" class="panel-card wide">
+			<Card v-if="activeTab === 'access'" class="panel-card wide">
 				<h3>Acceso al servidor personal</h3>
 				<p>Este servidor se administra desde Strata en este equipo.</p>
 				<div class="metric"><span>Panel remoto</span><strong>Desactivado</strong></div>
 				<div class="metric"><span>Usuarios remotos</span><strong>Sin configurar</strong></div>
 				<p class="hint">El acceso remoto no se habilita ni abre puertos desde esta sección.</p>
-			</section>
+			</Card>
 
 			<div v-if="activeTab === 'settings'" class="settings-stack">
-				<nav class="settings-subtabs"><button class="button secondary" :class="{chosen:settingsSection === 'general'}" @click="settingsSection = 'general'">General y lanzamiento</button><button class="button secondary" :class="{chosen:settingsSection === 'properties'}" @click="settingsSection = 'properties'; loadProperties()">server.properties</button></nav>
-<section v-if="settingsSection === 'properties'" class="panel-card editor">
-	<div class="card-title"><div><h3>Propiedades del servidor</h3><p>Conserva todas las opciones y comentarios del archivo. Detén el servidor para guardar.</p></div><button class="button primary" :disabled="running" @click="saveProperties">Guardar</button></div>
+				<Chips
+				:capitalize="false"
+						:items="['general', 'properties']"
+						:format-label="(section: string) => section === 'general' ? 'General y lanzamiento' : 'server.properties'"
+						:model-value="settingsSection"
+						aria-label="Sección de ajustes"
+						@update:model-value="settingsSection = $event as string; if ($event === 'properties') loadProperties()"
+					/>
+<Card v-if="settingsSection === 'properties'" class="panel-card editor">
+	<div class="card-title"><div><h3>Propiedades del servidor</h3><p>Conserva todas las opciones y comentarios del archivo. Detén el servidor para guardar.</p></div><Button type="colored" color="brand" :disabled="running" @click="saveProperties">Guardar</Button></div>
 	<textarea v-model="propertiesText" aria-label="server.properties" placeholder="El servidor generará este archivo al iniciarse. También puedes escribir sus propiedades aquí." />
-</section>
-<section v-if="settingsSection === 'general'" class="panel-card settings-general">
+</Card>
+<Card v-if="settingsSection === 'general'" class="panel-card settings-general">
 	<h3>General</h3>
 	<label class="field">Nombre<input v-model="selected.name" /></label>
 	<label class="field">Directorio de trabajo<input :value="selected.directory" readonly /><small>Carpeta vinculada al servidor. Sus archivos permanecen en esta ubicación.</small></label>
@@ -1000,9 +977,9 @@ onUnmounted(() => {
 	<div class="form-grid"><label class="field">RAM mínima (MB)<input v-model.number="selected.min_memory_mb" type="number" min="0" max="65536" /></label><label class="field">RAM máxima (MB)<input v-model.number="selected.memory_mb" type="number" min="512" max="65536" /></label></div>
 	<label class="field">Argumentos JVM adicionales<input v-model="selected.extra_jvm_args" placeholder="-XX:+UseG1GC" /></label>
 	<label class="field">Versión instalada<input v-model="selected.game_version" /></label>
-	<button class="button primary" :disabled="running" @click="saveSettings">Guardar cambios</button><p v-if="running" class="hint">Detén el servidor antes de cambiar el lanzamiento.</p>
-</section>
-<section class="panel-card">
+	<Button type="colored" color="brand" :disabled="running" @click="saveSettings">Guardar cambios</Button><p v-if="running" class="hint">Detén el servidor antes de cambiar el lanzamiento.</p>
+</Card>
+<Card class="panel-card">
 					<h3>Software y Java</h3>
 					<p>
 						Descarga el software del servidor en su carpeta o instala una versión de Java con el
@@ -1011,9 +988,9 @@ onUnmounted(() => {
 					<div class="inline-form">
 						<label class="field"
 							>Versión Minecraft<input v-model="version" placeholder="Ej.: 1.21.1" /></label
-						><button class="button secondary" :disabled="busy || !version" @click="downloadServer">
+						><Button :disabled="busy || !version" @click="downloadServer">
 							Descargar software
-						</button>
+						</Button>
 					</div>
 					<div class="inline-form">
 						<label class="field"
@@ -1022,24 +999,24 @@ onUnmounted(() => {
 								type="number"
 								min="8"
 								max="30" /></label
-						><button class="button secondary" :disabled="busy" @click="installJava">
+						><Button :disabled="busy" @click="installJava">
 							Instalar Java
-						</button>
+						</Button>
 					</div>
-				</section>
-				<section class="panel-card">
+				</Card>
+				<Card class="panel-card">
 					<h3>Clonar servidor</h3>
 					<form class="form-grid" @submit.prevent="cloneServer">
 						<label class="field">Nombre del clon<input v-model="cloneName" required /></label
 						><label class="field">Carpeta nueva<input v-model="cloneDirectory" required /></label
-						><button class="button secondary">Clonar servidor</button>
+						><Button native-type="submit">Clonar servidor</Button>
 					</form>
-				</section>
-				<section class="panel-card danger">
+				</Card>
+				<Card class="panel-card danger">
 					<h3>Quitar de la lista</h3>
 					<p>Los archivos del servidor permanecerán en disco.</p>
-					<button class="button danger-button" @click="remove">Quitar servidor</button>
-				</section>
+					<Button type="colored" color="red" @click="remove">Quitar servidor</Button>
+				</Card>
 			</div>
 		</template>
 
@@ -1061,31 +1038,31 @@ onUnmounted(() => {
 						</p>
 						<h2>{{ createMode === 'new' ? 'Crear servidor local' : 'Importar servidores' }}</h2>
 					</div>
-					<button class="close-button" aria-label="Cerrar" :disabled="creating" @click="showCreate = false">×</button>
+					<IconButton label="Cerrar" :disabled="creating" @click="showCreate = false"><XIcon aria-hidden="true" /></IconButton>
 				</div>
 				<form v-if="createMode === 'new'" class="modal-body" @submit.prevent="createStep === 2 && add()">
-<p v-if="error" class="notice error" role="alert">{{ error }}</p>
+<Admonition v-if="error" type="critical" :body="error" class="mb-4" role="alert" />
 					<template v-if="createStep === -1">
 	<div v-if="!browsePacks" class="creation-choices">
 		<h3>¿Qué quieres preparar?</h3>
-		<div class="pack-search" @keydown.enter.prevent="browsePacks = true; searchPacks()"><SearchIcon /><input v-model="packQuery" placeholder="Buscar modpacks para tu servidor…" aria-label="Buscar modpacks" /><button type="button" class="text-button" @click="browsePacks = true; searchPacks()">Buscar</button></div>
+		<div class="pack-search" @keydown.enter.prevent="browsePacks = true; searchPacks()"><SearchIcon /><input v-model="packQuery" placeholder="Buscar modpacks para tu servidor…" aria-label="Buscar modpacks" /><Button type="quiet" size="sm" @click="browsePacks = true; searchPacks()">Buscar</Button></div>
 		<div class="choice-divider">o elige cómo empezar</div>
 		<button type="button" class="creation-choice" @click="chooseCustom"><span class="choice-icon" aria-hidden="true"><BoxesIcon /></span><span><strong>Configuración personalizada</strong><small>Elige el software y la versión de Minecraft.</small></span><span>›</span></button>
-		<button type="button" class="creation-choice" @click="browsePacks = true; searchPacks()"><span class="choice-icon" aria-hidden="true"><CompassIcon /></span><span><strong>Empezar desde un modpack</strong><small>Explora packs del catálogo compatibles con servidores.</small></span><span>›</span></button>
+		<button type="button" class="creation-choice" @click="browsePacks = true; searchPacks()"><span class="choice-icon" aria-hidden="true"><CompassIcon /></span><span><strong>Empezar desde un modpack</strong><small>Explora packs de Modrinth compatibles con servidores.</small></span><span>›</span></button>
 		<button type="button" class="creation-choice" @click="uploadPack"><span class="choice-icon" aria-hidden="true"><UploadIcon /></span><span><strong>Subir un modpack</strong><small>Instala un archivo .mrpack de tu equipo.</small></span><span>›</span></button>
 		<button type="button" class="creation-choice" @click="sourceMode = 'existing'; downloadOnCreate = false; createStep = 0; pickServerDirectory()"><span class="choice-icon" aria-hidden="true"><BoxImportIcon /></span><span><strong>Importar un servidor</strong><small>Usa una carpeta existente sin mover sus archivos.</small></span><span>›</span></button>
 	</div>
 	<div v-else class="pack-browser">
-		<div class="pack-search" @keydown.enter.prevent="searchPacks()"><SearchIcon /><input v-model="packQuery" placeholder="Buscar modpacks…" aria-label="Buscar modpacks" /><button type="button" class="button secondary" :disabled="packLoading" @click="searchPacks()">Buscar</button></div>
+		<div class="pack-search" @keydown.enter.prevent="searchPacks()"><SearchIcon /><input v-model="packQuery" placeholder="Buscar modpacks…" aria-label="Buscar modpacks" /><Button :disabled="packLoading" @click="searchPacks()">Buscar</Button></div>
 		<p class="subtle">Solo packs que declaran compatibilidad con servidores. Los archivos exclusivos del cliente se omiten.</p>
 		<p v-if="packLoading" role="status">Cargando modpacks…</p>
 		<div v-for="hit in packHits" :key="hit.project_id" class="pack-result">
 			<img v-if="hit.icon_url" :src="hit.icon_url" alt="" /><span v-else class="pack-placeholder">▦</span>
 			<div><h3>{{ hit.title }} <small>por {{ hit.author }}</small></h3><p>{{ hit.description }}</p><div class="pack-tags"><span v-for="tag in hit.categories.slice(0, 4)" :key="tag">{{ tag }}</span><span>↓ {{ hit.downloads.toLocaleString() }}</span></div></div>
-			<button type="button" class="button outline" :disabled="packLoading" @click="choosePack(hit)"><PlusIcon /> Elegir</button>
+			<Button type="outlined" color="brand" :disabled="packLoading" @click="choosePack(hit)"><PlusIcon /> Elegir</Button>
 		</div>
 		<p v-if="!packLoading && !packHits.length" class="subtle">No hay resultados para esta búsqueda.</p>
-		<div class="modal-actions"><button type="button" class="button secondary" @click="browsePacks = false">Volver</button><div><button type="button" class="text-button" :disabled="!packOffset || packLoading" @click="packOffset -= 12; searchPacks(false)">Anterior</button><span>{{ Math.floor(packOffset / 12) + 1 }}</span><button type="button" class="text-button" :disabled="packOffset + 12 >= packTotal || packLoading" @click="packOffset += 12; searchPacks(false)">Siguiente</button></div></div>
+		<div class="modal-actions"><Button @click="browsePacks = false">Volver</Button><div><Button type="quiet" size="sm" :disabled="!packOffset || packLoading" @click="packOffset -= 12; searchPacks(false)">Anterior</Button><span>{{ Math.floor(packOffset / 12) + 1 }}</span><Button type="quiet" size="sm" :disabled="packOffset + 12 >= packTotal || packLoading" @click="packOffset += 12; searchPacks(false)">Siguiente</Button></div></div>
 	</div>
 </template>
 <template v-else-if="createStep === 0">
@@ -1093,14 +1070,30 @@ onUnmounted(() => {
 	<label class="field">Nombre<input v-model="name" placeholder="Mi servidor de Minecraft" /></label>
 	<template v-if="downloadOnCreate">
 		<label v-if="packVersions.length" class="field">Versión del modpack<select v-model="packVersionId" :disabled="packLoading" @change="preparePack"><option v-for="release in packVersions" :key="release.id" :value="release.id">{{ release.name }} · {{ release.game_versions.join(', ') }}</option></select></label>
-		<label class="field">Software del servidor</label><div class="software-options"><button v-for="type in softwareTypes" :key="type" type="button" class="button secondary" :class="{ chosen: kind === type }" :disabled="!!packPreview || catalogLoading" @click="kind = type; loadCatalogVersions()">{{ kind === type ? '✓ ' : '' }}{{ type === 'vanilla' ? 'Vanilla' : type }}</button></div>
+		<label class="field">Software del servidor</label><Chips
+				:capitalize="false"
+				:items="softwareTypes"
+				:format-label="(type: string) => type === 'vanilla' ? 'Vanilla' : type"
+				:model-value="kind"
+				:disabled-items="packPreview || catalogLoading ? softwareTypes : []"
+				aria-label="Software del servidor"
+				@update:model-value="kind = $event as string; loadCatalogVersions()"
+			/>
 		<label class="field">{{ ['Velocity','BungeeCord'].includes(kind) ? 'Versión del proxy' : 'Versión del juego' }}<select v-model="createVersion" :disabled="catalogLoading || !!packPreview" @change="loadCatalogBuilds"><option v-for="option in catalogVersions" :key="option.id" :value="option.id">{{ option.id }} · {{ option.group }}</option></select></label>
-		<label class="field">Versión del software</label><div v-if="!packPreview" class="software-options"><button v-for="policy in [{id:'stable',label:'Estable'},{id:'latest',label:'Última'},{id:'other',label:'Otra'}]" :key="policy.id" type="button" class="button secondary" :class="{chosen:buildPolicy === policy.id}" @click="selectBuildPolicy(policy.id)">{{ policy.label }}</button></div>
+		<label class="field">Versión del software</label><Chips
+				:capitalize="false"
+				v-if="!packPreview"
+				:items="['stable', 'latest', 'other']"
+				:format-label="(policy: string) => ({ stable: 'Estable', latest: 'Última', other: 'Otra' } as Record<string, string>)[policy]"
+				:model-value="buildPolicy"
+				aria-label="Versión del software"
+				@update:model-value="selectBuildPolicy($event as string)"
+			/>
 		<label v-if="buildPolicy === 'other' || packPreview" class="field">Build<select v-model="createBuild" :disabled="catalogLoading || !!packPreview"><option v-for="option in catalogBuilds" :key="option.id" :value="option.id">{{ option.id }} · {{ option.group }}</option></select></label>
 		<p v-if="catalogLoading || packLoading" class="subtle" role="status">Cargando versiones…</p>
 	</template>
-	<label class="field">Carpeta del servidor<div class="path-picker"><input v-model="directory" /><button type="button" class="button secondary" aria-label="Elegir carpeta" @click="pickServerDirectory"><FolderOpenIcon /></button></div></label>
-	<button v-if="sourceMode === 'existing'" type="button" class="button secondary" @click="importServerZip">Importar desde .zip</button>
+	<label class="field">Carpeta del servidor<div class="path-picker"><input v-model="directory" /><Button aria-label="Elegir carpeta" @click="pickServerDirectory"><FolderOpenIcon /></Button></div></label>
+	<Button v-if="sourceMode === 'existing'" @click="importServerZip">Importar desde .zip</Button>
 	<p v-if="detectedJar" class="subtle">Archivo detectado: {{ jar }}</p>
 </template>
 					<template v-else-if="createStep === 1">
@@ -1108,11 +1101,11 @@ onUnmounted(() => {
 					<div class="form-grid">
 						<label class="field">Modo de lanzamiento<select v-model="launchMode"><option value="jar">Archivo JAR vía Java</option><option value="command">Comando o ejecutable</option></select></label>
 						<label class="field full">{{ launchMode === 'jar' ? 'JAR del servidor' : 'Ejecutable' }}<input v-model="jar" placeholder="server.jar o run.bat" /></label>
-						<button type="button" class="button secondary" @click="pickExecutable">Elegir ejecutable</button>
+						<Button @click="pickExecutable">Elegir ejecutable</Button>
 						<label class="field full">Argumentos de lanzamiento<input v-model="launchArgs" placeholder="--world mundo" /></label>
 						<label v-if="launchMode === 'jar'" class="field full">Java<input v-model="java" placeholder="java o ruta a java.exe" @blur="checkJava" /></label>
 						<p v-if="recommendedJava" class="subtle">Esta versión de Minecraft recomienda Java {{ recommendedJava }}.</p>
-						<button v-if="recommendedJava" type="button" class="button secondary" :disabled="installingCreateJava" @click="installCreateJava">{{ installingCreateJava ? 'Instalando Java…' : `Instalar Java ${recommendedJava}` }}</button>
+						<Button v-if="recommendedJava" :disabled="installingCreateJava" @click="installCreateJava">{{ installingCreateJava ? 'Instalando Java…' : `Instalar Java ${recommendedJava}` }}</Button>
 						<p v-if="launchMode === 'jar' && javaCheck" class="subtle">{{ javaCheck.available ? (javaCheck.raw || 'Java disponible') : 'Java no disponible en esta ruta' }}</p>
 					</div>
 					<p class="subtle">Memoria máxima del servidor</p>
@@ -1122,7 +1115,7 @@ onUnmounted(() => {
 							:key="plan.label"
 							type="button"
 							class="plan-card"
-							:class="[plan.tone, { selected: memory === plan.memory }]"
+							:class="{ selected: memory === plan.memory }"
 							@click="memory = plan.memory"
 						>
 							<strong>{{ plan.label }}</strong
@@ -1147,10 +1140,10 @@ onUnmounted(() => {
 					<p v-if="creating" role="status" class="subtle">{{ downloadId ? `Descargando: ${downloadProgress || 'iniciando…'}` : 'Creando servidor…' }}</p>
 					</template>
 					<div class="modal-actions">
-						<button v-if="creating && downloadId && downloadCancelable" type="button" class="button secondary" @click="cancelCreateDownload">Cancelar descarga</button>
-						<button v-else type="button" class="button secondary" :disabled="creating" @click="createStep >= 0 ? createStep-- : showCreate = false">{{ createStep >= 0 ? 'Volver' : 'Cancelar' }}</button>
-						<button v-if="createStep >= 0 && createStep < 2" type="button" class="button primary" @click="nextCreateStep">Continuar</button>
-						<button v-else-if="createStep === 2" class="button primary" :disabled="creating">Crear servidor</button>
+						<Button v-if="creating && downloadId && downloadCancelable" @click="cancelCreateDownload">Cancelar descarga</Button>
+						<Button v-else :disabled="creating" @click="createStep >= 0 ? createStep-- : showCreate = false">{{ createStep >= 0 ? 'Volver' : 'Cancelar' }}</Button>
+						<Button type="colored" color="brand" v-if="createStep >= 0 && createStep < 2" @click="nextCreateStep">Continuar</Button>
+						<Button type="colored" color="brand" native-type="submit" v-else-if="createStep === 2" :disabled="creating">Crear servidor</Button>
 					</div>
 				</form>
 				<form v-else class="modal-body" @submit.prevent="importNyx">
@@ -1165,9 +1158,8 @@ onUnmounted(() => {
 					/></label>
 					<p v-if="importReport" role="status">{{ importReport }}</p>
 					<div class="modal-actions">
-						<button type="button" class="button secondary" @click="showCreate = false">
-							Cerrar</button
-						><button class="button primary">Importar servidores</button>
+						<Button @click="showCreate = false">
+							Cerrar</Button><Button type="colored" color="brand" native-type="submit">Importar servidores</Button>
 					</div>
 				</form>
 			</div>
@@ -1175,11 +1167,19 @@ onUnmounted(() => {
 	</main>
 </template>
 <style scoped>
+/* Colores: solo tokens del tema (claro/oscuro) y del acento del usuario. Botones, avisos, pestañas, chips, tarjetas y
+   estado vacío son componentes compartidos de @modrinth/ui; aquí queda solo la maquetación propia de la página. */
 .local-shell {
 	max-width: 1320px;
 	margin: auto;
 	padding: 2rem 2.25rem 5rem;
-	color: var(--color-text, #f4f5f6);
+	color: var(--color-text-default);
+}
+.local-shell h1,
+.local-shell h2,
+.local-shell h3,
+.local-shell h4 {
+	color: var(--color-contrast);
 }
 .page-head,
 .section-heading,
@@ -1218,51 +1218,13 @@ onUnmounted(() => {
 .card-title p,
 .panel-card p,
 .server-card small {
-	color: #a7adb8;
+	color: var(--color-text-tertiary);
 }
 .subtle {
 	margin: 0.25rem 0;
 }
 .head-actions {
 	flex-shrink: 0;
-}
-.button {
-	border: 1px solid #41454f;
-	border-radius: 0.65rem;
-	padding: 0.7rem 1rem;
-	font-weight: 700;
-	cursor: pointer;
-	background: #32343c;
-	color: #f7f7f7;
-	white-space: nowrap;
-}
-.button:hover:not(:disabled) {
-	filter: brightness(1.13);
-}
-.button:disabled {
-	opacity: 0.45;
-	cursor: not-allowed;
-}
-.button.primary {
-	background: var(--color-brand);
-	color: var(--color-accent-contrast);
-	border-color: var(--color-brand);
-}
-.button.secondary {
-	background: #33363e;
-}
-.notice {
-	padding: 0.8rem 1rem;
-	border-radius: 0.6rem;
-	margin: 1rem 0;
-}
-.notice.error {
-	background: #512b30;
-	color: #ffd6d6;
-}
-.notice.success {
-	background: #153d29;
-	color: #b8ffd1;
 }
 .section-heading {
 	margin-bottom: 1rem;
@@ -1275,6 +1237,15 @@ onUnmounted(() => {
 	display: grid;
 	gap: 0.75rem;
 }
+.server-card,
+.server-hero,
+.creation-choice,
+.plan-card,
+.pack-result,
+.toggle-field {
+	border: 1px solid var(--surface-5);
+	background: var(--color-raised-bg);
+}
 .server-card {
 	display: flex;
 	align-items: center;
@@ -1282,15 +1253,20 @@ onUnmounted(() => {
 	width: 100%;
 	padding: 1.1rem 1.2rem;
 	text-align: left;
-	border: 1px solid #41434b;
 	border-radius: 0.9rem;
-	background: #26282e;
 	color: inherit;
 	cursor: pointer;
 }
-.server-card:hover {
+.server-card:hover,
+.creation-choice:hover {
 	border-color: var(--color-brand);
-	background: #2c3034;
+}
+.server-card:focus-visible,
+.creation-choice:focus-visible,
+.plan-card:focus-visible,
+.file-row button:focus-visible {
+	outline: 2px solid var(--color-brand);
+	outline-offset: 2px;
 }
 .server-avatar {
 	display: grid;
@@ -1315,19 +1291,21 @@ onUnmounted(() => {
 }
 .server-card-body strong {
 	font-size: 1.1rem;
+	color: var(--color-contrast);
 }
 .server-card-body .path {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
+/* Estado: siempre con texto (no depende solo del color); «en marcha» es verde semántico. */
 .status-pill {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.45rem;
 	border-radius: 2rem;
-	background: #373941;
-	color: #c1c6cf;
+	background: var(--surface-4);
+	color: var(--color-text-tertiary);
 	padding: 0.4rem 0.7rem;
 	font-size: 0.78rem;
 	font-weight: 700;
@@ -1338,50 +1316,21 @@ onUnmounted(() => {
 	width: 0.5rem;
 	height: 0.5rem;
 	border-radius: 50%;
-	background: #8b909b;
+	background: var(--color-text-tertiary);
 }
 .status-pill.online {
-	background: #123d28;
-	color: #46e889;
+	background: var(--color-green-highlight);
+	color: var(--color-green);
 }
 .status-pill.online i,
 .live-dot.on {
-	background: #32df79;
+	background: var(--color-green);
 }
 .arrow {
 	font-size: 1.7rem;
-	color: #9ca4ac;
-}
-.empty-card {
-	text-align: center;
-	background: #25272d;
-	border: 1px dashed #484b54;
-	border-radius: 1rem;
-	padding: 3.5rem 2rem;
-}
-.empty-icon {
-	font-size: 3rem;
-	color: var(--color-brand);
-}
-.empty-card p {
-	max-width: 30rem;
-	margin: 0 auto 1.5rem;
-	color: #a7adb8;
-}
-.back-link,
-.text-button {
-	background: none;
-	border: 0;
-	color: var(--color-brand);
-	cursor: pointer;
-	padding: 0.3rem 0;
-}
-.back-link {
-	margin-bottom: 1rem;
+	color: var(--color-text-tertiary);
 }
 .server-hero {
-	background: #26282e;
-	border: 1px solid #41434b;
 	border-radius: 1rem;
 	padding: 1.35rem 1.5rem;
 	flex-wrap: wrap;
@@ -1392,27 +1341,6 @@ onUnmounted(() => {
 .server-identity h2 {
 	font-size: 1.5rem;
 	margin: 0.2rem 0;
-}
-.panel-tabs {
-	display: flex;
-	gap: 1.5rem;
-	border-bottom: 1px solid #454750;
-	margin: 1.5rem 0 1.25rem;
-	overflow: auto;
-}
-.panel-tabs button {
-	border: 0;
-	border-bottom: 3px solid transparent;
-	padding: 0.8rem 0.2rem;
-	background: none;
-	color: #a7adb8;
-	cursor: pointer;
-	font-weight: 700;
-	white-space: nowrap;
-}
-.panel-tabs button.active {
-	color: #f9fafb;
-	border-color: var(--color-brand);
 }
 .panel-layout {
 	display: grid;
@@ -1427,10 +1355,6 @@ onUnmounted(() => {
 	align-content: start;
 }
 .panel-card {
-	background: #26282e;
-	border: 1px solid #41434b;
-	border-radius: 0.9rem;
-	padding: 1.3rem;
 	min-width: 0;
 }
 .panel-card.wide {
@@ -1454,6 +1378,7 @@ onUnmounted(() => {
 	font-size: 0.85rem;
 	margin-top: 0.25rem;
 }
+/* La consola es un terminal: colores fijos a propósito (la salida del servidor no depende del tema). */
 .panel-card pre {
 	height: 300px;
 	overflow: auto;
@@ -1474,10 +1399,11 @@ onUnmounted(() => {
 	gap: 0.65rem;
 }
 .command-bar {
-	background: #1c1e24;
+	background: var(--color-button-bg);
 	padding: 0.35rem 0.4rem 0.35rem 0.8rem;
-	border: 1px solid #40434a;
+	border: 1px solid var(--surface-5);
 	border-radius: 0.65rem;
+	margin-top: 0.75rem;
 }
 .command-bar span {
 	color: var(--color-brand);
@@ -1491,50 +1417,51 @@ onUnmounted(() => {
 }
 .metric {
 	padding: 0.65rem 0;
-	border-bottom: 1px solid #3a3d45;
+	border-bottom: 1px solid var(--surface-5);
 }
 .metric span {
-	color: #a7adb8;
+	color: var(--color-text-tertiary);
 }
 .metric strong {
 	font-size: 0.95rem;
+	color: var(--color-contrast);
 }
 .path-block {
 	overflow-wrap: anywhere;
 }
 .hint {
 	font-size: 0.85rem;
-	color: #a7adb8;
+	color: var(--color-text-tertiary);
 }
 .list-row {
 	padding: 1rem 0;
-	border-top: 1px solid #40434a;
+	border-top: 1px solid var(--surface-5);
 }
 .list-row div {
 	display: grid;
 	gap: 0.25rem;
 }
 .list-row small {
-	color: #a7adb8;
+	color: var(--color-text-tertiary);
 }
 .file-path {
-	background: #1c1e24;
+	background: var(--color-button-bg);
 	border-radius: 0.5rem;
 	padding: 0.7rem;
 	margin-bottom: 0.5rem;
 }
 .file-path span {
 	margin-left: 0.7rem;
-	color: #a7adb8;
+	color: var(--color-text-tertiary);
 }
 .file-row {
-	border-bottom: 1px solid #3c3e47;
+	border-bottom: 1px solid var(--surface-5);
 	padding: 0.5rem;
 }
 .file-row button {
 	background: none;
 	border: 0;
-	color: #f3f4f5;
+	color: var(--color-contrast);
 	cursor: pointer;
 	text-align: left;
 }
@@ -1543,7 +1470,7 @@ onUnmounted(() => {
 	margin-right: 0.7rem;
 }
 .file-row small {
-	color: #9da4ae;
+	color: var(--color-text-tertiary);
 }
 .editor {
 	margin-top: 1.5rem;
@@ -1563,7 +1490,7 @@ onUnmounted(() => {
 .field {
 	display: grid;
 	gap: 0.4rem;
-	color: #c7cbd1;
+	color: var(--color-text-default);
 	font-size: 0.85rem;
 	font-weight: 700;
 }
@@ -1573,29 +1500,31 @@ onUnmounted(() => {
 .local-shell input,
 .local-shell select,
 .local-shell textarea {
-	background: #1e2026;
-	border: 1px solid #464951;
+	background: var(--color-button-bg);
+	border: 1px solid var(--surface-5);
 	border-radius: 0.55rem;
-	color: #f7f8f9;
+	color: var(--color-text-primary);
 	padding: 0.68rem 0.78rem;
 	min-width: 0;
 }
-.local-shell input:focus,
-.local-shell select:focus,
-.local-shell textarea:focus {
+.local-shell input:focus-visible,
+.local-shell select:focus-visible,
+.local-shell textarea:focus-visible {
 	outline: 2px solid var(--color-brand);
 	outline-offset: 1px;
 }
 .settings-stack {
 	max-width: 900px;
 }
-.danger {
-	border-color: #6f3d40;
+.settings-general,
+.creation-choices,
+.pack-browser {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
 }
-.danger-button {
-	background: #592d31;
-	border-color: #9a4b50;
-	color: #fff;
+.danger {
+	border-color: var(--color-red-highlight);
 }
 .modal-mask {
 	position: fixed;
@@ -1606,46 +1535,201 @@ onUnmounted(() => {
 	justify-content: center;
 	overflow-y: auto;
 	padding: 1rem;
-	background: #07090bc9;
+	background: rgba(0, 0, 0, 0.6);
 	backdrop-filter: blur(5px);
 }
 .create-modal {
-	width: min(900px, 100%);
+	width: min(620px, calc(100vw - 3rem));
 	max-height: calc(100vh - 8rem);
 	overflow: auto;
-	border: 1px solid #484b53;
+	border: 1px solid var(--surface-5);
 	border-radius: 1rem;
-	background: #282a30;
-	box-shadow: 0 25px 80px #0009;
+	background: var(--color-raised-bg);
+	box-shadow: 0 25px 80px rgba(0, 0, 0, 0.45);
+}
+.create-modal.pack-modal {
+	width: min(940px, calc(100vw - 3rem));
 }
 .modal-head {
 	padding: 1.5rem;
-	border-bottom: 1px solid #444750;
+	border-bottom: 1px solid var(--surface-5);
 }
 .modal-head h2 {
 	margin: 0.5rem 0 0;
 }
 .steps {
-	color: #9ea8b2;
+	color: var(--color-text-tertiary);
 	letter-spacing: 0;
 	font-size: 0.8rem;
-}
-.close-button {
-	background: #383b43;
-	border: 1px solid #4e515b;
-	color: #f8f9fa;
-	border-radius: 50%;
-	font-size: 1.5rem;
-	width: 2.2rem;
-	height: 2.2rem;
-	cursor: pointer;
 }
 .modal-body {
 	padding: 1.5rem;
 }
+.modal-body > .field,
+.modal-body > .chips {
+	margin-bottom: 1rem;
+}
 .modal-actions {
 	justify-content: flex-end;
 	margin-top: 1.5rem;
+}
+.creation-choice {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	width: 100%;
+	text-align: left;
+	padding: 1rem;
+	border-radius: 1.1rem;
+	color: var(--color-contrast);
+	cursor: pointer;
+}
+.creation-choice > span:nth-child(2) {
+	flex: 1;
+}
+.creation-choice strong,
+.creation-choice small {
+	display: block;
+}
+.creation-choice small {
+	color: var(--color-text-tertiary);
+	margin-top: 0.3rem;
+	line-height: 1.4;
+}
+.choice-icon {
+	display: grid;
+	place-items: center;
+	width: 3.5rem;
+	height: 3.5rem;
+	flex-shrink: 0;
+	border: 1px solid var(--surface-5);
+	border-radius: 1rem;
+	color: var(--color-text-tertiary);
+	font-size: 1.5rem;
+}
+.choice-icon svg {
+	width: 1.75rem;
+	height: 1.75rem;
+}
+.choice-divider {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	color: var(--color-text-tertiary);
+	font-size: 0.8rem;
+}
+.choice-divider::before,
+.choice-divider::after {
+	content: '';
+	height: 1px;
+	background: var(--surface-5);
+	flex: 1;
+}
+.pack-search {
+	display: flex;
+	align-items: center;
+	gap: 0.7rem;
+	border: 1px solid var(--surface-5);
+	border-radius: 0.8rem;
+	background: var(--color-button-bg);
+	padding: 0.6rem 0.8rem;
+}
+.pack-search:focus-within {
+	outline: 2px solid var(--color-brand);
+}
+.pack-search input {
+	min-width: 0;
+	flex: 1;
+	border: 0;
+	outline: 0;
+	background: transparent;
+	color: inherit;
+}
+.pack-search svg,
+.path-picker svg {
+	width: 1.2rem;
+	height: 1.2rem;
+}
+.pack-result {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	padding: 1rem;
+	margin-top: 0.8rem;
+	border-radius: 1rem;
+}
+.pack-result > img,
+.pack-placeholder {
+	width: 4.5rem;
+	height: 4.5rem;
+	border-radius: 0.9rem;
+	object-fit: cover;
+	flex-shrink: 0;
+}
+.pack-result > div {
+	flex: 1;
+	min-width: 0;
+}
+.pack-result h3 {
+	margin: 0 0 0.4rem;
+	font-size: 1.05rem;
+}
+.pack-result h3 small {
+	font-weight: 400;
+	color: var(--color-text-tertiary);
+}
+.pack-result p {
+	margin: 0;
+	color: var(--color-text-tertiary);
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+.pack-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-top: 0.5rem;
+	font-size: 0.75rem;
+	color: var(--color-text-tertiary);
+}
+.pack-tags span {
+	background: var(--surface-4);
+	border-radius: 1rem;
+	padding: 0.2rem 0.5rem;
+}
+.creation-banner {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+.creation-banner img {
+	width: 4rem;
+	height: 4rem;
+	border-radius: 1rem;
+}
+.path-picker {
+	display: flex;
+	gap: 0.5rem;
+}
+.path-picker input {
+	flex: 1;
+	min-width: 0;
+}
+.toggle-field {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.8rem;
+	border-radius: 0.7rem;
+	gap: 1rem;
+}
+.toggle-field input {
+	accent-color: var(--color-brand);
+	width: 1.2rem;
+	height: 1.2rem;
 }
 .plan-grid {
 	display: grid;
@@ -1659,9 +1743,8 @@ onUnmounted(() => {
 	gap: 0.65rem;
 	align-content: start;
 	min-height: 180px;
-	background: #1e2025;
-	color: white;
-	border: 2px solid transparent;
+	color: var(--color-contrast);
+	border-width: 2px;
 	border-radius: 0.8rem;
 	padding: 1.15rem;
 	cursor: pointer;
@@ -1676,14 +1759,11 @@ onUnmounted(() => {
 .plan-card b {
 	font-size: 1.7rem;
 }
-.plan-card b small {
-	font-size: 0.8rem;
-	font-weight: 400;
-	color: #aeb5bf;
-}
+.plan-card b small,
 .plan-card span {
 	font-size: 0.85rem;
-	color: #adb3bd;
+	font-weight: 400;
+	color: var(--color-text-tertiary);
 }
 .plan-card em {
 	align-self: end;
@@ -1691,7 +1771,8 @@ onUnmounted(() => {
 	text-align: center;
 	border-radius: 0.5rem;
 	padding: 0.45rem;
-	background: #3a3d46;
+	background: var(--surface-5);
+	color: var(--color-contrast);
 	font-size: 0.85rem;
 	font-weight: 700;
 }
@@ -1699,19 +1780,10 @@ onUnmounted(() => {
 	background: var(--color-brand);
 	color: var(--color-accent-contrast);
 }
-.plan-card.blue:not(.selected) em {
-	background: #5398f5;
-	color: #071522;
-}
-.plan-card.purple:not(.selected) em {
-	background: #be87ee;
-	color: #22142e;
-}
 @media (max-width: 850px) {
-	.panel-layout {
-		grid-template-columns: 1fr;
-	}
-	.plan-grid {
+	.panel-layout,
+	.plan-grid,
+	.form-grid {
 		grid-template-columns: 1fr;
 	}
 	.plan-card {
@@ -1731,46 +1803,8 @@ onUnmounted(() => {
 		flex-wrap: wrap;
 		justify-content: flex-start;
 	}
-	.form-grid {
-		grid-template-columns: 1fr;
-	}
 	.field.full {
 		grid-column: auto;
 	}
 }
-.creation-choices, .settings-general { display: flex; flex-direction: column; gap: 1rem; }
-.creation-choice { display: flex; align-items: center; gap: 1rem; width: 100%; text-align: left; padding: 1rem; border: 1px solid transparent; border-radius: 1.1rem; background: #34363d; color: #f5f5f6; cursor: pointer; }
-.creation-choice:hover { border-color: var(--color-brand); background: #3a3d43; }
-.creation-choice > span:nth-child(2) { flex: 1; }
-.creation-choice strong, .creation-choice small { display: block; }
-.creation-choice small { color: #acb4bf; margin-top: .3rem; line-height: 1.4; }
-.choice-icon { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; flex-shrink: 0; border: 1px solid #464951; border-radius: 1rem; color: #9aa8b9; font-size: 1.5rem; }
-.choice-icon svg { width: 1.75rem; height: 1.75rem; }
-.choice-divider { display: flex; align-items: center; gap: 1rem; color: #9ba4b2; font-size: .8rem; }
-.choice-divider::before, .choice-divider::after { content: ''; height: 1px; background: #464951; flex: 1; }
-.pack-search { display: flex; align-items: center; gap: .7rem; border: 1px solid #464951; border-radius: .8rem; background: #34363d; padding: .6rem .8rem; }
-.pack-search:focus-within { outline: 2px solid var(--color-brand); }
-.pack-search input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; color: inherit; }
-.pack-search svg, .path-picker svg, .outline svg { width: 1.2rem; height: 1.2rem; }
-.pack-result { display: flex; align-items: center; gap: 1rem; padding: 1rem; margin-top: .8rem; background: #24262c; border: 1px solid #3d4048; border-radius: 1rem; }
-.pack-result > img, .pack-placeholder { width: 4.5rem; height: 4.5rem; border-radius: .9rem; object-fit: cover; flex-shrink: 0; }
-.pack-result > div { flex: 1; min-width: 0; }
-.pack-result h3 { margin: 0 0 .4rem; font-size: 1.05rem; }
-.pack-result h3 small { font-weight: 400; color: #a7adb8; }
-.pack-result p { margin: 0; color: #acb4bf; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.pack-tags, .software-options, .settings-subtabs { display: flex; flex-wrap: wrap; gap: .5rem; }
-.pack-tags { margin-top: .5rem; font-size: .75rem; color: #acb4bf; }
-.pack-tags span { background: #33363e; border-radius: 1rem; padding: .2rem .5rem; }
-.button.outline { color: var(--color-brand); border-color: var(--color-brand); display: flex; align-items: center; gap: .3rem; }
-.button.chosen { border-color: var(--color-brand); background: var(--color-brand-highlight); color: var(--color-brand); }
-.creation-banner { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-.creation-banner img { width: 4rem; height: 4rem; border-radius: 1rem; }
-.path-picker { display: flex; gap: .5rem; }
-.path-picker input { flex: 1; min-width: 0; }
-.toggle-field { display: flex; align-items: center; justify-content: space-between; padding: .8rem; background: #24262c; border: 1px solid #3d4048; border-radius: .7rem; gap: 1rem; }
-.toggle-field input { accent-color: var(--color-brand); width: 1.2rem; height: 1.2rem; }
-.create-modal { width: min(620px, calc(100vw - 3rem)); }
-.create-modal.pack-modal { width: min(940px, calc(100vw - 3rem)); }
-.modal-body > .field { margin-bottom: 1rem; }
-.modal-body > .software-options { margin-bottom: 1.2rem; }
 </style>
