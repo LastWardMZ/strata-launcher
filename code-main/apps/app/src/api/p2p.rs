@@ -750,7 +750,7 @@ impl Core {
         W: AsyncWriteExt + Unpin + Send + 'static,
         R: AsyncReadExt + Unpin + Send + 'static,
     {
-        let (port, instance_id) = match self.authorize_tunnel(remote, share_id) {
+        let (port, instance_id, guard) = match self.authorize_tunnel(remote, share_id) {
             Ok(found) => found,
             Err(message) => {
                 tracing::warn!("Túnel P2P rechazado ({share_id}): {message}");
@@ -765,7 +765,6 @@ impl Core {
             (Some(instance_id), Some(resolver)) => resolver(instance_id).await.unwrap_or(port),
             _ => port,
         };
-        let guard = TunnelGuard::new(self.clone(), remote.to_string());
         let mut tcp = match TcpStream::connect(("127.0.0.1", port)).await {
             Ok(tcp) => tcp,
             Err(error) => {
@@ -783,7 +782,9 @@ impl Core {
         Ok(())
     }
 
-    fn authorize_tunnel(&self, remote: &str, share_id: &str) -> Result<(u16, Option<String>), String> {
+    /// Autoriza el túnel y reserva su hueco a la vez: comprobar el límite y contar el túnel en dos pasos permitía que una
+    /// ráfaga de aperturas simultáneas lo superara (el contador solo subía después de resolver el puerto).
+    fn authorize_tunnel(self: &Arc<Self>, remote: &str, share_id: &str) -> Result<(u16, Option<String>, TunnelGuard), String> {
         self.require_friend(remote)?;
         let (port, instance_id) = self
             .shares
@@ -792,10 +793,8 @@ impl Core {
             .get(share_id)
             .map(|s| (s.port, s.instance_id.clone().filter(|_| s.kind == "world")))
             .ok_or("Ese recurso ya no se comparte (puede que tu amigo haya reiniciado Strata): pídele que vuelva a invitarte")?;
-        if *self.tunnels.lock().unwrap().get(remote).unwrap_or(&0) >= MAX_TUNNELS_PER_FRIEND {
-            return Err("Demasiadas conexiones simultáneas".into());
-        }
-        Ok((port, instance_id))
+        let guard = TunnelGuard::reserve(self.clone(), remote.to_string()).ok_or("Demasiadas conexiones simultáneas")?;
+        Ok((port, instance_id, guard))
     }
 
     /// Abre un canal hacia el recurso de un amigo y espera a que él lo acepte.
@@ -1246,9 +1245,17 @@ struct TunnelGuard {
 }
 
 impl TunnelGuard {
-    fn new(core: Arc<Core>, friend: String) -> Self {
-        *core.tunnels.lock().unwrap().entry(friend.clone()).or_insert(0) += 1;
-        Self { core, friend }
+    /// Cuenta un túnel más del amigo, o `None` si ya tiene el máximo (comprobación y reserva bajo el mismo bloqueo).
+    fn reserve(core: Arc<Core>, friend: String) -> Option<Self> {
+        {
+            let mut tunnels = core.tunnels.lock().unwrap();
+            let count = tunnels.entry(friend.clone()).or_insert(0);
+            if *count >= MAX_TUNNELS_PER_FRIEND {
+                return None;
+            }
+            *count += 1;
+        }
+        Some(Self { core, friend })
     }
 }
 
@@ -1843,6 +1850,21 @@ mod tests {
         }
     }
 
+
+    /// SEC-13: el límite de túneles por amigo se reserva al autorizar, no después de resolver el puerto.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn tunnel_limit_is_reserved_atomically_at_authorization() {
+        let (a, b) = pair().await;
+        befriend(&a, &b).await;
+        let b_id = b.info().id;
+        let share = a.share_start("server", "Servidor", "1.21", 25565).unwrap();
+        let held: Vec<_> = (0..MAX_TUNNELS_PER_FRIEND).map(|_| a.authorize_tunnel(&b_id, &share.id).expect("dentro del límite")).collect();
+        assert!(a.authorize_tunnel(&b_id, &share.id).is_err(), "el siguiente se rechaza aunque ninguno haya llegado a conectar");
+        drop(held);
+        assert!(a.authorize_tunnel(&b_id, &share.id).is_ok(), "al liberar los túneles vuelve a haber hueco");
+        a.shutdown().await;
+        b.shutdown().await;
+    }
 
     /// SEC-05: un amigo no puede inflar el disco con ids enormes ni saturar con mensajes.
     #[tokio::test(flavor = "multi_thread")]
