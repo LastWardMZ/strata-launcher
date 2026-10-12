@@ -153,10 +153,9 @@ defineExpose({ open: openMenu, close: closeMenu })
 	<component
 		:is="triggerComponent"
 		ref="triggerButton"
-		v-bind="$attrs"
+		v-bind="props.iconOnly ? $attrs : { ...$attrs, 'aria-label': props.label }"
 		v-tooltip="props.tooltip"
 		:label="props.iconOnly ? props.label : undefined"
-		:aria-label="props.iconOnly ? undefined : props.label"
 		:circular="props.iconOnly ? props.circular : undefined"
 		:type="props.type"
 		:color="props.color"

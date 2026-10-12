@@ -2,7 +2,7 @@
 import {
 	BanIcon,
 	CheckIcon,
-	FlagIcon,
+	ReportIcon,
 	MoreVerticalIcon,
 	PlayIcon,
 	SearchIcon,
@@ -466,7 +466,7 @@ const exactInResults = () =>
 					>
 						<MoreVerticalIcon />
 						<template #join><PlayIcon /> Pedir unirse a su partida</template>
-						<template #report><FlagIcon /> Denunciar</template>
+						<template #report><ReportIcon /> Denunciar</template>
 						<template #remove><XIcon /> Eliminar amigo</template>
 						<template #block><BanIcon /> Bloquear</template>
 					</TeleportOverflowMenu>

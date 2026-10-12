@@ -229,6 +229,7 @@ function openContextMenu(event: MouseEvent) {
 			<template v-if="!installing" #clickable>
 				<router-link
 					class="no-click-animation"
+					:aria-label="instance.name"
 					:to="`/instance/${encodeURIComponent(instance.id)}`"
 				/>
 			</template>

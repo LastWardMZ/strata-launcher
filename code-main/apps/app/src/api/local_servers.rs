@@ -779,6 +779,16 @@ async fn maven_checksum(client: &reqwest::Client, url: &str) -> Result<(&'static
     Err("No se pudo obtener el hash que publica el repositorio para este instalador, así que no se descarga".into())
 }
 
+/// Clave para ordenar versiones del tipo `0.30.1` o `0.31.0-beta.4` de la más nueva a la más antigua: los números
+/// primero y, a igualdad, una versión final va antes que sus versiones de prueba.
+fn version_sort_key(version: &str) -> (Vec<u64>, bool, Vec<u64>) {
+    let numbers = |text: &str| text.split(|c: char| !c.is_ascii_digit()).filter_map(|part| part.parse::<u64>().ok()).collect::<Vec<_>>();
+    match version.split_once('-') {
+        Some((release, preview)) => (numbers(release), false, numbers(preview)),
+        None => (numbers(version), true, Vec::new()),
+    }
+}
+
 async fn catalog_json(client: &reqwest::Client, url: &str) -> Result<serde_json::Value, String> {
     client.get(url).send().await.map_err(|e| e.to_string())?
         .error_for_status().map_err(|e| e.to_string())?
@@ -830,6 +840,14 @@ pub async fn local_servers_versions(kind: String) -> Result<Vec<ServerCatalogOpt
         "fabric" => {
             let data = catalog_json(&client, "https://meta.fabricmc.net/v2/versions/game").await?;
             for item in data.as_array().ok_or("Catálogo Fabric no válido")? {
+                if let Some(id) = item["version"].as_str() {
+                    options.push(ServerCatalogOption { id: id.into(), group: if item["stable"] == true { "release" } else { "snapshot" }.into() });
+                }
+            }
+        }
+        "quilt" => {
+            let data = catalog_json(&client, "https://meta.quiltmc.org/v3/versions/game").await?;
+            for item in data.as_array().ok_or("Catálogo Quilt no válido")? {
                 if let Some(id) = item["version"].as_str() {
                     options.push(ServerCatalogOption { id: id.into(), group: if item["stable"] == true { "release" } else { "snapshot" }.into() });
                 }
@@ -894,6 +912,18 @@ pub async fn local_servers_builds(kind: String, version: String) -> Result<Vec<S
                 }
             }
         }
+        "quilt" => {
+            let data = catalog_json(&client, &format!("https://meta.quiltmc.org/v3/versions/loader/{version}")).await?;
+            for item in data.as_array().ok_or("Builds Quilt no válidas")? {
+                if let Some(id) = item["loader"]["version"].as_str() {
+                    // Quilt no marca las versiones estables: las de prueba llevan «-beta», «-pre» o «-rc» en el nombre.
+                    let preview = ["-beta", "-pre", "-rc", "-alpha"].iter().any(|tag| id.contains(tag));
+                    options.push(ServerCatalogOption { id: id.into(), group: if preview { "UNKNOWN" } else { "STABLE" }.into() });
+                }
+            }
+            // La API las devuelve sin un orden útil: de la más nueva a la más antigua, para que la primera estable sea la última.
+            options.sort_by(|a, b| version_sort_key(&b.id).cmp(&version_sort_key(&a.id)));
+        }
         "forge" => {
             let xml = client.get("https://maven.minecraftforge.net/net/minecraftforge/forge/maven-metadata.xml").send().await.map_err(|e| e.to_string())?.error_for_status().map_err(|e| e.to_string())?.text().await.map_err(|e| e.to_string())?;
             for full in maven_versions(&xml).into_iter().filter(|v| v.split('-').next() == Some(version.as_str())) {
@@ -938,8 +968,16 @@ pub async fn local_servers_download<R: tauri::Runtime>(
     }
     let server = find_server(&app, &id)?;
     state.cancelled_downloads.lock().map_err(|e| e.to_string())?.remove(&id);
-    let installer_kind = matches!(server.kind.to_ascii_lowercase().as_str(), "forge" | "neoforge");
-    let target = if installer_kind { server.directory.join(if cfg!(windows) { "run.bat" } else { "run.sh" }) } else { server.directory.join(&server.jar) };
+    let quilt = server.kind.eq_ignore_ascii_case("quilt");
+    let installer_kind = matches!(server.kind.to_ascii_lowercase().as_str(), "forge" | "neoforge" | "quilt");
+    // Forge y NeoForge dejan un script de arranque; el instalador de Quilt deja `quilt-server-launch.jar`.
+    let target = if quilt {
+        server.directory.join("quilt-server-launch.jar")
+    } else if installer_kind {
+        server.directory.join(if cfg!(windows) { "run.bat" } else { "run.sh" })
+    } else {
+        server.directory.join(&server.jar)
+    };
     if target.exists() {
         return Err("El JAR ya existe; no se sobrescribirá".into());
     }
@@ -1031,6 +1069,18 @@ pub async fn local_servers_download<R: tauri::Runtime>(
                 .and_then(|v| v["version"].as_str()).ok_or("No hay instalador Fabric")?;
             format!("https://meta.fabricmc.net/v2/versions/loader/{version}/{loader}/{installer}/server/jar")
         }
+        "quilt" => {
+            // Se usa el instalador oficial más reciente. El hash NO se toma de Quilt Meta (no coincidía con el archivo): se
+            // verifica con el que publica el repositorio Maven junto al JAR, como en Forge y NeoForge.
+            build_id.as_deref().ok_or("Elige una versión del loader Quilt")?;
+            let installers = catalog_json(&client, "https://meta.quiltmc.org/v3/versions/installer").await?;
+            let url = installers.as_array().and_then(|list| list.first()).and_then(|item| item["url"].as_str()).ok_or("No hay instalador Quilt")?;
+            let parsed = url::Url::parse(url).map_err(|e| e.to_string())?;
+            if parsed.scheme() != "https" || parsed.host_str() != Some("maven.quiltmc.org") {
+                return Err("Dominio de descarga inesperado".into());
+            }
+            url.to_owned()
+        }
         "bungeecord" => {
             let build = build_id.as_deref().ok_or("Elige una build de BungeeCord")?;
             format!("https://ci.md-5.net/job/BungeeCord/{build}/artifact/bootstrap/target/BungeeCord.jar")
@@ -1053,7 +1103,7 @@ pub async fn local_servers_download<R: tauri::Runtime>(
         }
     };
     // Los instaladores de Forge y NeoForge se ejecutan con Java: el repositorio Maven publica su hash junto al archivo.
-    let published = if matches!(server.kind.to_ascii_lowercase().as_str(), "forge" | "neoforge") {
+    let published = if matches!(server.kind.to_ascii_lowercase().as_str(), "forge" | "neoforge" | "quilt") {
         Some(maven_checksum(&client, &url).await?)
     } else {
         None
@@ -1117,10 +1167,15 @@ pub async fn local_servers_download<R: tauri::Runtime>(
         let _ = app.emit("local-server-download-progress", serde_json::json!({"id":id,"phase":"install"}));
         let java = server.java.clone();
         let directory = server.directory.clone();
+        let quilt_install = quilt.then(|| (version.clone(), build_id.clone().unwrap_or_default()));
         let installer = download_target.file_name().ok_or("Instalador no válido")?.to_owned();
         let result = tokio::task::spawn_blocking(move || {
             let mut command = Command::new(java);
-            command.current_dir(directory).arg("-jar").arg(installer).arg("--installServer");
+            command.current_dir(directory).arg("-jar").arg(installer);
+            match &quilt_install {
+                Some((game, loader)) => command.args(["install", "server", game.as_str(), loader.as_str(), "--download-server", "--install-dir=."]),
+                None => command.arg("--installServer"),
+            };
             #[cfg(windows)] {
                 use std::os::windows::process::CommandExt;
                 command.creation_flags(0x0800_0000);
@@ -1131,10 +1186,10 @@ pub async fn local_servers_download<R: tauri::Runtime>(
             let output = String::from_utf8_lossy(&result.stderr);
             return Err(format!("El instalador terminó con {}: {}", result.status, output.chars().rev().take(400).collect::<String>().chars().rev().collect::<String>()));
         }
-        if !target.is_file() { return Err("El instalador no creó el script de arranque".into()); }
+        if !target.is_file() { return Err("El instalador no creó el archivo de arranque".into()); }
         let mut servers = read_servers(&app)?;
         let current = servers.iter_mut().find(|s| s.id == id).ok_or("Servidor desconocido")?;
-        current.launch_mode = "command".into();
+        current.launch_mode = if quilt { "jar" } else { "command" }.into();
         current.jar = target.file_name().ok_or("Script no válido")?.to_string_lossy().into_owned();
         current.args = vec!["nogui".into()];
         current.game_version = version;
@@ -1288,6 +1343,7 @@ fn content_loader(
         "fabric" => Ok(("fabric", "mod")),
         "forge" => Ok(("forge", "mod")),
         "neoforge" => Ok(("neoforge", "mod")),
+        "quilt" => Ok(("quilt", "mod")),
         "paper" => Ok(("paper", "plugin")),
         "purpur" => Ok(("purpur", "plugin")),
         "folia" => Ok(("folia", "plugin")),
@@ -1936,5 +1992,17 @@ mod zip_bomb_tests {
         let mut again = std::io::empty();
         assert_eq!(copy_declared(&mut again, &mut Vec::new(), 0).unwrap(), 0);
         let _ = entry.read(&mut [0u8; 1]);
+    }
+}
+
+#[cfg(test)]
+mod quilt_order_tests {
+    use super::version_sort_key;
+
+    #[test]
+    fn loader_versions_sort_newest_first_with_final_releases_before_their_previews() {
+        let mut versions = vec!["0.20.0-beta.9", "0.30.1", "0.20.1", "0.31.0-beta.4", "0.20.0-beta.10", "0.24.0", "0.31.0", "0.9.0"];
+        versions.sort_by(|a, b| version_sort_key(b).cmp(&version_sort_key(a)));
+        assert_eq!(versions, ["0.31.0", "0.31.0-beta.4", "0.30.1", "0.24.0", "0.20.1", "0.20.0-beta.10", "0.20.0-beta.9", "0.9.0"]);
     }
 }
