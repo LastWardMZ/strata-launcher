@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fs, io::Read, path::{Component, PathBuf}};
 use tauri::Manager;
 
+use super::local_servers::STRATA_USER_AGENT;
+
 #[derive(Deserialize)]
 struct PackIndex {
 	name: String,
@@ -76,7 +78,7 @@ async fn archive_bytes(path: Option<PathBuf>, version_id: Option<String>) -> Res
 	}
 	let id = version_id.ok_or("Elige una versión de modpack")?;
 	if !id.chars().all(|c| c.is_ascii_alphanumeric()) { return Err("Versión de modpack no válida".into()); }
-	let client = reqwest::Client::builder().user_agent("StrataLauncher/0.1").redirect(reqwest::redirect::Policy::none()).build().map_err(|e| e.to_string())?;
+	let client = reqwest::Client::builder().user_agent(STRATA_USER_AGENT).redirect(reqwest::redirect::Policy::none()).build().map_err(|e| e.to_string())?;
 	let version: serde_json::Value = client.get(format!("https://api.modrinth.com/v2/version/{id}")).send().await.map_err(|e| e.to_string())?.error_for_status().map_err(|e| e.to_string())?.json().await.map_err(|e| e.to_string())?;
 	let file = version["files"].as_array().ok_or("Versión sin archivos")?.iter().find(|f| f["filename"].as_str().is_some_and(|s| s.ends_with(".mrpack"))).ok_or("Esta versión no contiene un archivo .mrpack")?;
 	let bytes = fetch_file(&client, file["url"].as_str().ok_or("Descarga no disponible")?, 200_000_000).await?;
@@ -114,7 +116,7 @@ pub async fn local_servers_pack_preview(path: Option<PathBuf>, version_id: Optio
 
 #[tauri::command]
 pub async fn local_servers_pack_search(query: String, offset: u32) -> Result<serde_json::Value, String> {
-	let client = reqwest::Client::builder().user_agent("StrataLauncher/0.1").build().map_err(|e| e.to_string())?;
+	let client = reqwest::Client::builder().user_agent(STRATA_USER_AGENT).build().map_err(|e| e.to_string())?;
 	client.get("https://api.modrinth.com/v2/search").query(&[("query", query), ("facets", r#"[["project_type:modpack"],["server_side:required","server_side:optional"]]"#.into()), ("limit", "12".into()), ("offset", offset.to_string())])
 		.send().await.map_err(|e| e.to_string())?.error_for_status().map_err(|e| e.to_string())?.json().await.map_err(|e| e.to_string())
 }
@@ -122,7 +124,7 @@ pub async fn local_servers_pack_search(query: String, offset: u32) -> Result<ser
 #[tauri::command]
 pub async fn local_servers_pack_versions(project_id: String) -> Result<serde_json::Value, String> {
 	if !project_id.chars().all(|c| c.is_ascii_alphanumeric() || c == '-') { return Err("Proyecto no válido".into()); }
-	let client = reqwest::Client::builder().user_agent("StrataLauncher/0.1").build().map_err(|e| e.to_string())?;
+	let client = reqwest::Client::builder().user_agent(STRATA_USER_AGENT).build().map_err(|e| e.to_string())?;
 	client.get(format!("https://api.modrinth.com/v2/project/{project_id}/version")).send().await.map_err(|e| e.to_string())?.error_for_status().map_err(|e| e.to_string())?.json().await.map_err(|e| e.to_string())
 }
 
@@ -136,7 +138,7 @@ pub async fn local_servers_pack_install<R: tauri::Runtime>(app: tauri::AppHandle
     let info = preview(&index)?;
     if !info.loader.eq_ignore_ascii_case(&server.kind) || info.minecraft != server.game_version { return Err("El modpack no coincide con la versión o loader del servidor".into()); }
 	let staging = tempfile::tempdir().map_err(|e| e.to_string())?;
-	let client = reqwest::Client::builder().user_agent("StrataLauncher/0.1").redirect(reqwest::redirect::Policy::none()).build().map_err(|e| e.to_string())?;
+	let client = reqwest::Client::builder().user_agent(STRATA_USER_AGENT).redirect(reqwest::redirect::Policy::none()).build().map_err(|e| e.to_string())?;
 	let mut paths = std::collections::HashSet::new();
 	let mut total = 0_u64;
 	for file in &index.files {

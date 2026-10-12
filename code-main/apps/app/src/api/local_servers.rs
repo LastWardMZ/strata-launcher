@@ -9,6 +9,9 @@ use std::{
 };
 use tauri::{Emitter, Manager};
 
+/// Identificación en las APIs públicas de catálogos. PaperMC exige un `User-Agent` descriptivo con una forma de contacto.
+pub(crate) const STRATA_USER_AGENT: &str = concat!("Strata-Launcher/", env!("CARGO_PKG_VERSION"), " (+https://github.com/LastWardMZ/strata-launcher)");
+
 #[derive(Clone, Serialize, Deserialize)]
 pub struct LocalServer {
     id: String,
@@ -784,7 +787,7 @@ async fn catalog_json(client: &reqwest::Client, url: &str) -> Result<serde_json:
 
 #[tauri::command]
 pub async fn local_servers_java_requirement(version: String) -> Result<Option<u32>, String> {
-    let client = reqwest::Client::builder().user_agent("StrataLauncher/0.1").build().map_err(|e| e.to_string())?;
+    let client = reqwest::Client::builder().user_agent(STRATA_USER_AGENT).build().map_err(|e| e.to_string())?;
     let manifest = catalog_json(&client, "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json").await?;
     let Some(detail_url) = manifest["versions"].as_array().and_then(|versions| versions.iter().find(|v| v["id"].as_str() == Some(version.as_str()))).and_then(|v| v["url"].as_str()) else { return Ok(None) };
     let url = url::Url::parse(detail_url).map_err(|e| e.to_string())?;
@@ -795,7 +798,7 @@ pub async fn local_servers_java_requirement(version: String) -> Result<Option<u3
 
 #[tauri::command]
 pub async fn local_servers_versions(kind: String) -> Result<Vec<ServerCatalogOption>, String> {
-    let client = reqwest::Client::builder().user_agent("StrataLauncher/0.1").build().map_err(|e| e.to_string())?;
+    let client = reqwest::Client::builder().user_agent(STRATA_USER_AGENT).build().map_err(|e| e.to_string())?;
     let kind = kind.to_ascii_lowercase();
     let mut options = Vec::new();
     match kind.as_str() {
@@ -861,7 +864,7 @@ pub async fn local_servers_builds(kind: String, version: String) -> Result<Vec<S
     if version.is_empty() || !version.chars().all(|c| c.is_ascii_alphanumeric() || ".-_+".contains(c)) {
         return Err("Versión no válida".into());
     }
-    let client = reqwest::Client::builder().user_agent("StrataLauncher/0.1").build().map_err(|e| e.to_string())?;
+    let client = reqwest::Client::builder().user_agent(STRATA_USER_AGENT).build().map_err(|e| e.to_string())?;
     let kind = kind.to_ascii_lowercase();
     let mut options = Vec::new();
     match kind.as_str() {
@@ -941,7 +944,7 @@ pub async fn local_servers_download<R: tauri::Runtime>(
         return Err("El JAR ya existe; no se sobrescribirá".into());
     }
     let client = reqwest::Client::builder()
-        .user_agent("StrataLauncher/0.1")
+        .user_agent(STRATA_USER_AGENT)
         .build()
         .map_err(|e| e.to_string())?;
     let mut expected_sha1 = None;
@@ -1311,7 +1314,7 @@ pub async fn local_servers_content_search<R: tauri::Runtime>(
     ])
     .to_string();
     let response = reqwest::Client::builder()
-        .user_agent("StrataLauncher/0.1")
+        .user_agent(STRATA_USER_AGENT)
         .build()
         .map_err(|e| e.to_string())?
         .get("https://api.modrinth.com/v2/search")
@@ -1351,7 +1354,7 @@ pub async fn local_servers_content_install<R: tauri::Runtime>(
     }
     let (loader, project_type) = content_loader(&server)?;
     let client = reqwest::Client::builder()
-        .user_agent("StrataLauncher/0.1")
+        .user_agent(STRATA_USER_AGENT)
         .build()
         .map_err(|e| e.to_string())?;
     let versions: serde_json::Value = client
