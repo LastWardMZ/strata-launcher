@@ -101,7 +101,7 @@ onBeforeUnmount(() => observer?.disconnect())
 			<span
 				v-if="selectable"
 				class="absolute left-2 top-2 z-[3] flex size-7 items-center justify-center rounded-full border-2 border-solid text-sm font-bold"
-				:class="order ? 'border-brand bg-brand text-brand-contrast' : 'border-contrast bg-surface-2 text-transparent'"
+				:class="order ? 'border-brand bg-brand text-[var(--color-accent-contrast)]' : 'border-contrast bg-surface-2 text-transparent'"
 				aria-hidden="true"
 			>
 				<template v-if="order">{{ order }}</template>
