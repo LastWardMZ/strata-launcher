@@ -139,7 +139,7 @@ const { hasModal } = useModalStack()
 const crashHeader = computed(() => {
 	const problems = ctx.crashAnalysis?.value?.analysis.problems ?? []
 	const count = problems.length
-	return `${count} problem${count !== 1 ? 's' : ''} detected`
+	return count === 1 ? '1 problema detectado' : `${count} problemas detectados`
 })
 
 const crashItems = computed<CollapsibleAdmonitionItem[]>(() => {

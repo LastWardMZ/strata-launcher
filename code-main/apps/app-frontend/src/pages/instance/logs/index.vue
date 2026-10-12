@@ -7,7 +7,6 @@
 <script setup>
 import {
 	ConsolePageLayout,
-	injectModrinthClient,
 	injectNotificationManager,
 	provideConsoleManager,
 } from '@modrinth/ui'
@@ -16,12 +15,12 @@ import { computed, ref, shallowRef, triggerRef, watch, watchEffect } from 'vue'
 
 import { useAppEvent } from '@/composables/use-app-event'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
+import { diagnoseLog } from '@/helpers/crash-diagnosis'
 import { delete_logs_by_filename, get_output_by_filename } from '@/helpers/logs.js'
 
 import { injectInstancePage } from '../instance-context'
 import { instanceKeys } from '../query-options'
 
-const client = injectModrinthClient()
 const { handleError } = injectNotificationManager()
 const instancePage = injectInstancePage()
 const instanceId = instancePage.instanceId
@@ -110,19 +109,13 @@ watchEffect(() => {
 
 const crashAnalysis = ref(null)
 
+// El registro se analiza en este equipo con reglas fijas: no se envía a ningún servicio.
 async function analyseForCrash() {
 	const lines = liveConsole.output.value
 	if (lines.length === 0) return
 
-	const content = lines.map((l) => l.text).join('\n')
-	try {
-		const data = await client.mclogs.insights_v1.analyse(content)
-		if (data.analysis?.problems?.length > 0) {
-			crashAnalysis.value = data
-		}
-	} catch {
-		// Crash analysis is best-effort
-	}
+	const found = diagnoseLog(lines.map((l) => l.text).join('\n'))
+	if (found) crashAnalysis.value = found
 }
 
 const selectedLog = computed(() => filteredLogs.value[selectedLogIndex.value])
