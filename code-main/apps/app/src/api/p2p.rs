@@ -1231,12 +1231,53 @@ const LAN_PORT_MARKERS: &[&str] = &[
     "The port number is [",
 ];
 
+/// Los puertos de un mundo LAN son efímeros: nada por debajo (SSH, HTTP, SMB…) puede ser el de Minecraft.
+const MIN_LAN_PORT: u16 = 1024;
+
+/// `true` si lo que hay antes del marcador es solo el prefijo con el que el propio juego escribe sus líneas:
+/// `[hh:mm:ss] [hilo/NIVEL]: ` (y, a veces, `(registro)`, `[System]` y `[CHAT]`). Un jugador puede escribir en el chat
+/// cualquier frase, incluso «Started serving on 3306»; esa línea lleva delante su nombre (`<Steve> `, `* Steve `…) y no
+/// pasa este filtro, así que no puede cambiar a qué puerto reenvía el túnel.
+fn is_game_log_prefix(before: &str) -> bool {
+    let mut rest = before;
+    let mut groups = 0;
+    loop {
+        rest = rest.trim_start_matches(|c: char| c == ':' || c.is_whitespace());
+        if rest.is_empty() {
+            return groups >= 2;
+        }
+        if let Some(tail) = rest.strip_prefix('[') {
+            let Some((inner, after)) = tail.split_once(']') else { return false };
+            let clock = !inner.is_empty() && inner.chars().all(|c| c.is_ascii_digit() || c == ':');
+            let thread = inner.contains('/') && inner.chars().all(|c| c.is_ascii_alphanumeric() || " #-_/".contains(c));
+            if !(clock || thread || inner == "System" || inner == "CHAT") {
+                return false;
+            }
+            groups += 1;
+            rest = after;
+        } else if let Some(tail) = rest.strip_prefix('(') {
+            let Some((inner, after)) = tail.split_once(')') else { return false };
+            if inner.is_empty() || !inner.chars().all(|c| c.is_ascii_alphanumeric() || " _.-".contains(c)) {
+                return false;
+            }
+            rest = after;
+        } else {
+            // La frase del propio juego que antecede al marcador «The port number is [».
+            return groups >= 2 && rest.trim_end() == "This world is now open to LAN.";
+        }
+    }
+}
+
 /// Último puerto anunciado en el texto de un log, o `None` si no hay ninguno.
 fn lan_port_from_log(text: &str) -> Option<u16> {
     text.lines().rev().find_map(|line| {
         LAN_PORT_MARKERS.iter().find_map(|marker| {
-            let rest = line.split(marker).nth(1)?;
-            rest.trim_start().split(|c: char| !c.is_ascii_digit()).next()?.parse().ok()
+            let (before, rest) = line.split_once(marker)?;
+            if !is_game_log_prefix(before) {
+                return None;
+            }
+            let port: u16 = rest.trim_start().split(|c: char| !c.is_ascii_digit()).next()?.parse().ok()?;
+            (port >= MIN_LAN_PORT).then_some(port)
         })
     })
 }
@@ -1792,11 +1833,31 @@ e3b0c44298fc1c149afbf4c8996fb924";
         // Líneas reales de Minecraft 26.3 (registro del servidor y chat).
         let real = "[18:00:01] [Render thread/INFO]: Published LAN server on port 55535\n[18:00:01] [Render thread/INFO]: [System] [CHAT] This world is now open to LAN. The port number is [55535]\n";
         assert_eq!(lan_port_from_log(real), Some(55535));
-        assert_eq!(lan_port_from_log("[x] [CHAT] This world is now open to LAN. The port number is [41000]"), Some(41000));
-        assert_eq!(lan_port_from_log("[x] Started serving on 42000"), Some(42000));
+        assert_eq!(lan_port_from_log("[18:00:00] [Render thread/INFO]: [System] [CHAT] This world is now open to LAN. The port number is [41000]"), Some(41000));
+        assert_eq!(lan_port_from_log("[18:00:00] [Server thread/INFO]: Started serving on 42000"), Some(42000));
+        assert_eq!(lan_port_from_log("[18:00:00] [Server thread/INFO] (Minecraft): Started serving on 42001"), Some(42001));
         assert_eq!(lan_port_from_log("sin nada"), None);
-        assert_eq!(lan_port_from_log("Local game hosted on port abc"), None);
-        assert_eq!(lan_port_from_log("Local game hosted on port 99999"), None, "fuera de rango");
+        assert_eq!(lan_port_from_log("[18:00:00] [Render thread/INFO]: Local game hosted on port abc"), None);
+        assert_eq!(lan_port_from_log("[18:00:00] [Render thread/INFO]: Local game hosted on port 99999"), None, "fuera de rango");
+        assert_eq!(lan_port_from_log("[18:00:00] [Render thread/INFO]: Published LAN server on port 80"), None, "los puertos bajos no son de un mundo LAN");
+    }
+
+    /// SEC-01: lo que escriba un jugador en el chat no puede cambiar a qué puerto local reenvía el túnel.
+    #[test]
+    fn chat_lines_cannot_redirect_the_lan_port() {
+        let honest = "[12:00:00] [Server thread/INFO]: Started serving on 61234\n";
+        for forged in [
+            "[12:05:10] [Server thread/INFO]: <Steve> Started serving on 3306",
+            "[12:05:10] [Server thread/INFO] (Minecraft) <Steve> Started serving on 3306",
+            "[12:05:10] [Render thread/INFO]: [System] [CHAT] <Steve> Local game hosted on port 5432",
+            "[12:05:10] [Server thread/INFO]: * Steve Started serving on 2375",
+            "[12:05:10] [Server thread/INFO]: [Steve] Started serving on 6379",
+            "[12:05:10] [Server thread/INFO]: Steve: This world is now open to LAN. The port number is [8000]",
+            "Started serving on 3306",
+        ] {
+            assert_eq!(lan_port_from_log(&format!("{honest}{forged}\n")), Some(61234), "{forged}");
+            assert_eq!(lan_port_from_log(forged), None, "{forged}");
+        }
     }
 
     fn recipe() -> InstanceRecipe {
