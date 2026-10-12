@@ -142,8 +142,37 @@ pub fn start_microphone_capture(queue: Queue, stop: Arc<AtomicBool>) -> Result<s
 }
 
 /// Crea el servidor de la tubería. Debe existir antes de lanzar FFmpeg, que se conecta como cliente.
+/// Descriptor de seguridad de las tuberías de audio: DACL protegida con control total solo para el propietario (el usuario
+/// que graba) y SYSTEM. Con el descriptor por defecto, «Todos» tiene lectura: otro proceso local que enumerase
+/// `\\.\pipe\` podría escuchar en vivo el audio del juego o el micrófono (el nombre lleva un UUID, pero se puede listar).
+pub const PIPE_SDDL: &str = "D:P(A;;GA;;;OW)(A;;GA;;;SY)";
+
 pub fn create_pipe(name: &str) -> std::io::Result<NamedPipeServer> {
-    ServerOptions::new().access_inbound(false).access_outbound(true).reject_remote_clients(true).first_pipe_instance(true).create(name)
+    use windows::Win32::Foundation::{HLOCAL, LocalFree};
+    use windows::Win32::Security::Authorization::{ConvertStringSecurityDescriptorToSecurityDescriptorW, SDDL_REVISION_1};
+    use windows::Win32::Security::{PSECURITY_DESCRIPTOR, SECURITY_ATTRIBUTES};
+    use windows::core::PCWSTR;
+
+    let sddl: Vec<u16> = PIPE_SDDL.encode_utf16().chain(std::iter::once(0)).collect();
+    let mut descriptor = PSECURITY_DESCRIPTOR::default();
+    // SAFETY: `sddl` termina en 0 y vive durante la llamada; `descriptor` recibe memoria que se libera con `LocalFree`.
+    unsafe { ConvertStringSecurityDescriptorToSecurityDescriptorW(PCWSTR(sddl.as_ptr()), SDDL_REVISION_1, &mut descriptor, None) }
+        .map_err(|e| std::io::Error::other(format!("No se pudo crear el descriptor de seguridad de la tubería: {e}")))?;
+    let mut attributes = SECURITY_ATTRIBUTES { nLength: std::mem::size_of::<SECURITY_ATTRIBUTES>() as u32, lpSecurityDescriptor: descriptor.0, bInheritHandle: false.into() };
+    // SAFETY: `attributes` apunta a un descriptor válido hasta después de `create`, que copia lo que necesita.
+    let server = unsafe {
+        ServerOptions::new()
+            .access_inbound(false)
+            .access_outbound(true)
+            .reject_remote_clients(true)
+            .first_pipe_instance(true)
+            .create_with_security_attributes_raw(name, &mut attributes as *mut SECURITY_ATTRIBUTES as *mut std::ffi::c_void)
+    };
+    // SAFETY: el descriptor lo reservó `ConvertStringSecurityDescriptorToSecurityDescriptorW` (se libera con LocalFree).
+    unsafe {
+        let _ = LocalFree(Some(HLOCAL(descriptor.0)));
+    }
+    server
 }
 
 /// Cuántos fotogramas hay que haber escrito `elapsed` después de empezar.
@@ -466,6 +495,47 @@ mod tests {
         push(&queue, &mut local);
         let len = queue.lock().unwrap().len();
         assert!(len <= MAX_QUEUED_BYTES && len % FRAME_BYTES == 0, "{len}");
+    }
+
+    /// DACL de una tubería en formato SDDL.
+    fn pipe_dacl(server: &NamedPipeServer) -> String {
+        use std::os::windows::io::AsRawHandle;
+        use windows::Win32::Foundation::{HANDLE, HLOCAL, LocalFree};
+        use windows::Win32::Security::Authorization::{ConvertSecurityDescriptorToStringSecurityDescriptorW, GetSecurityInfo, SDDL_REVISION_1, SE_KERNEL_OBJECT};
+        use windows::Win32::Security::{DACL_SECURITY_INFORMATION, PSECURITY_DESCRIPTOR};
+
+        let mut descriptor = PSECURITY_DESCRIPTOR::default();
+        // SAFETY: el identificador es el de la tubería, que sigue abierta durante la llamada.
+        unsafe { GetSecurityInfo(HANDLE(server.as_raw_handle()), SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, None, None, None, None, Some(&mut descriptor)) }.ok().unwrap();
+        let mut text = windows::core::PWSTR::null();
+        // SAFETY: `descriptor` es válido; `text` recibe una cadena que se libera con LocalFree.
+        unsafe { ConvertSecurityDescriptorToStringSecurityDescriptorW(descriptor, SDDL_REVISION_1, DACL_SECURITY_INFORMATION, &mut text, None) }.unwrap();
+        // SAFETY: la cadena es válida y termina en 0.
+        let sddl = unsafe { text.to_string().unwrap() };
+        unsafe {
+            let _ = LocalFree(Some(HLOCAL(text.0 as *mut _)));
+            let _ = LocalFree(Some(HLOCAL(descriptor.0)));
+        }
+        sddl
+    }
+
+    /// SEC-11: la tubería no da acceso a «Todos» ni a los anónimos; solo al propietario y a SYSTEM.
+    #[tokio::test]
+    async fn pipes_are_only_accessible_to_their_owner_and_system() {
+        // Control: con el descriptor por defecto de Windows, «Todos» (WD) sí tiene acceso. Ese era el problema.
+        let default_name = format!(r"\\.\pipe\strata-acl-default-{}", uuid::Uuid::new_v4());
+        let default_pipe = ServerOptions::new().access_outbound(true).first_pipe_instance(true).create(&default_name).unwrap();
+        assert!(pipe_dacl(&default_pipe).contains(";;;WD)"), "la premisa: por defecto «Todos» tiene acceso: {}", pipe_dacl(&default_pipe));
+
+        let name = format!(r"\\.\pipe\strata-acl-{}", uuid::Uuid::new_v4());
+        let server = create_pipe(&name).unwrap();
+        let sddl = pipe_dacl(&server);
+        assert!(!sddl.contains(";;;WD)"), "«Todos» no debe tener acceso: {sddl}");
+        assert!(!sddl.contains(";;;AN)"), "los anónimos no deben tener acceso: {sddl}");
+        assert!(sddl.contains("D:P"), "DACL protegida (no hereda): {sddl}");
+        assert!(sddl.contains(";;;SY)"), "{sddl}");
+        // Y el propietario sí puede conectarse (es lo que hace FFmpeg).
+        tokio::net::windows::named_pipe::ClientOptions::new().read(true).write(false).open(&name).expect("el propio usuario se conecta");
     }
 
     #[tokio::test]
