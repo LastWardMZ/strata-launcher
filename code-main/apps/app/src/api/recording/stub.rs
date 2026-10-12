@@ -80,7 +80,7 @@ pub async fn recording_allow_playback(_path: String) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub async fn recording_trim_start(_path: String, _start: f64, _end: f64, _precise: bool, _gif: Option<bool>) -> Result<String, String> {
+pub async fn recording_trim_start(_path: String, _start: f64, _end: f64, _precise: bool, _gif: Option<bool>, _speed: Option<f64>, _mute: Option<bool>) -> Result<String, String> {
     Err(UNSUPPORTED.into())
 }
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ArrowLeftIcon, PauseIcon, PlayIcon, XIcon } from '@modrinth/assets'
-import { Admonition, Button, injectNotificationManager, ProgressBar } from '@modrinth/ui'
+import { Admonition, Button, Chips, injectNotificationManager, ProgressBar } from '@modrinth/ui'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import {
@@ -40,6 +40,9 @@ const now = ref(0)
 const previewing = ref(false)
 const precise = ref(true)
 const asGif = ref(false)
+const SPEEDS = [0.5, 0.75, 1, 1.5, 2]
+const speed = ref(1)
+const muted = ref(false)
 const startText = ref('0:00.0')
 const endText = ref(formatClock(props.video.duration ?? 0, 1))
 const job = ref<string | null>(null)
@@ -169,7 +172,7 @@ async function startExport() {
 	previewing.value = false
 	player.value?.pause()
 	try {
-		job.value = await recording_trim_start(props.video.path, start.value, end.value, precise.value, asGif.value)
+		job.value = await recording_trim_start(props.video.path, start.value, end.value, precise.value, asGif.value, speed.value, muted.value)
 	} catch (error) {
 		job.value = null
 		exportError.value = recordingError(error)
@@ -373,6 +376,26 @@ async function reveal() {
 				</div>
 				<p v-if="asGif" class="m-0 text-sm text-secondary">
 					Sin sonido, 480 px de ancho y 15 imágenes por segundo, ideal para compartir en chats. Máximo {{ MAX_GIF }} segundos.
+				</p>
+			</div>
+
+			<div v-if="!asGif" class="flex flex-col gap-2">
+				<span class="font-semibold text-contrast">Velocidad y sonido</span>
+				<div class="flex flex-wrap items-center gap-2">
+					<Chips
+						:model-value="String(speed)"
+						:items="SPEEDS.map(String)"
+						:format-label="(value: string) => `${value}×`"
+						:capitalize="false"
+						aria-label="Velocidad del clip"
+						@update:model-value="(value: string | null | undefined) => value && (speed = Number(value))"
+					/>
+					<Button :type="muted ? 'colored' : 'outlined'" :color="muted ? 'brand' : undefined" @click="muted = !muted">
+						{{ muted ? 'Sin sonido' : 'Quitar el sonido' }}
+					</Button>
+				</div>
+				<p v-if="speed !== 1" class="m-0 text-sm text-secondary">
+					Cambiar la velocidad recodifica el vídeo (tarda algo más) y se ignora el corte «Rápido».
 				</p>
 			</div>
 

@@ -107,7 +107,10 @@ impl Service {
         }
     }
 
-    pub(super) async fn trim_start(self: &Arc<Self>, path: PathBuf, start: f64, end: f64, precise: bool, gif: bool) -> Result<String, String> {
+    pub(super) async fn trim_start(self: &Arc<Self>, path: PathBuf, start: f64, end: f64, precise: bool, gif: bool, speed: f64, mute: bool) -> Result<String, String> {
+        if !args::TRIM_SPEEDS.contains(&speed) {
+            return Err("Velocidad no válida".into());
+        }
         if !library::is_managed(&path, &self.managed_roots().await) {
             return Err("Ese vídeo no está en una carpeta de grabaciones".into());
         }
@@ -127,20 +130,25 @@ impl Service {
 
         let settings = self.settings();
         let format = if path.extension().is_some_and(|e| e.eq_ignore_ascii_case("mkv")) { "mkv" } else { "mp4" };
-        let mode = if precise { TrimMode::Precise } else { TrimMode::Fast };
-        let encoder = if precise && !gif { self.pick_encoder(&settings.encoder).await? } else { "libx264" };
+        let changes_speed = (speed - 1.0).abs() > f64::EPSILON;
+        // Cambiar la velocidad obliga a recodificar: se ignora «rápido».
+        let mode = if precise || changes_speed { TrimMode::Precise } else { TrimMode::Fast };
+        let encoder = if mode == TrimMode::Precise && !gif { self.pick_encoder(&settings.encoder).await? } else { "libx264" };
         let source = TrimSource {
             encoder,
             quality: &settings.quality,
             size: (info.width.unwrap_or(1280) & !1, info.height.unwrap_or(720) & !1),
             fps: info.fps.map_or(30, |f| f.round() as u32).clamp(1, 120),
             format,
+            speed,
+            mute,
         };
 
         let output = if gif { gif_path(&path) } else { clip_path(&path) };
         let temp = PathBuf::from(format!("{}.trimming", output.display()));
         let arguments = if gif { args::gif_args(&path, &temp, start, end) } else { args::trim_args(&path, &temp, start, end, mode, &source) };
-        self.launch_export(arguments, temp, output, end - start).await
+        let output_seconds = if gif { end - start } else { (end - start) / speed };
+        self.launch_export(arguments, temp, output, output_seconds).await
     }
 
     /// Lanza FFmpeg con los argumentos dados y avisa del progreso (`wanted` = segundos de salida esperados). El archivo se

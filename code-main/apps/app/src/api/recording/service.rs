@@ -644,9 +644,11 @@ pub async fn recording_trim_start(
     end: f64,
     precise: bool,
     gif: Option<bool>,
+    speed: Option<f64>,
+    mute: Option<bool>,
 ) -> Result<String, String> {
     let service = service(&app, &state).await?;
-    service.trim_start(PathBuf::from(path), start, end, precise, gif.unwrap_or(false)).await
+    service.trim_start(PathBuf::from(path), start, end, precise, gif.unwrap_or(false), speed.unwrap_or(1.0), mute.unwrap_or(false)).await
 }
 
 #[tauri::command]

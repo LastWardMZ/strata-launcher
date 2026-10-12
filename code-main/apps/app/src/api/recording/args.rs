@@ -261,21 +261,43 @@ pub struct TrimSource<'a> {
     pub fps: u32,
     /// `mp4` o `mkv`: el del archivo original.
     pub format: &'a str,
+    /// Velocidad de reproducción del resultado (1.0 = normal). Distinta de 1 exige recodificar.
+    pub speed: f64,
+    /// Quitar la pista de audio.
+    pub mute: bool,
 }
+
+/// Velocidades que ofrece el editor (el filtro de audio `atempo` admite de 0.5 a 2).
+pub const TRIM_SPEEDS: [f64; 5] = [0.5, 0.75, 1.0, 1.5, 2.0];
 
 pub fn trim_args(input: &Path, output: &Path, start: f64, end: f64, mode: TrimMode, source: &TrimSource) -> Vec<String> {
     let mut args: Vec<String> = ["-hide_banner", "-loglevel", "error", "-nostats", "-n", "-progress", "pipe:1"].map(String::from).to_vec();
     // `-ss` antes de `-i` es rápido y, al recodificar, también exacto.
-    args.extend(["-ss".to_string(), format!("{start:.3}"), "-i".to_string(), input.to_string_lossy().into_owned()]);
-    args.extend(["-t".to_string(), format!("{:.3}", (end - start).max(0.0))]);
+    // `-t` va antes de `-i`: limita lo que se LEE del original, así que con otra velocidad la salida sale entera.
+    args.extend(["-ss".to_string(), format!("{start:.3}"), "-t".to_string(), format!("{:.3}", (end - start).max(0.0))]);
+    args.extend(["-i".to_string(), input.to_string_lossy().into_owned()]);
     args.extend(["-map", "0:v:0", "-map", "0:a?"].map(String::from));
+    let changes_speed = (source.speed - 1.0).abs() > f64::EPSILON;
     match mode {
-        TrimMode::Fast => {
+        TrimMode::Fast if !changes_speed => {
             args.extend(["-c", "copy", "-avoid_negative_ts", "make_zero"].map(String::from));
+            if source.mute {
+                args.push("-an".into());
+            }
         }
-        TrimMode::Precise => {
+        _ => {
+            if changes_speed {
+                args.extend(["-filter:v".to_string(), format!("setpts=PTS/{}", source.speed)]);
+                if !source.mute {
+                    args.extend(["-filter:a".to_string(), format!("atempo={}", source.speed)]);
+                }
+            }
             args.extend(video_codec_args(source.encoder, source.quality, source.size.0, source.size.1, source.fps));
-            args.extend(["-c:a", "aac", "-b:a", "160k"].map(String::from));
+            if source.mute {
+                args.push("-an".into());
+            } else {
+                args.extend(["-c:a", "aac", "-b:a", "160k"].map(String::from));
+            }
         }
     }
     args.extend(["-f".to_string(), container_format(source.format).to_string()]);
@@ -463,6 +485,31 @@ mod tests {
     }
 
     #[test]
+    fn speed_and_mute_force_reencoding_and_keep_the_whole_output() {
+        let (i, o) = (PathBuf::from("in.mp4"), PathBuf::from("out.mp4"));
+        let base = TrimSource { encoder: "libx264", quality: "medium", size: (1920, 1080), fps: 30, format: "mp4", speed: 1.0, mute: false };
+        // El límite de duración se aplica a la entrada (antes de -i), no a la salida.
+        let normal = trim_args(&i, &o, 10.0, 20.0, TrimMode::Precise, &base);
+        let t = normal.iter().position(|a| a == "-t").unwrap();
+        let input = normal.iter().position(|a| a == "-i").unwrap();
+        assert!(t < input, "-t va antes de -i");
+
+        // Más lento: se recodifica aunque se pida «rápido», con vídeo y audio al mismo ritmo.
+        let slow = trim_args(&i, &o, 10.0, 20.0, TrimMode::Fast, &TrimSource { speed: 0.5, ..base }).join(" ");
+        assert!(slow.contains("setpts=PTS/0.5") && slow.contains("atempo=0.5"), "{slow}");
+        assert!(slow.contains("-c:v libx264") && !slow.contains("-c copy"));
+
+        // Silenciar un corte rápido conserva la copia directa del vídeo y quita el audio.
+        let muted = trim_args(&i, &o, 10.0, 20.0, TrimMode::Fast, &TrimSource { mute: true, ..base }).join(" ");
+        assert!(muted.contains("-c copy") && muted.contains("-an"));
+
+        // Más rápido y sin sonido: sin filtro de audio ni codificación de audio.
+        let fast_mute = trim_args(&i, &o, 10.0, 20.0, TrimMode::Precise, &TrimSource { speed: 2.0, mute: true, ..base }).join(" ");
+        assert!(fast_mute.contains("setpts=PTS/2") && !fast_mute.contains("atempo") && !fast_mute.contains("-c:a") && fast_mute.contains("-an"));
+        assert!(TRIM_SPEEDS.iter().all(|s| (0.5..=2.0).contains(s)));
+    }
+
+    #[test]
     fn merge_scales_everything_to_the_first_video_and_fills_missing_audio() {
         let a = PathBuf::from("a.mp4");
         let b = PathBuf::from("b.mp4");
@@ -494,9 +541,9 @@ mod tests {
     #[test]
     fn trim_modes_copy_or_reencode() {
         let (i, o) = (PathBuf::from("in.mp4"), PathBuf::from("out.mp4"));
-        let source = TrimSource { encoder: "libx264", quality: "medium", size: (1920, 1080), fps: 30, format: "mp4" };
+        let source = TrimSource { encoder: "libx264", quality: "medium", size: (1920, 1080), fps: 30, format: "mp4", speed: 1.0, mute: false };
         let fast = trim_args(&i, &o, 35.0, 58.0, TrimMode::Fast, &source).join(" ");
-        assert!(fast.contains("-ss 35.000 -i in.mp4 -t 23.000") && fast.contains("-c copy"), "{fast}");
+        assert!(fast.contains("-ss 35.000 -t 23.000 -i in.mp4") && fast.contains("-c copy"), "{fast}");
         let precise = trim_args(&i, &o, 35.0, 58.0, TrimMode::Precise, &source).join(" ");
         assert!(precise.contains("-c:v libx264") && precise.contains("-c:a aac") && !precise.contains("-c copy"));
         assert!(precise.contains("-n ") && precise.contains("-progress pipe:1"), "no sobrescribe y da progreso");
