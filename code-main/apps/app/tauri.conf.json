@@ -130,7 +130,9 @@
 				"style-src": "'unsafe-inline' 'self'",
 				"script-src": "'self'",
 				"frame-src": "https://www.youtube.com https://www.youtube-nocookie.com https://discord.com 'self'",
-				"media-src": "https://*.githubusercontent.com asset: http://asset.localhost"
+				"media-src": "https://*.githubusercontent.com asset: http://asset.localhost",
+				"base-uri": "'self'",
+				"form-action": "'none'"
 			}
 		}
 	}
