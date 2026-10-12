@@ -94,8 +94,8 @@ export const recording_delete = (path: string) => invoke<void>('recording_delete
 export const recording_reveal = (path: string) => invoke<void>('recording_reveal', { path })
 export const recording_allow_playback = (path: string) =>
 	invoke<void>('recording_allow_playback', { path })
-export const recording_trim_start = (path: string, start: number, end: number, precise: boolean) =>
-	invoke<string>('recording_trim_start', { path, start, end, precise })
+export const recording_trim_start = (path: string, start: number, end: number, precise: boolean, gif = false) =>
+	invoke<string>('recording_trim_start', { path, start, end, precise, gif })
 export const recording_trim_cancel = (job: string) => invoke<void>('recording_trim_cancel', { job })
 
 /** Texto legible de un error de Tauri (texto u objeto `{ message }`). */

@@ -18,6 +18,8 @@ import {
 import VideoPlayer from './VideoPlayer.vue'
 
 const MIN_CLIP = 0.5
+/** Un GIF más largo pesa demasiado; el servicio también lo limita. */
+const MAX_GIF = 30
 
 const props = defineProps<{ video: VideoItem }>()
 const emit = defineEmits<{
@@ -37,6 +39,7 @@ const end = ref(props.video.duration ?? 0)
 const now = ref(0)
 const previewing = ref(false)
 const precise = ref(true)
+const asGif = ref(false)
 const startText = ref('0:00.0')
 const endText = ref(formatClock(props.video.duration ?? 0, 1))
 const job = ref<string | null>(null)
@@ -45,7 +48,8 @@ const exportError = ref('')
 const dragging = ref<'start' | 'end' | null>(null)
 
 const clipLength = computed(() => Math.max(0, end.value - start.value))
-const valid = computed(() => duration.value > 0 && clipLength.value >= MIN_CLIP)
+const tooLongForGif = computed(() => asGif.value && clipLength.value > MAX_GIF)
+const valid = computed(() => duration.value > 0 && clipLength.value >= MIN_CLIP && !tooLongForGif.value)
 const exporting = computed(() => job.value !== null)
 const startPercent = computed(() => (duration.value > 0 ? (start.value / duration.value) * 100 : 0))
 const endPercent = computed(() => (duration.value > 0 ? (end.value / duration.value) * 100 : 100))
@@ -165,7 +169,7 @@ async function startExport() {
 	previewing.value = false
 	player.value?.pause()
 	try {
-		job.value = await recording_trim_start(props.video.path, start.value, end.value, precise.value)
+		job.value = await recording_trim_start(props.video.path, start.value, end.value, precise.value, asGif.value)
 	} catch (error) {
 		job.value = null
 		exportError.value = recordingError(error)
@@ -191,8 +195,8 @@ onMounted(async () => {
 			job.value = null
 			addNotification({
 				type: 'success',
-				title: 'Recorte exportado',
-				text: `Se ha guardado un clip nuevo de ${formatClock(event.duration ?? clipLength.value)}. El vídeo original no se ha tocado.`,
+				title: asGif.value ? 'GIF exportado' : 'Recorte exportado',
+				text: `Se ha guardado ${asGif.value ? 'un GIF nuevo' : 'un clip nuevo'} de ${formatClock(event.duration ?? clipLength.value)}. El vídeo original no se ha tocado.`,
 			})
 			emit('exported', event.output ?? '')
 		} else if (event.state === 'error') {
@@ -358,6 +362,21 @@ async function reveal() {
 			</div>
 
 			<div class="flex flex-col gap-2">
+				<span class="font-semibold text-contrast">Formato de salida</span>
+				<div class="flex flex-wrap gap-2">
+					<Button :type="!asGif ? 'colored' : 'outlined'" :color="!asGif ? 'brand' : undefined" @click="asGif = false">
+						Vídeo
+					</Button>
+					<Button :type="asGif ? 'colored' : 'outlined'" :color="asGif ? 'brand' : undefined" @click="asGif = true">
+						GIF animado
+					</Button>
+				</div>
+				<p v-if="asGif" class="m-0 text-sm text-secondary">
+					Sin sonido, 480 px de ancho y 15 imágenes por segundo, ideal para compartir en chats. Máximo {{ MAX_GIF }} segundos.
+				</p>
+			</div>
+
+			<div v-if="!asGif" class="flex flex-col gap-2">
 				<span class="font-semibold text-contrast">Tipo de corte</span>
 				<div class="flex flex-wrap gap-2">
 					<Button :type="precise ? 'colored' : 'outlined'" :color="precise ? 'brand' : undefined" @click="precise = true">
@@ -399,7 +418,10 @@ async function reveal() {
 				{{ previewing ? 'Detener la previsualización' : 'Previsualizar fragmento' }}
 			</Button>
 			<Button :disabled="exporting" @click="back">Cancelar</Button>
-			<span v-if="!valid && duration > 0" class="text-sm text-red">
+			<span v-if="tooLongForGif" class="text-sm text-red">
+				Un GIF puede durar como máximo {{ MAX_GIF }} segundos: acorta el fragmento.
+			</span>
+			<span v-else-if="!valid && duration > 0" class="text-sm text-red">
 				El fragmento debe durar al menos medio segundo.
 			</span>
 		</div>

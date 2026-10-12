@@ -286,6 +286,18 @@ pub fn trim_args(input: &Path, output: &Path, start: f64, end: f64, mode: TrimMo
     args
 }
 
+/// Fragmento como GIF animado: 15 fotogramas por segundo, 480 px de ancho y paleta propia (mucha mejor calidad que la fija).
+pub fn gif_args(input: &Path, output: &Path, start: f64, end: f64) -> Vec<String> {
+    let mut args: Vec<String> = ["-hide_banner", "-loglevel", "error", "-nostats", "-n", "-progress", "pipe:1"].map(String::from).to_vec();
+    args.extend(["-ss".to_string(), format!("{start:.3}"), "-i".to_string(), input.to_string_lossy().into_owned()]);
+    args.extend(["-t".to_string(), format!("{:.3}", (end - start).max(0.0))]);
+    args.extend(["-an", "-vf"].map(String::from));
+    args.push("fps=15,scale=480:-2:flags=lanczos,split[a][b];[a]palettegen=max_colors=128[p];[b][p]paletteuse=dither=bayer:bayer_scale=4".into());
+    args.extend(["-loop", "0", "-f", "gif"].map(String::from));
+    args.push(output.to_string_lossy().into_owned());
+    args
+}
+
 pub fn thumbnail_args(input: &Path, output: &Path, at_seconds: f64) -> Vec<String> {
     let mut args: Vec<String> = ["-hide_banner", "-loglevel", "error", "-y", "-ss"].map(String::from).to_vec();
     args.push(format!("{at_seconds:.2}"));
@@ -405,6 +417,16 @@ mod tests {
             assert!(args.ends_with("-f null -") && args.contains(encoder));
             assert_eq!(args.matches("-pix_fmt").count(), 1, "un único formato de píxel: {args}");
         }
+    }
+
+    #[test]
+    fn gif_export_uses_a_custom_palette_and_no_audio() {
+        let args = gif_args(&PathBuf::from("in.mp4"), &PathBuf::from("out.gif.trimming"), 5.0, 12.5).join(" ");
+        assert!(args.contains("-ss 5.000") && args.contains("-t 7.500"));
+        assert!(args.contains("-an"), "un GIF no lleva audio");
+        assert!(args.contains("palettegen") && args.contains("paletteuse"));
+        assert!(args.contains("-f gif"), "formato explícito: el temporal no acaba en .gif");
+        assert!(args.contains("fps=15") && args.contains("scale=480:-2"));
     }
 
     #[test]

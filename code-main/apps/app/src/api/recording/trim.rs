@@ -17,6 +17,8 @@ pub struct Job {
 }
 
 pub const MIN_CLIP_SECONDS: f64 = 0.5;
+/// Un GIF más largo pesa demasiado (decenas de MB) y casi nadie puede enviarlo.
+pub const MAX_GIF_SECONDS: f64 = 30.0;
 
 /// Comprueba el intervalo elegido y devuelve el final ajustado a la duración real del vídeo.
 pub fn validate_range(start: f64, end: f64, duration: f64) -> Result<f64, String> {
@@ -54,6 +56,24 @@ pub fn clip_path(original: &Path) -> PathBuf {
     dir.join(format!("{stem} (recorte {}).{ext}", uuid::Uuid::new_v4().simple()))
 }
 
+/// Nombre del GIF: `original (gif).gif`, `original (gif 2).gif`… Nunca existe ya.
+pub fn gif_path(original: &Path) -> PathBuf {
+    let dir = original.parent().unwrap_or_else(|| Path::new("."));
+    let stem = original.file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_else(|| "vídeo".into());
+    let free = |p: &PathBuf| !p.exists() && !PathBuf::from(format!("{}.trimming", p.display())).exists();
+    let first = dir.join(format!("{stem} (gif).gif"));
+    if free(&first) {
+        return first;
+    }
+    for n in 2..10_000 {
+        let candidate = dir.join(format!("{stem} (gif {n}).gif"));
+        if free(&candidate) {
+            return candidate;
+        }
+    }
+    dir.join(format!("{stem} (gif {}).gif", uuid::Uuid::new_v4().simple()))
+}
+
 /// Segundos de la línea `out_time_us=…` / `out_time_ms=…` de `-progress`.
 pub fn parse_progress_line(line: &str) -> Option<f64> {
     let value = line.strip_prefix("out_time_us=").or_else(|| line.strip_prefix("out_time_ms="))?;
@@ -67,7 +87,7 @@ impl Service {
         }
     }
 
-    pub(super) async fn trim_start(self: &Arc<Self>, path: PathBuf, start: f64, end: f64, precise: bool) -> Result<String, String> {
+    pub(super) async fn trim_start(self: &Arc<Self>, path: PathBuf, start: f64, end: f64, precise: bool, gif: bool) -> Result<String, String> {
         if !library::is_managed(&path, &self.managed_roots().await) {
             return Err("Ese vídeo no está en una carpeta de grabaciones".into());
         }
@@ -81,11 +101,14 @@ impl Service {
         let info = ffmpeg::probe_media(&paths.ffprobe, &path).await?;
         let duration = info.duration.ok_or("No se pudo leer la duración del vídeo")?;
         let end = validate_range(start, end, duration)?;
+        if gif && end - start > MAX_GIF_SECONDS {
+            return Err(format!("Un GIF puede durar como máximo {} segundos: acorta el fragmento", MAX_GIF_SECONDS as u32));
+        }
 
         let settings = self.settings();
         let format = if path.extension().is_some_and(|e| e.eq_ignore_ascii_case("mkv")) { "mkv" } else { "mp4" };
         let mode = if precise { TrimMode::Precise } else { TrimMode::Fast };
-        let encoder = if precise { self.pick_encoder(&settings.encoder).await? } else { "libx264" };
+        let encoder = if precise && !gif { self.pick_encoder(&settings.encoder).await? } else { "libx264" };
         let source = TrimSource {
             encoder,
             quality: &settings.quality,
@@ -94,10 +117,11 @@ impl Service {
             format,
         };
 
-        let output = clip_path(&path);
+        let output = if gif { gif_path(&path) } else { clip_path(&path) };
         let temp = PathBuf::from(format!("{}.trimming", output.display()));
         let mut cmd = ffmpeg::command(&paths.ffmpeg);
-        cmd.args(args::trim_args(&path, &temp, start, end, mode, &source)).stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped());
+        let arguments = if gif { args::gif_args(&path, &temp, start, end) } else { args::trim_args(&path, &temp, start, end, mode, &source) };
+        cmd.args(arguments).stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped());
         let mut child = cmd.spawn().map_err(|e| format!("No se pudo iniciar FFmpeg: {e}"))?;
 
         let job_id = uuid::Uuid::new_v4().simple().to_string();
@@ -186,6 +210,19 @@ impl Service {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn gif_names_never_collide_with_existing_files_or_pending_exports() {
+        let dir = std::env::temp_dir().join(format!("strata-gif-{}", uuid::Uuid::new_v4()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let video = dir.join("partida.mp4");
+        assert_eq!(gif_path(&video), dir.join("partida (gif).gif"));
+        std::fs::write(dir.join("partida (gif).gif"), b"x").unwrap();
+        assert_eq!(gif_path(&video), dir.join("partida (gif 2).gif"));
+        std::fs::write(dir.join("partida (gif 2).gif.trimming"), b"x").unwrap();
+        assert_eq!(gif_path(&video), dir.join("partida (gif 3).gif"));
+        let _ = std::fs::remove_dir_all(&dir);
+    }
 
     #[test]
     fn the_selected_range_is_validated() {
