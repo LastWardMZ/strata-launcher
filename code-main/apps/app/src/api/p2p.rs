@@ -39,6 +39,10 @@ const MAX_INCOMING_PENDING: usize = 50;
 const MAX_SHARES: usize = 16;
 /// Los identificadores de mensaje y de recurso compartido son UUID: nada más largo es legítimo.
 const MAX_ID: usize = 64;
+/// Conexiones entrantes simultáneas (de amigos o de desconocidos: cualquiera que conozca tu código puede conectar) y
+/// streams simultáneos por conexión. Por encima de esto se rechaza en lugar de acumular tareas y memoria.
+const MAX_CONNECTIONS: usize = 256;
+const MAX_STREAMS_PER_CONNECTION: usize = 64;
 /// Mensajes (chat o invitaciones) que se aceptan de un mismo amigo por minuto.
 const MAX_INCOMING_PER_MINUTE: u32 = 60;
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(12);
@@ -186,6 +190,8 @@ pub struct Core {
     tunnels: Mutex<HashMap<String, usize>>,
     /// Mensajes recibidos por amigo en el minuto en curso: (inicio de la ventana en segundos, cuántos).
     incoming_rate: Mutex<HashMap<String, (u64, u32)>>,
+    /// (conexiones entrantes simultáneas, streams simultáneos por conexión).
+    limits: (usize, usize),
     conns: tokio::sync::Mutex<HashMap<String, Connection>>,
     hints: Mutex<HashMap<String, EndpointAddr>>,
     /// Códigos de los amigos de la cuenta de Strata: se aceptan sin pedir confirmación.
@@ -200,8 +206,14 @@ fn now() -> u64 {
     SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0)
 }
 
+/// Caracteres de formato Unicode que no se ven pero cambian cómo se muestra el texto: dirección (U+202E y similares, que
+/// permiten suplantar nombres escribiéndolos al revés), anchura cero y marcas de orden de bytes.
+fn is_invisible_format(c: char) -> bool {
+    matches!(c, '\u{061C}' | '\u{200B}'..='\u{200F}' | '\u{202A}'..='\u{202E}' | '\u{2060}'..='\u{206F}' | '\u{FEFF}')
+}
+
 fn clean_name(name: &str) -> String {
-    let cleaned: String = name.chars().filter(|c| !c.is_control()).collect();
+    let cleaned: String = name.chars().filter(|c| !c.is_control() && !is_invisible_format(*c)).collect();
     cleaned.trim().chars().take(MAX_NAME).collect()
 }
 
@@ -296,6 +308,11 @@ fn load_or_create_key(dir: &Path) -> Result<SecretKey, String> {
 impl Core {
     /// Arranca el motor. `relay` permite desactivar los relays públicos (pruebas).
     pub async fn start(dir: PathBuf, notify: Notify, relay: bool) -> Result<Arc<Self>, String> {
+        Self::start_limited(dir, notify, relay, (MAX_CONNECTIONS, MAX_STREAMS_PER_CONNECTION)).await
+    }
+
+    /// Como `start`, con otros topes de conexiones y de streams por conexión (pruebas).
+    async fn start_limited(dir: PathBuf, notify: Notify, relay: bool, limits: (usize, usize)) -> Result<Arc<Self>, String> {
         fs::create_dir_all(dir.join("chats")).map_err(|e| e.to_string())?;
         let key = load_or_create_key(&dir)?;
         let builder = if relay {
@@ -326,6 +343,7 @@ impl Core {
             joins: Mutex::new(HashMap::new()),
             tunnels: Mutex::new(HashMap::new()),
             incoming_rate: Mutex::new(HashMap::new()),
+            limits,
             conns: tokio::sync::Mutex::new(HashMap::new()),
             hints: Mutex::new(HashMap::new()),
             trusted: Mutex::new(HashSet::new()),
@@ -370,9 +388,14 @@ impl Core {
     fn save_store(&self) -> Result<(), String> {
         let bytes = serde_json::to_vec_pretty(&*self.store.lock().unwrap()).map_err(|e| e.to_string())?;
         let path = self.dir.join("friends.json");
-        let temp = path.with_extension("json.tmp");
+        // Temporal propio de cada guardado: varios a la vez (p. ej. una sincronización en segundo plano y una acción del
+        // usuario) compartían `friends.json.tmp` y uno de ellos fallaba al renombrar un archivo que el otro ya había movido.
+        let temp = path.with_extension(format!("json.{}.tmp", uuid::Uuid::new_v4().simple()));
         fs::write(&temp, bytes).map_err(|e| e.to_string())?;
-        fs::rename(temp, path).map_err(|e| e.to_string())
+        fs::rename(&temp, path).map_err(|e| {
+            let _ = fs::remove_file(&temp);
+            e.to_string()
+        })
     }
 
     fn chat_path(&self, friend: &str) -> PathBuf {
@@ -409,16 +432,24 @@ impl Core {
     // ---------------------------------------------------------------- red
 
     async fn accept_loop(self: Arc<Self>) {
+        let connections = Arc::new(tokio::sync::Semaphore::new(self.limits.0));
         while let Some(incoming) = self.endpoint.accept().await {
+            // Sin hueco libre se descarta la conexión entrante (se rechaza) en lugar de acumular tareas.
+            let Ok(slot) = connections.clone().try_acquire_owned() else { continue };
             let core = self.clone();
             tokio::spawn(async move {
+                let _slot = slot;
                 let Ok(connection) = incoming.await else { return };
                 let remote = connection.remote_id().to_string();
+                let streams = Arc::new(tokio::sync::Semaphore::new(core.limits.1));
                 loop {
                     let Ok((send, recv)) = connection.accept_bi().await else { break };
+                    // Un par que abre más streams a la vez de los que puede haber legítimamente: se descartan los sobrantes.
+                    let Ok(permit) = streams.clone().try_acquire_owned() else { continue };
                     let core = core.clone();
                     let remote = remote.clone();
                     tokio::spawn(async move {
+                        let _permit = permit;
                         let _ = core.handle_stream(&remote, send, recv).await;
                     });
                 }
@@ -1850,6 +1881,41 @@ mod tests {
         }
     }
 
+
+    /// SEC-07: los nombres no pueden llevar caracteres invisibles de dirección ni de anchura cero.
+    #[test]
+    fn names_lose_invisible_direction_and_zero_width_characters() {
+        assert_eq!(clean_name("Ana\u{202E}evil\u{202C}"), "Anaevil");
+        assert_eq!(clean_name("A\u{200B}d\u{200D}m\u{FEFF}in\u{2066}"), "Admin");
+        assert_eq!(clean_name("  Ana María  "), "Ana María", "los acentos y los espacios normales se conservan");
+        assert_eq!(clean_name("\u{202E}\u{200B}"), "", "solo invisibles = vacío");
+    }
+
+    /// SEC-07: un par no puede tener abiertos más streams a la vez que el tope; los sobrantes se descartan.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn a_peer_cannot_hold_more_streams_than_the_limit() {
+        let a = Core::start_limited(temp("a"), silent(), false, (8, 2)).await.unwrap();
+        let b = Core::start(temp("b"), silent(), false).await.unwrap();
+        settle().await;
+        b.add_hint(a.addr());
+        let connection = b.get_conn(&a.info().id).await.unwrap();
+        let mut streams = Vec::new();
+        for _ in 0..4 {
+            let (mut send, recv) = connection.open_bi().await.unwrap();
+            send.write_all(&[0u8]).await.unwrap(); // abre el stream en el otro extremo sin completar la petición
+            streams.push((send, recv));
+        }
+        tokio::time::sleep(Duration::from_millis(700)).await;
+        let mut dropped = 0;
+        for (send, _) in streams.iter_mut() {
+            if tokio::time::timeout(Duration::from_millis(300), send.stopped()).await.is_ok() {
+                dropped += 1;
+            }
+        }
+        assert_eq!(dropped, 2, "con tope 2, los 2 sobrantes se descartan y los otros 2 siguen esperando la petición");
+        a.shutdown().await;
+        b.shutdown().await;
+    }
 
     /// SEC-13: el límite de túneles por amigo se reserva al autorizar, no después de resolver el puerto.
     #[tokio::test(flavor = "multi_thread")]
