@@ -1,0 +1,90 @@
+//! En sistemas que no son Windows la grabación no está disponible: los comandos existen para que la interfaz
+//! pueda preguntar y mostrar un aviso claro, pero no hacen nada más.
+
+use serde_json::Value;
+
+const UNSUPPORTED: &str = "La grabación de partidas solo está disponible en Windows";
+
+#[derive(Default)]
+pub struct RecordingState;
+
+impl RecordingState {
+    pub fn close(&self) {}
+}
+
+pub fn start_in_background(_app: tauri::AppHandle) {}
+
+#[tauri::command]
+pub async fn recording_support() -> bool {
+    false
+}
+
+#[tauri::command]
+pub async fn recording_status() -> Result<Value, String> {
+    Err(UNSUPPORTED.into())
+}
+
+#[tauri::command]
+pub async fn recording_set_settings(_settings: Value) -> Result<Value, String> {
+    Err(UNSUPPORTED.into())
+}
+
+#[tauri::command]
+pub async fn recording_install_ffmpeg() -> Result<Value, String> {
+    Err(UNSUPPORTED.into())
+}
+
+#[tauri::command]
+pub async fn recording_remove_ffmpeg() -> Result<Value, String> {
+    Err(UNSUPPORTED.into())
+}
+
+#[tauri::command]
+pub async fn recording_reprobe_encoders() -> Result<Value, String> {
+    Err(UNSUPPORTED.into())
+}
+
+#[tauri::command]
+pub async fn recording_check_conflicts(_hotkey: Value) -> Result<Value, String> {
+    Err(UNSUPPORTED.into())
+}
+
+#[tauri::command]
+pub async fn recording_toggle() -> Result<(), String> {
+    Err(UNSUPPORTED.into())
+}
+
+#[tauri::command]
+pub async fn recording_list() -> Result<Value, String> {
+    Ok(Value::Array(Vec::new()))
+}
+
+#[tauri::command]
+pub async fn recording_thumbnail(_path: String) -> Result<Option<String>, String> {
+    Ok(None)
+}
+
+#[tauri::command]
+pub async fn recording_delete(_path: String) -> Result<(), String> {
+    Err(UNSUPPORTED.into())
+}
+
+#[tauri::command]
+pub async fn recording_reveal(_path: String) -> Result<(), String> {
+    Err(UNSUPPORTED.into())
+}
+
+#[tauri::command]
+pub async fn recording_allow_playback(_path: String) -> Result<(), String> {
+    Err(UNSUPPORTED.into())
+}
+
+#[tauri::command]
+pub async fn recording_trim_start(_path: String, _start: f64, _end: f64, _precise: bool) -> Result<String, String> {
+    Err(UNSUPPORTED.into())
+}
+
+#[tauri::command]
+pub async fn recording_trim_cancel(_job: String) -> Result<(), String> {
+    Err(UNSUPPORTED.into())
+}

@@ -10,7 +10,7 @@
 //! la respuesta `ok`, el stream pasa a transportar bytes TCP en bruto hacia un
 //! puerto local del anfitrión (un mundo LAN o un servidor personal).
 
-use iroh::{Endpoint, EndpointAddr, EndpointId, SecretKey, endpoint::{Connection, presets}};
+use iroh::{Endpoint, EndpointAddr, EndpointId, SecretKey, endpoint::{Connection, RecvStream, SendStream, presets}};
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use std::{
     collections::{HashMap, HashSet},
@@ -63,14 +63,42 @@ pub struct Friend {
     pub via_account: bool,
 }
 
+/// Modpack de Modrinth del que viene una instancia (para que el amigo instale el mismo).
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Default)]
+pub struct ModpackRef {
+    pub project_id: String,
+    pub version_id: String,
+    #[serde(default)]
+    pub title: String,
+    #[serde(default)]
+    pub icon_url: Option<String>,
+}
+
+/// Lo justo para reconocer o reconstruir una instancia en el launcher de un amigo.
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Default)]
+pub struct InstanceRecipe {
+    pub name: String,
+    pub game_version: String,
+    /// `vanilla`, `forge`, `fabric`, `quilt` o `neoforge`.
+    pub loader: String,
+    #[serde(default)]
+    pub loader_version: Option<String>,
+    #[serde(default)]
+    pub modpack: Option<ModpackRef>,
+}
+
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
 pub struct InviteInfo {
+    /// Vacío cuando `kind` es `instance` (no hay nada a lo que conectarse).
     pub share_id: String,
-    /// `world` (mundo LAN) o `server` (servidor personal).
+    /// `world` (mundo LAN), `server` (servidor personal) o `instance` (instancia compartida por el chat).
     pub kind: String,
     pub title: String,
     #[serde(default)]
     pub game_version: String,
+    /// Instancia con la que juega quien invita. Los launchers antiguos no la envían.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub instance: Option<InstanceRecipe>,
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
@@ -91,6 +119,10 @@ pub struct Share {
     pub title: String,
     pub game_version: String,
     pub port: u16,
+    pub instance: Option<InstanceRecipe>,
+    /// Instancia local desde la que se juega (solo en mundos): permite seguir el puerto LAN.
+    #[serde(skip_serializing)]
+    pub instance_id: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -136,7 +168,11 @@ struct Store {
 
 type Notify = Arc<dyn Fn(serde_json::Value) + Send + Sync>;
 
+/// Devuelve el puerto LAN que tiene abierto ahora una instancia (el puerto cambia cada vez que se abre el mundo).
+pub type PortResolver = Arc<dyn Fn(String) -> std::pin::Pin<Box<dyn std::future::Future<Output = Option<u16>> + Send>> + Send + Sync>;
+
 pub struct Core {
+    port_resolver: Mutex<Option<PortResolver>>,
     endpoint: Endpoint,
     dir: PathBuf,
     store: Mutex<Store>,
@@ -161,6 +197,38 @@ fn now() -> u64 {
 fn clean_name(name: &str) -> String {
     let cleaned: String = name.chars().filter(|c| !c.is_control()).collect();
     cleaned.trim().chars().take(MAX_NAME).collect()
+}
+
+/// Identificadores de Modrinth, versiones y cargadores: solo caracteres inofensivos.
+fn clean_token(value: &str, max: usize) -> String {
+    value.chars().filter(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '-' | '_' | '+')).take(max).collect()
+}
+
+fn clean_recipe(recipe: InstanceRecipe) -> Result<InstanceRecipe, String> {
+    let loader = clean_token(&recipe.loader, 16).to_lowercase();
+    if !["vanilla", "forge", "fabric", "quilt", "neoforge"].contains(&loader.as_str()) {
+        return Err("Instancia no válida".into());
+    }
+    let game_version = clean_token(&recipe.game_version, 32);
+    if game_version.is_empty() {
+        return Err("Instancia no válida".into());
+    }
+    let modpack = recipe.modpack.and_then(|m| {
+        let (project_id, version_id) = (clean_token(&m.project_id, 32), clean_token(&m.version_id, 32));
+        if project_id.is_empty() || version_id.is_empty() {
+            return None;
+        }
+        // La imagen solo se admite si viene del CDN de Modrinth (nunca se descarga desde otro sitio).
+        let icon_url = m.icon_url.filter(|u| u.len() <= 300 && u.starts_with("https://cdn.modrinth.com/"));
+        Some(ModpackRef { project_id, version_id, title: clean_name(&m.title), icon_url })
+    });
+    Ok(InstanceRecipe {
+        name: clean_name(&recipe.name),
+        game_version,
+        loader,
+        loader_version: recipe.loader_version.map(|v| clean_token(&v, 48)).filter(|v| !v.is_empty()),
+        modpack,
+    })
 }
 
 async fn write_frame<W: AsyncWriteExt + Unpin, T: Serialize>(w: &mut W, value: &T) -> Result<(), String> {
@@ -238,6 +306,7 @@ impl Core {
             store.name = format!("Strata-{}", &endpoint.id().to_string()[..6]);
         }
         let core = Arc::new(Self {
+            port_resolver: Mutex::new(None),
             endpoint,
             dir,
             store: Mutex::new(store),
@@ -257,6 +326,11 @@ impl Core {
         let retrying = core.clone();
         tokio::spawn(async move { retrying.retry_loop().await });
         Ok(core)
+    }
+
+    /// Permite que los mundos compartidos sigan al puerto LAN actual de su instancia.
+    pub fn set_port_resolver(&self, resolver: PortResolver) {
+        *self.port_resolver.lock().unwrap() = Some(resolver);
     }
 
     pub async fn shutdown(&self) {
@@ -452,13 +526,30 @@ impl Core {
                 if self.invites_none.load(Ordering::Relaxed) {
                     return Err("Este usuario no acepta invitaciones".into());
                 }
-                if !["world", "server"].contains(&info.kind.as_str()) {
+                if !["world", "server", "instance"].contains(&info.kind.as_str()) {
                     return Err("Invitación no válida".into());
                 }
-                let info = InviteInfo {
-                    title: clean_name(&info.title),
-                    game_version: clean_name(&info.game_version),
-                    ..info
+                let instance = match info.instance.clone() {
+                    Some(recipe) => Some(clean_recipe(recipe)?),
+                    None => None,
+                };
+                // Compartir una instancia no abre ningún túnel: no lleva `share_id` y exige la receta.
+                let info = if info.kind == "instance" {
+                    let recipe = instance.ok_or("Instancia no válida")?;
+                    InviteInfo {
+                        share_id: String::new(),
+                        kind: info.kind,
+                        title: if recipe.name.is_empty() { clean_name(&info.title) } else { recipe.name.clone() },
+                        game_version: recipe.game_version.clone(),
+                        instance: Some(recipe),
+                    }
+                } else {
+                    InviteInfo {
+                        title: clean_name(&info.title),
+                        game_version: clean_name(&info.game_version),
+                        instance,
+                        ..info
+                    }
                 };
                 self.store_incoming(
                     remote,
@@ -623,19 +714,27 @@ impl Core {
         W: AsyncWriteExt + Unpin + Send + 'static,
         R: AsyncReadExt + Unpin + Send + 'static,
     {
-        let port = match self.authorize_tunnel(remote, share_id) {
-            Ok(port) => port,
+        let (port, instance_id) = match self.authorize_tunnel(remote, share_id) {
+            Ok(found) => found,
             Err(message) => {
+                tracing::warn!("Túnel P2P rechazado ({share_id}): {message}");
                 write_frame(&mut send, &Response::Error { message: message.clone() }).await?;
                 let _ = send.shutdown().await;
                 return Err(message);
             }
         };
+        // Un mundo LAN cambia de puerto cada vez que se abre: se usa el que tiene abierto ahora la instancia.
+        let resolver = self.port_resolver.lock().unwrap().clone();
+        let port = match (instance_id, resolver) {
+            (Some(instance_id), Some(resolver)) => resolver(instance_id).await.unwrap_or(port),
+            _ => port,
+        };
         let guard = TunnelGuard::new(self.clone(), remote.to_string());
         let mut tcp = match TcpStream::connect(("127.0.0.1", port)).await {
             Ok(tcp) => tcp,
-            Err(_) => {
-                let message = "El mundo o servidor no está disponible".to_string();
+            Err(error) => {
+                tracing::warn!("Túnel P2P: no se pudo conectar con el puerto local {port}: {error}");
+                let message = "El mundo o servidor no está disponible: comprueba que sigue abierto a LAN".to_string();
                 write_frame(&mut send, &Response::Error { message: message.clone() }).await?;
                 let _ = send.shutdown().await;
                 return Err(message);
@@ -648,26 +747,43 @@ impl Core {
         Ok(())
     }
 
-    fn authorize_tunnel(&self, remote: &str, share_id: &str) -> Result<u16, String> {
+    fn authorize_tunnel(&self, remote: &str, share_id: &str) -> Result<(u16, Option<String>), String> {
         self.require_friend(remote)?;
-        let port = self.shares.lock().unwrap().get(share_id).map(|s| s.port).ok_or("Ese recurso ya no se comparte")?;
+        let (port, instance_id) = self
+            .shares
+            .lock()
+            .unwrap()
+            .get(share_id)
+            .map(|s| (s.port, s.instance_id.clone().filter(|_| s.kind == "world")))
+            .ok_or("Ese recurso ya no se comparte (puede que tu amigo haya reiniciado Strata): pídele que vuelva a invitarte")?;
         if *self.tunnels.lock().unwrap().get(remote).unwrap_or(&0) >= MAX_TUNNELS_PER_FRIEND {
             return Err("Demasiadas conexiones simultáneas".into());
         }
-        Ok(port)
+        Ok((port, instance_id))
     }
 
-    async fn tunnel_connection(&self, friend: &str, share_id: &str, mut tcp: TcpStream) -> Result<(), String> {
+    /// Abre un canal hacia el recurso de un amigo y espera a que él lo acepte.
+    async fn open_tunnel(&self, friend: &str, share_id: &str) -> Result<(SendStream, RecvStream), String> {
         let conn = self.get_conn(friend).await?;
         let (mut send, mut recv) = conn.open_bi().await.map_err(|e| e.to_string())?;
         write_frame(&mut send, &Request::Tunnel { share_id: share_id.to_string() }).await?;
         match tokio::time::timeout(REQUEST_TIMEOUT, read_frame::<_, Response>(&mut recv))
             .await
-            .map_err(|_| "Tiempo agotado".to_string())??
+            .map_err(|_| "Tiempo agotado esperando a tu amigo".to_string())??
         {
-            Response::Error { message } => return Err(message),
-            Response::Ok { .. } => {}
+            Response::Error { message } => Err(message),
+            Response::Ok { .. } => Ok((send, recv)),
         }
+    }
+
+    async fn tunnel_connection(&self, friend: &str, share_id: &str, mut tcp: TcpStream) -> Result<(), String> {
+        let (send, recv) = match self.open_tunnel(friend, share_id).await {
+            Ok(channel) => channel,
+            Err(error) => {
+                tracing::warn!("Túnel P2P: no se pudo abrir el canal con el amigo: {error}");
+                return Err(error);
+            }
+        };
         let mut stream = tokio::io::join(recv, send);
         let _ = tokio::io::copy_bidirectional(&mut stream, &mut tcp).await;
         Ok(())
@@ -890,12 +1006,36 @@ impl Core {
         Ok(self.messages(id).into_iter().find(|m| m.id == message.id).unwrap_or(message))
     }
 
+    #[cfg(test)]
     pub fn share_start(&self, kind: &str, title: &str, game_version: &str, port: u16) -> Result<Share, String> {
+        self.share_start_with(kind, title, game_version, port, None, None)
+    }
+
+    /// Como `share_start`, indicando además con qué instancia se juega (para que el amigo use la misma).
+    pub fn share_start_with(
+        &self,
+        kind: &str,
+        title: &str,
+        game_version: &str,
+        port: u16,
+        instance: Option<InstanceRecipe>,
+        instance_id: Option<String>,
+    ) -> Result<Share, String> {
         if !["world", "server"].contains(&kind) || port == 0 {
             return Err("Recurso no válido".into());
         }
+        let instance = instance.map(clean_recipe).transpose()?;
+        let instance_id = instance_id.filter(|_| kind == "world").map(|id| id.chars().take(128).collect::<String>());
         let mut shares = self.shares.lock().unwrap();
-        if let Some(existing) = shares.values().find(|s| s.port == port) {
+        // Mismo puerto, o el mismo mundo de la misma instancia con otro puerto (se abrió a LAN de nuevo):
+        // se conserva el id para que las invitaciones ya enviadas sigan valiendo.
+        let same = shares.values_mut().find(|s| {
+            s.port == port || (kind == "world" && s.kind == "world" && instance_id.is_some() && s.instance_id == instance_id)
+        });
+        if let Some(existing) = same {
+            existing.port = port;
+            existing.instance = instance.or(existing.instance.take());
+            existing.instance_id = instance_id.or(existing.instance_id.take());
             return Ok(existing.clone());
         }
         if shares.len() >= MAX_SHARES {
@@ -907,6 +1047,8 @@ impl Core {
             title: clean_name(title),
             game_version: clean_name(game_version),
             port,
+            instance,
+            instance_id,
         };
         shares.insert(share.id.clone(), share.clone());
         Ok(share)
@@ -923,7 +1065,31 @@ impl Core {
     pub async fn invite(self: &Arc<Self>, friend: &str, share_id: &str) -> Result<ChatMessage, String> {
         self.require_friend(friend).map_err(|_| "Solo puedes invitar a tus amigos".to_string())?;
         let share = self.shares.lock().unwrap().get(share_id).cloned().ok_or("Ese recurso ya no se comparte")?;
-        let info = InviteInfo { share_id: share.id, kind: share.kind, title: share.title, game_version: share.game_version };
+        let info = InviteInfo {
+            share_id: share.id,
+            kind: share.kind,
+            title: share.title,
+            game_version: share.game_version,
+            instance: share.instance,
+        };
+        self.send_invite_message(friend, info).await
+    }
+
+    /// Envía por el chat una instancia (versión, cargador y modpack) para que el amigo pueda instalarla.
+    pub async fn send_instance(self: &Arc<Self>, friend: &str, recipe: InstanceRecipe) -> Result<ChatMessage, String> {
+        self.require_friend(friend).map_err(|_| "Solo puedes compartir instancias con tus amigos".to_string())?;
+        let recipe = clean_recipe(recipe)?;
+        let info = InviteInfo {
+            share_id: String::new(),
+            kind: "instance".into(),
+            title: recipe.name.clone(),
+            game_version: recipe.game_version.clone(),
+            instance: Some(recipe),
+        };
+        self.send_invite_message(friend, info).await
+    }
+
+    async fn send_invite_message(self: &Arc<Self>, friend: &str, info: InviteInfo) -> Result<ChatMessage, String> {
         let message = ChatMessage {
             id: uuid::Uuid::new_v4().to_string(),
             from_me: true,
@@ -941,22 +1107,47 @@ impl Core {
     pub async fn join(self: &Arc<Self>, friend: &str, share_id: &str) -> Result<u16, String> {
         self.require_friend(friend).map_err(|_| "Solo puedes unirte a recursos de tus amigos".to_string())?;
         let key = format!("{friend}:{share_id}");
-        if let Some((port, _)) = self.joins.lock().unwrap().get(&key) {
-            return Ok(*port);
+        // Un puerto guardado solo vale si su escucha sigue viva (si murió, se abre de nuevo).
+        {
+            let mut joins = self.joins.lock().unwrap();
+            match joins.get(&key) {
+                Some((port, handle)) if !handle.is_finished() => return Ok(*port),
+                Some(_) => {
+                    joins.remove(&key);
+                }
+                None => {}
+            }
         }
-        // Comprueba antes de abrir nada que el amigo está disponible.
-        self.get_conn(friend).await?;
+        // Antes de abrir nada se comprueba que el amigo está y que de verdad comparte esto: así los fallos
+        // salen aquí, con un texto claro, y no como un error críptico dentro de Minecraft.
+        let (send, recv) = self.open_tunnel(friend, share_id).await?;
+        drop((send, recv));
         let listener = TcpListener::bind(("127.0.0.1", 0)).await.map_err(|e| e.to_string())?;
         let port = listener.local_addr().map_err(|e| e.to_string())?.port();
         let core = self.clone();
         let (friend_id, share) = (friend.to_string(), share_id.to_string());
         let task = tokio::spawn(async move {
-            while let Ok((tcp, _)) = listener.accept().await {
-                let core = core.clone();
-                let (friend_id, share) = (friend_id.clone(), share.clone());
-                tokio::spawn(async move {
-                    let _ = core.tunnel_connection(&friend_id, &share, tcp).await;
-                });
+            let mut errors = 0u32;
+            loop {
+                match listener.accept().await {
+                    Ok((tcp, _)) => {
+                        errors = 0;
+                        let core = core.clone();
+                        let (friend_id, share) = (friend_id.clone(), share.clone());
+                        tokio::spawn(async move {
+                            let _ = core.tunnel_connection(&friend_id, &share, tcp).await;
+                        });
+                    }
+                    // Un fallo aislado (p. ej. una conexión abortada en Windows) no debe cerrar el puerto.
+                    Err(error) => {
+                        errors += 1;
+                        tracing::warn!("Túnel P2P: error al aceptar una conexión local: {error}");
+                        if errors > 50 {
+                            break;
+                        }
+                        tokio::time::sleep(Duration::from_millis(50)).await;
+                    }
+                }
             }
         });
         self.joins.lock().unwrap().insert(key, (port, task.abort_handle()));
@@ -1019,7 +1210,12 @@ pub(crate) async fn core<R: tauri::Runtime>(app: &tauri::AppHandle<R>, state: &P
             let notify: Notify = Arc::new(move |value| {
                 let _ = handle.emit("p2p-event", value);
             });
-            Core::start(dir, notify, true).await
+            let core = Core::start(dir, notify, true).await?;
+            // Los mundos compartidos siguen al puerto LAN actual de su instancia.
+            core.set_port_resolver(Arc::new(|instance_id: String| {
+                Box::pin(async move { detect_lan_port(&instance_id).await.ok().flatten() })
+            }));
+            Ok::<_, String>(core)
         })
         .await
         .cloned()
@@ -1197,8 +1393,13 @@ pub async fn p2p_send_message<R: tauri::Runtime>(app: tauri::AppHandle<R>, state
 }
 
 #[tauri::command]
-pub async fn p2p_share_start<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>, kind: String, title: String, game_version: String, port: u16) -> Result<Share, String> {
-    core(&app, &state).await?.share_start(&kind, &title, &game_version, port)
+pub async fn p2p_share_start<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>, kind: String, title: String, game_version: String, port: u16, instance: Option<InstanceRecipe>, instance_id: Option<String>) -> Result<Share, String> {
+    core(&app, &state).await?.share_start_with(&kind, &title, &game_version, port, instance, instance_id)
+}
+
+#[tauri::command]
+pub async fn p2p_send_instance<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>, friend: String, instance: InstanceRecipe) -> Result<ChatMessage, String> {
+    core(&app, &state).await?.send_instance(&friend, instance).await
 }
 
 #[tauri::command]
@@ -1343,13 +1544,7 @@ mod tests {
         c.add_hint(a.addr());
         a.add_hint(c.addr());
         c.store.lock().unwrap().friends.push(Friend { id: a.info().id, name: "A".into(), status: FriendStatus::Accepted, synced: true, via_account: false });
-        let stolen = c.join(&a.info().id, &share.id).await.unwrap();
-        let mut intruder = TcpStream::connect(("127.0.0.1", stolen)).await.unwrap();
-        let _ = intruder.write_all(b"hola").await;
-        let mut received = Vec::new();
-        let read = tokio::time::timeout(Duration::from_secs(10), intruder.read_to_end(&mut received)).await;
-        assert!(read.is_ok(), "la conexión del desconocido debe cerrarse");
-        assert!(received.is_empty(), "el desconocido no recibe datos del servidor");
+        assert!(c.join(&a.info().id, &share.id).await.is_err(), "el desconocido ni siquiera consigue abrir el túnel");
 
         // Dejar de compartir corta las conexiones nuevas.
         a.share_stop(&share.id);
@@ -1361,6 +1556,90 @@ mod tests {
         a.shutdown().await;
         b.shutdown().await;
         c.shutdown().await;
+    }
+
+    async fn echo_server() -> u16 {
+        let echo = TcpListener::bind(("127.0.0.1", 0)).await.unwrap();
+        let port = echo.local_addr().unwrap().port();
+        tokio::spawn(async move {
+            while let Ok((mut tcp, _)) = echo.accept().await {
+                tokio::spawn(async move {
+                    let (mut r, mut w) = tcp.split();
+                    let _ = tokio::io::copy(&mut r, &mut w).await;
+                });
+            }
+        });
+        port
+    }
+
+    async fn echo_through(port: u16) {
+        let mut client = TcpStream::connect(("127.0.0.1", port)).await.unwrap();
+        client.write_all(b"ping").await.unwrap();
+        let mut buffer = [0u8; 4];
+        tokio::time::timeout(Duration::from_secs(10), client.read_exact(&mut buffer)).await.unwrap().unwrap();
+        assert_eq!(&buffer, b"ping");
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn joining_something_that_is_no_longer_shared_fails_clearly_without_opening_a_port() {
+        let (a, b) = pair().await;
+        befriend(&a, &b).await;
+        let error = b.join(&a.info().id, "recurso-inexistente").await.unwrap_err();
+        assert!(error.contains("ya no se comparte"), "mensaje claro: {error}");
+        assert!(b.joins.lock().unwrap().is_empty(), "no se abre ningún puerto local");
+
+        // Compartido pero con el mundo cerrado: el error lo explica en vez de cortar la conexión sin más.
+        let closed = TcpListener::bind(("127.0.0.1", 0)).await.unwrap();
+        let closed_port = closed.local_addr().unwrap().port();
+        drop(closed);
+        let share = a.share_start("world", "Mundo", "1.21", closed_port).unwrap();
+        let error = b.join(&a.info().id, &share.id).await.unwrap_err();
+        assert!(error.contains("no está disponible"), "mensaje claro: {error}");
+        a.shutdown().await;
+        b.shutdown().await;
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn shared_worlds_follow_the_current_lan_port_of_their_instance() {
+        let (a, b) = pair().await;
+        befriend(&a, &b).await;
+        let live_port = echo_server().await;
+        let closed = TcpListener::bind(("127.0.0.1", 0)).await.unwrap();
+        let stale_port = closed.local_addr().unwrap().port();
+        drop(closed);
+
+        // El mundo se compartió con un puerto que ya no existe; la instancia tiene ahora otro abierto.
+        let share = a.share_start_with("world", "Mundo", "1.21", stale_port, None, Some("instancia-1".into())).unwrap();
+        a.set_port_resolver(Arc::new(move |instance: String| {
+            Box::pin(async move { (instance == "instancia-1").then_some(live_port) })
+        }));
+        let port = b.join(&a.info().id, &share.id).await.unwrap();
+        echo_through(port).await;
+
+        // Volver a compartir el mismo mundo con otro puerto conserva el id (las invitaciones siguen valiendo).
+        let again = a.share_start_with("world", "Mundo", "1.21", live_port, None, Some("instancia-1".into())).unwrap();
+        assert_eq!(again.id, share.id);
+        assert_eq!(a.shares().len(), 1);
+        assert_eq!(a.shares()[0].port, live_port);
+        a.shutdown().await;
+        b.shutdown().await;
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn a_dead_local_listener_is_replaced_instead_of_returning_a_dead_port() {
+        let (a, b) = pair().await;
+        befriend(&a, &b).await;
+        let share = a.share_start("server", "Servidor", "1.21", echo_server().await).unwrap();
+        let first = b.join(&a.info().id, &share.id).await.unwrap();
+        // Se simula que la escucha local murió.
+        let key = format!("{}:{}", a.info().id, share.id);
+        b.joins.lock().unwrap().get(&key).unwrap().1.abort();
+        tokio::time::sleep(Duration::from_millis(200)).await;
+        let second = b.join(&a.info().id, &share.id).await.unwrap();
+        echo_through(second).await;
+        let _ = first;
+        a.shutdown().await;
+        b.shutdown().await;
     }
 
     #[tokio::test(flavor = "multi_thread")]
@@ -1518,6 +1797,79 @@ e3b0c44298fc1c149afbf4c8996fb924";
         assert_eq!(lan_port_from_log("sin nada"), None);
         assert_eq!(lan_port_from_log("Local game hosted on port abc"), None);
         assert_eq!(lan_port_from_log("Local game hosted on port 99999"), None, "fuera de rango");
+    }
+
+    fn recipe() -> InstanceRecipe {
+        InstanceRecipe {
+            name: "BattleArmory TACZ".into(),
+            game_version: "1.20.1".into(),
+            loader: "forge".into(),
+            loader_version: Some("47.4.0".into()),
+            modpack: Some(ModpackRef {
+                project_id: "rQiXwLhB".into(),
+                version_id: "TX0XBjIG".into(),
+                title: "BattleArmory TACZ".into(),
+                icon_url: Some("https://cdn.modrinth.com/data/rQiXwLhB/icon.jpeg".into()),
+            }),
+        }
+    }
+
+    #[test]
+    fn old_invites_without_instance_still_parse_and_do_not_leak_the_field() {
+        let old = r#"{"share_id":"abc","kind":"world","title":"Mi mundo","game_version":"1.21"}"#;
+        let info: InviteInfo = serde_json::from_str(old).unwrap();
+        assert!(info.instance.is_none());
+        assert!(!serde_json::to_string(&info).unwrap().contains("instance"), "un launcher antiguo recibe lo mismo de siempre");
+    }
+
+    #[test]
+    fn recipe_is_validated_and_cleaned() {
+        assert_eq!(clean_recipe(recipe()).unwrap(), recipe());
+        let mut bad = recipe();
+        bad.loader = "../../etc".into();
+        assert!(clean_recipe(bad).is_err(), "cargador desconocido");
+        let mut bad = recipe();
+        bad.game_version = "  <script> ".into();
+        assert_eq!(clean_recipe(bad).unwrap().game_version, "script");
+        let mut bad = recipe();
+        bad.game_version = "!!".into();
+        assert!(clean_recipe(bad).is_err(), "versión vacía tras limpiar");
+        let mut evil = recipe();
+        evil.modpack.as_mut().unwrap().icon_url = Some("https://evil.example/x.png".into());
+        evil.modpack.as_mut().unwrap().version_id = "a/b?c".into();
+        let cleaned = clean_recipe(evil).unwrap();
+        assert_eq!(cleaned.modpack.as_ref().unwrap().icon_url, None, "solo imágenes del CDN de Modrinth");
+        assert_eq!(cleaned.modpack.unwrap().version_id, "abc");
+        let mut empty = recipe();
+        empty.modpack.as_mut().unwrap().project_id = "///".into();
+        assert!(clean_recipe(empty).unwrap().modpack.is_none(), "modpack sin identificador válido se descarta");
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn instances_travel_with_invites_and_can_be_sent_through_chat() {
+        let (a, b) = pair().await;
+        befriend(&a, &b).await;
+        let (a_id, b_id) = (a.info().id, b.info().id);
+
+        // Mundo compartido: la invitación lleva la instancia con la que juega A.
+        let share = a.share_start_with("world", "Mi mundo", "1.20.1", 25565, Some(recipe()), None).unwrap();
+        a.invite(&b_id, &share.id).await.unwrap();
+        let invite = b.messages(&a_id).into_iter().find_map(|m| m.invite).expect("invitación recibida");
+        assert_eq!(invite.instance, Some(recipe()));
+
+        // Instancia por el chat: sin share_id y sin túnel.
+        a.send_instance(&b_id, recipe()).await.unwrap();
+        let sent = b.messages(&a_id).into_iter().filter_map(|m| m.invite).find(|i| i.kind == "instance").expect("instancia recibida");
+        assert_eq!((sent.share_id.as_str(), sent.title.as_str(), sent.game_version.as_str()), ("", "BattleArmory TACZ", "1.20.1"));
+        assert_eq!(sent.instance.unwrap().modpack.unwrap().version_id, "TX0XBjIG");
+
+        // No se puede enviar algo inválido, ni a quien no es amigo.
+        let mut bad = recipe();
+        bad.loader = "otro".into();
+        assert!(a.send_instance(&b_id, bad).await.is_err());
+        assert!(a.send_instance(&"0".repeat(64), recipe()).await.is_err());
+        a.shutdown().await;
+        b.shutdown().await;
     }
 
     #[test]

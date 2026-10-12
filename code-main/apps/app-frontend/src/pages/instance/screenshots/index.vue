@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ScreenshotsPage from '@/components/ui/screenshots-page/index.vue'
+import ScreenshotsPage from '@/components/ui/screenshots-page/with-videos.vue'
 
 import { injectInstancePage } from '../instance-context'
 

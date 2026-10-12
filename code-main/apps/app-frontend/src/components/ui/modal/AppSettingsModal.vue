@@ -11,6 +11,7 @@ import {
 	ShieldIcon,
 	ToggleRightIcon,
 	UserIcon,
+	VideoIcon,
 } from '@modrinth/assets'
 import {
 	commonMessages,
@@ -18,6 +19,7 @@ import {
 	defineMessage,
 	defineMessages,
 	injectNotificationManager,
+	Button,
 	ProgressBar,
 	TabbedModal,
 	UnsavedChangesPopup,
@@ -37,6 +39,7 @@ import BehaviorSettings from '@/components/ui/settings/display/BehaviorSettings.
 import FeatureFlagSettings from '@/components/ui/settings/display/FeatureFlagSettings.vue'
 import FeaturesSettings from '@/components/ui/settings/display/FeaturesSettings.vue'
 import LanguageSettings from '@/components/ui/settings/display/LanguageSettings.vue'
+import RecordingSettings from '@/components/ui/settings/display/RecordingSettings.vue'
 import InstancesSyncedSettings from '@/components/ui/settings/instances/instances-synced-settings/index.vue'
 import JavaSettings from '@/components/ui/settings/instances/JavaSettings.vue'
 import ResourceManagementSettings from '@/components/ui/settings/instances/ResourceManagementSettings.vue'
@@ -46,6 +49,11 @@ import {
 	appSettingsModalContextKey,
 	type UnsavedChangesController,
 } from '@/providers/app-settings-modal'
+import {
+	appUpdateState,
+	checkForAppUpdate,
+	installAvailableAppUpdate,
+} from '@/providers/app-update'
 import { injectAppUpdateDownloadProgress } from '@/providers/download-progress.ts'
 
 // TODO: Apply COMPONENT_STRUCTURE.md here and extract out common setting option components
@@ -95,6 +103,15 @@ const tabs = [
 		category: tabCategories.display,
 		icon: LightBulbIcon,
 		content: FeaturesSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'app.settings.tabs.recording',
+			defaultMessage: 'Grabación',
+		}),
+		category: tabCategories.display,
+		icon: VideoIcon,
+		content: RecordingSettings,
 	},
 	{
 		name: defineMessage({
@@ -257,7 +274,15 @@ function showSyncedOptions(): void {
 	modal.value?.show()
 }
 
-defineExpose({ show, showProfile, showFeatureFlags, showSyncedOptions })
+function showRecording(): void {
+	const recordingTabIndex = availableTabs.value.findIndex((tab) => tab.content === RecordingSettings)
+	if (recordingTabIndex >= 0) {
+		modal.value?.setTab(recordingTabIndex)
+	}
+	modal.value?.show()
+}
+
+defineExpose({ show, showProfile, showFeatureFlags, showSyncedOptions, showRecording })
 
 const { progress, version: downloadingVersion } = injectAppUpdateDownloadProgress()
 
@@ -304,6 +329,25 @@ function devModeCount() {
 		developerModeMutation.mutate(!appSettings.devMode)
 	}
 }
+
+const { checking, lastCheckResult, availableUpdate, finishedDownloading, downloading } =
+	appUpdateState
+
+const updateStatus = computed(() => {
+	if (checking.value) return 'Buscando actualizaciones…'
+	if (availableUpdate.value) {
+		const version = availableUpdate.value.version
+		if (finishedDownloading.value) return `La versión ${version} está lista para instalar.`
+		if (downloading.value) return `Descargando la versión ${version}…`
+		return `Hay una versión nueva (${version}).`
+	}
+	if (lastCheckResult.value === 'up-to-date') return 'Tienes la última versión.'
+	if (lastCheckResult.value === 'error')
+		return 'No se pudo comprobar. Revisa tu conexión e inténtalo de nuevo.'
+	if (lastCheckResult.value === 'disabled')
+		return 'Las actualizaciones están desactivadas en esta versión.'
+	return ''
+})
 
 const messages = defineMessages({
 	downloading: {
@@ -359,7 +403,22 @@ const messages = defineMessages({
 						<ProgressBar :progress="progress" />
 					</template>
 				</div>
-				<p v-if="appSettings.devMode" class="text-brand font-semibold m-0 mb-2">
+				<div class="mb-3 flex flex-col gap-2">
+						<p v-if="updateStatus" class="m-0" aria-live="polite">{{ updateStatus }}</p>
+						<div class="flex flex-wrap gap-2">
+							<Button
+								v-if="finishedDownloading && availableUpdate"
+								color="brand"
+								@click="installAvailableAppUpdate"
+							>
+								<RefreshCwIcon /> Reiniciar y actualizar
+							</Button>
+							<Button v-else :disabled="checking" @click="checkForAppUpdate">
+								<RefreshCwIcon :class="{ 'animate-spin': checking }" /> Buscar actualizaciones
+							</Button>
+						</div>
+					</div>
+					<p v-if="appSettings.devMode" class="text-brand font-semibold m-0 mb-2">
 					{{ formatMessage(developerModeEnabled) }}
 				</p>
 				<div class="flex items-center gap-3">

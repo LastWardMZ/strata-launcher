@@ -235,6 +235,7 @@ impl ProcessManager {
                 instance_id: instance_id.to_string(),
                 instance_path: instance_path.to_string(),
                 instance_name: instance_name.to_string(),
+                pid: child_pid,
             },
             child: mc_proc,
             rpc_server,
@@ -401,6 +402,9 @@ pub struct ProcessMetadata {
     pub instance_path: String,
     pub instance_name: String,
     pub start_time: DateTime<Utc>,
+    /// Identificador del proceso del juego en el sistema (lo usa la grabación para encontrar su ventana).
+    #[serde(default)]
+    pub pid: Option<u32>,
 }
 
 #[derive(Debug)]

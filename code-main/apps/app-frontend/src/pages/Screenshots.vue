@@ -3,7 +3,7 @@ import { ImageIcon } from '@modrinth/assets'
 import { defineMessages, useVIntl } from '@modrinth/ui'
 import { onActivated } from 'vue'
 
-import ScreenshotsPage from '@/components/ui/screenshots-page/index.vue'
+import ScreenshotsPage from '@/components/ui/screenshots-page/with-videos.vue'
 import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 
 defineOptions({ name: 'ScreenshotsPage' })

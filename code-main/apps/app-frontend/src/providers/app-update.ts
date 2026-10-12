@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue'
 
-export const APP_UPDATE_POPUP_DELAY_MS = 24 * 60 * 60 * 1000
+// Strata avisa en cuanto la actualización está lista (la app original esperaba 24 h).
+export const APP_UPDATE_POPUP_DELAY_MS = 0
 
 const UPDATE_PROMPT_STORAGE_KEY = 'modrinth-app-update-prompt-state'
 
@@ -24,7 +25,10 @@ interface AppUpdateActions {
 	download?: () => Promise<void> | void
 	install?: () => Promise<void> | void
 	changelog?: () => Promise<void> | void
+	check?: () => Promise<AppUpdateCheckResult> | AppUpdateCheckResult
 }
+
+export type AppUpdateCheckResult = 'available' | 'up-to-date' | 'error' | 'disabled'
 
 const progress = ref(0)
 const metered = ref(true)
@@ -34,6 +38,8 @@ const restarting = ref(false)
 const availableUpdate = ref<AppUpdate | null>(null)
 const updateSize = ref<number | null>(null)
 const updatesEnabled = ref(true)
+const checking = ref(false)
+const lastCheckResult = ref<AppUpdateCheckResult | null>(null)
 
 let actions: AppUpdateActions = {}
 
@@ -50,6 +56,8 @@ export const appUpdateState = {
 	availableUpdate,
 	updateSize,
 	updatesEnabled,
+	checking,
+	lastCheckResult,
 	downloadProgress: computed(() => progress.value),
 	downloadPercent: computed(() => Math.trunc(progress.value * 100)),
 	isVisible: computed(() => !!availableUpdate.value && !restarting.value && updatesEnabled.value),
@@ -153,6 +161,20 @@ export function getNextAppUpdatePopupTime(
 
 export function setAppUpdateActions(nextActions: AppUpdateActions): void {
 	actions = nextActions
+}
+
+export async function checkForAppUpdate(): Promise<AppUpdateCheckResult> {
+	if (checking.value) return lastCheckResult.value ?? 'up-to-date'
+	checking.value = true
+	try {
+		lastCheckResult.value = (await actions.check?.()) ?? 'error'
+	} catch (error) {
+		console.error('Update check failed:', error)
+		lastCheckResult.value = 'error'
+	} finally {
+		checking.value = false
+	}
+	return lastCheckResult.value
 }
 
 export async function downloadAvailableAppUpdate(): Promise<void> {

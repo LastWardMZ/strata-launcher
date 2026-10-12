@@ -3,6 +3,7 @@ import {
 	BanIcon,
 	CheckIcon,
 	CopyIcon,
+	DownloadIcon,
 	PlayIcon,
 	SendIcon,
 	ServerStackIcon,
@@ -16,7 +17,17 @@ import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 
+import {
+	findMatchingInstance,
+	type InstanceMatch,
+	type InstanceRecipe,
+	installRecipe,
+	type LocalInstance,
+	recipeOf,
+	recipeSummary,
+} from '@/composables/use-instance-sharing'
 import { useStrataAccount } from '@/composables/use-strata-account'
+import { getErrorMessage } from '@/helpers/install'
 
 type FriendStatus = 'outgoing' | 'incoming' | 'accepted' | 'blocked'
 type Friend = {
@@ -28,9 +39,11 @@ type Friend = {
 }
 type InviteInfo = {
 	share_id: string
-	kind: 'world' | 'server'
+	kind: 'world' | 'server' | 'instance'
 	title: string
 	game_version: string
+	/** Instancia con la que juega quien invita (o la que comparte, si `kind` es `instance`). */
+	instance?: InstanceRecipe | null
 }
 type ChatMessage = {
 	id: string
@@ -42,7 +55,7 @@ type ChatMessage = {
 }
 type Share = { id: string; kind: string; title: string; game_version: string; port: number }
 type LocalServer = { id: string; name: string; game_version: string; port: number | null }
-type Instance = { id: string; name: string; game_version: string }
+type Instance = LocalInstance
 
 const call = <T,>(cmd: string, args: Record<string, unknown> = {}) => invoke<T>(cmd, args)
 
@@ -64,6 +77,9 @@ const lanVersion = ref('')
 const instances = ref<Instance[]>([])
 const instanceId = ref('')
 const joined = ref<Record<string, number>>({})
+/** Mensajes cuya instancia se está instalando ahora mismo (por id de mensaje). */
+const installing = ref<Record<string, boolean>>({})
+const shareInstanceId = ref('')
 const chatScroll = ref<HTMLElement | null>(null)
 
 const instanceOptions = computed(() =>
@@ -78,8 +94,29 @@ const accepted = computed(() => friends.value.filter((f) => f.status === 'accept
 const outgoing = computed(() => friends.value.filter((f) => f.status === 'outgoing'))
 const blocked = computed(() => friends.value.filter((f) => f.status === 'blocked'))
 
+/** Texto legible de un error de Tauri (texto u objeto `{ message }`): nunca «[object Object]». */
+function describeError(e: unknown) {
+	let text = getErrorMessage(e)
+	if (text === 'Unknown error') {
+		try {
+			text = JSON.stringify(e)?.slice(0, 300) ?? text
+		} catch {
+			// se queda el texto genérico
+		}
+	}
+	if (/ya no se comparte/i.test(text)) {
+		return 'Tu amigo ya no comparte esta partida (si reinició Strata, se pierde lo compartido). Pídele que la comparta y te invite otra vez.'
+	}
+	if (/no está disponible/i.test(text)) {
+		return 'El mundo de tu amigo no está abierto a LAN ahora mismo. Pídele que lo abra (Esc → Abrir a LAN) y vuelve a intentarlo.'
+	}
+	if (/not logged in|no credentials/i.test(text)) {
+		return 'Para jugar tienes que iniciar sesión con tu cuenta de Minecraft (icono de perfil, abajo a la izquierda) y volver a pulsar «Unirme».'
+	}
+	return text
+}
 function fail(e: unknown) {
-	error.value = String(e)
+	error.value = describeError(e)
 	notice.value = ''
 }
 function say(text: string) {
@@ -239,6 +276,10 @@ async function shareWorld() {
 			title: lanTitle.value || 'Mi mundo',
 			gameVersion: lanVersion.value,
 			port,
+			// Con qué instancia se juega: así el amigo usa (o instala) la misma.
+			instance: selectedInstance.value ? recipeOf(selectedInstance.value) : null,
+			// Permite que el mundo compartido siga al puerto LAN si se vuelve a abrir.
+			instanceId: selectedInstance.value?.id ?? null,
 		})
 		await loadShares()
 		say('Mundo listo para invitar')
@@ -260,16 +301,42 @@ async function invite(share: Share) {
 		fail(e)
 	}
 }
+/** Instancia propia que sirve para una invitación o instancia compartida (o `null` si no hay ninguna). */
+function matchFor(info: InviteInfo): InstanceMatch | null {
+	return findMatchingInstance(instances.value, info.instance, info.game_version)
+}
+function inviteNeedsInstall(info: InviteInfo) {
+	return !!info.instance && !matchFor(info)
+}
+function matchHint(info: InviteInfo, match: InstanceMatch | null) {
+	if (!info.instance) return ''
+	if (!match) return `Necesitas la instancia «${info.instance.name}» (${recipeSummary(info.instance)}).`
+	if (match.versionDiffers)
+		return `Tu «${match.instance.name}» es la misma modpack pero de otra versión: puede que algún mod no coincida.`
+	if (match.level === 'loader' && info.instance.loader !== 'vanilla')
+		return `Se usará tu «${match.instance.name}» (${recipeSummary(info.instance)}). Los mods tienen que ser los mismos que los de tu amigo.`
+	return `Se usará tu instancia «${match.instance.name}».`
+}
+
+async function refreshInstances() {
+	instances.value = await call<Instance[]>('plugin:instance|instance_list').catch(() => instances.value)
+}
+
 async function join(friendId: string, info: InviteInfo) {
 	try {
+		// La instancia de la invitación manda; el desplegable solo se usa con invitaciones antiguas.
+		const match = matchFor(info)
+		if (info.instance && !match) {
+			return fail(`No tienes la instancia «${info.instance.name}». Pulsa «Instalar y unirme».`)
+		}
+		const instance = match?.instance ?? selectedInstance.value
 		const port = await call<number>('p2p_join', { friend: friendId, shareId: info.share_id })
 		joined.value = { ...joined.value, [info.share_id]: port }
-		const instance = selectedInstance.value
 		if (!instance)
 			return say(
 				`Conectado. En Minecraft añade el servidor 127.0.0.1:${port}, o elige una instancia para abrirlo directo.`,
 			)
-		if (info.game_version && instance.game_version !== info.game_version) {
+		if (!match && info.game_version && instance.game_version !== info.game_version) {
 			return say(
 				`Conectado, pero tu instancia es ${instance.game_version} y la partida es ${info.game_version}. Usa una instancia ${info.game_version} y entra en 127.0.0.1:${port}.`,
 			)
@@ -281,6 +348,43 @@ async function join(friendId: string, info: InviteInfo) {
 		say(`Abriendo "${instance.name}" y entrando a la partida…`)
 	} catch (e) {
 		fail(e)
+	}
+}
+
+/** Instala la instancia de un amigo. Si venía de una invitación a partida, se une en cuanto termina. */
+async function installInstance(messageId: string, friendId: string, info: InviteInfo) {
+	const recipe = info.instance
+	if (!recipe || installing.value[messageId]) return
+	installing.value = { ...installing.value, [messageId]: true }
+	say(`Instalando «${recipe.name}»… Puedes ver el progreso en el panel de tareas.`)
+	try {
+		await installRecipe(recipe)
+		await refreshInstances()
+		if (info.kind === 'instance') {
+			say(`«${recipe.name}» instalada. Ya la tienes en tu biblioteca.`)
+		} else {
+			say(`«${recipe.name}» instalada.`)
+			await join(friendId, info)
+		}
+	} catch (e) {
+		fail(e)
+	} finally {
+		installing.value = Object.fromEntries(Object.entries(installing.value).filter(([id]) => id !== messageId))
+	}
+}
+
+async function sendInstance(id: string) {
+	if (!selected.value || !id) return
+	const instance = instances.value.find((i) => i.id === id)
+	if (!instance) return
+	try {
+		await call('p2p_send_instance', { friend: selected.value.id, instance: recipeOf(instance) })
+		await loadMessages()
+		say(`Instancia «${instance.name}» enviada a ${selected.value.name}`)
+	} catch (e) {
+		fail(e)
+	} finally {
+		shareInstanceId.value = ''
 	}
 }
 async function leave(friendId: string, info: InviteInfo) {
@@ -520,17 +624,52 @@ onUnmounted(() => {
 							<template v-if="m.invite">
 								<strong class="flex items-center gap-1.5 text-contrast">
 									<component
-										:is="m.invite.kind === 'world' ? PlayIcon : ServerStackIcon"
+										:is="
+											m.invite.kind === 'world'
+												? PlayIcon
+												: m.invite.kind === 'instance'
+													? DownloadIcon
+													: ServerStackIcon
+										"
 										class="size-4"
 									/>
-									{{ m.from_me ? 'Invitaste' : 'Te invita' }} a
-									{{ m.invite.kind === 'world' ? 'un mundo' : 'un servidor' }}
+									<template v-if="m.invite.kind === 'instance'">
+										{{ m.from_me ? 'Compartiste' : 'Te comparte' }} una instancia
+									</template>
+									<template v-else>
+										{{ m.from_me ? 'Invitaste' : 'Te invita' }} a
+										{{ m.invite.kind === 'world' ? 'un mundo' : 'un servidor' }}
+									</template>
 								</strong>
 								<span>
 									{{ m.invite.title
-									}}<template v-if="m.invite.game_version"> · {{ m.invite.game_version }}</template>
+									}}<template v-if="m.invite.instance">
+										· {{ recipeSummary(m.invite.instance) }}</template
+									><template v-else-if="m.invite.game_version">
+										· {{ m.invite.game_version }}</template
+									>
 								</span>
-								<template v-if="!m.from_me">
+								<template v-if="!m.from_me && m.invite.kind === 'instance'">
+									<span v-if="matchFor(m.invite)" class="text-sm text-secondary"
+										>Ya tienes esta instancia («{{ matchFor(m.invite)?.instance.name }}»).</span
+									>
+									<div v-if="!matchFor(m.invite)">
+										<Button
+											type="colored"
+											color="brand"
+											size="sm"
+											:disabled="installing[m.id]"
+											@click="installInstance(m.id, selected.id, m.invite)"
+										>
+											<DownloadIcon />
+											{{ installing[m.id] ? 'Instalando…' : 'Instalar instancia' }}
+										</Button>
+									</div>
+								</template>
+								<template v-else-if="!m.from_me">
+									<span v-if="m.invite.instance" class="text-sm text-secondary">{{
+										matchHint(m.invite, matchFor(m.invite))
+									}}</span>
 									<div v-if="joined[m.invite.share_id]" class="flex flex-wrap items-center gap-2">
 										<span class="text-sm"
 											>Conectado en <code>127.0.0.1:{{ joined[m.invite.share_id] }}</code></span
@@ -538,6 +677,18 @@ onUnmounted(() => {
 										<Button type="outlined" size="sm" @click="leave(selected.id, m.invite)"
 											>Desconectar</Button
 										>
+									</div>
+									<div v-else-if="inviteNeedsInstall(m.invite)">
+										<Button
+											type="colored"
+											color="brand"
+											size="sm"
+											:disabled="installing[m.id]"
+											@click="installInstance(m.id, selected.id, m.invite)"
+										>
+											<DownloadIcon />
+											{{ installing[m.id] ? 'Instalando…' : 'Instalar y unirme' }}
+										</Button>
 									</div>
 									<div v-else>
 										<Button
@@ -560,7 +711,15 @@ onUnmounted(() => {
 							</small>
 						</div>
 					</div>
-					<form class="flex gap-2" @submit.prevent="send">
+					<form class="flex flex-wrap gap-2" @submit.prevent="send">
+						<Combobox
+							v-model="shareInstanceId"
+							:options="instanceOptions"
+							placeholder="Compartir instancia…"
+							:disabled="!instances.length"
+							class="w-52 max-w-full"
+							@update:model-value="sendInstance"
+						/>
 						<Input
 							v-model="draft"
 							:maxlength="2000"

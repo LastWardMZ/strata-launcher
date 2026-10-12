@@ -108,6 +108,7 @@ import {
 import WindowControls from '@/components/ui/WindowControls.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { useAppEvent } from '@/composables/use-app-event'
+import { useRecordingNotifications } from '@/composables/use-recording-notifications'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { useError } from '@/composables/use-error.js'
 import { useInstanceMetadataRefresh } from '@/composables/use-instance-metadata-refresh'
@@ -206,6 +207,7 @@ import { AppNotificationManager } from './providers/app-notifications'
 import { AppPopupNotificationManager } from './providers/app-popup-notifications'
 import {
 	appSettingsModalOpenProfileKey,
+	appSettingsModalOpenRecordingKey,
 	appSettingsModalOpenSyncedOptionsKey,
 } from './providers/app-settings-modal'
 
@@ -556,7 +558,7 @@ onMounted(async () => {
 	document.querySelector('body').addEventListener('contextmenu', handleContextMenu)
 	document.addEventListener('fullscreenchange', handleFullscreenChange)
 
-	checkUpdates()
+	checkUpdates().catch((e) => console.error('Update check failed:', e))
 })
 
 onUnmounted(async () => {
@@ -1142,6 +1144,21 @@ function showSyncInstancesUpdateNotification() {
 
 provide(appSettingsModalOpenProfileKey, () => appSettingsModal.value?.showProfile())
 provide(appSettingsModalOpenSyncedOptionsKey, () => appSettingsModal.value?.showSyncedOptions())
+provide(appSettingsModalOpenRecordingKey, () => appSettingsModal.value?.showRecording())
+useRecordingNotifications({
+	addNotification,
+	addPopupNotification,
+	openSettings: () => appSettingsModal.value?.showRecording(),
+	openVideos: () => {
+		// Se abre la pantalla de capturas ya en la sección de vídeos.
+		try {
+			localStorage.setItem('screenshots-section-global', 'videos')
+		} catch {
+			// Sin almacenamiento local se abre en la sección por defecto.
+		}
+		router.push('/screenshots')
+	},
+})
 
 watch(
 	() => appSettings.getFeatureFlag('show_sync_instances_update_modal'),
@@ -1904,49 +1921,65 @@ async function checkUpdates() {
 		return
 	}
 
-	async function performCheck() {
-		const update = await invoke('plugin:updater|check')
-		if (!update) {
-			console.log('No update available')
-			return
-		}
-
-		const isExistingUpdate = update.version === availableUpdate.value?.version
-
-		if (isExistingUpdate) {
-			console.log('Update is already known')
-			scheduleDelayedUpdatePopup()
-			return
-		}
-
-		appUpdateDownload.progress.value = 0
-		finishedDownloading.value = false
-		downloading.value = false
-		updateSize.value = null
-		availableUpdate.value = update
-
-		console.log(`Update ${update.version} is available.`)
-
-		metered.value = await isNetworkMetered()
-		if (!metered.value) {
-			console.log('Starting download of update')
-			downloadUpdate(update)
-		} else {
-			console.log(`Metered connection detected, not auto-downloading update.`)
-			markAppUpdateActionable(update.version)
-			scheduleDelayedUpdatePopup()
-		}
-
-		getUpdateSize(update.rid).then((size) => (updateSize.value = size))
-	}
-
-	await performCheck()
+	// Un fallo puntual (sin red, GitHub caído…) no debe cortar las comprobaciones siguientes.
+	await checkUpdatesNow()
 	setTimeout(
 		() => {
-			checkUpdates()
+			checkUpdates().catch((e) => console.error('Update check failed:', e))
 		},
 		5 /* min */ * 60 /* sec */ * 1000 /* ms */,
 	)
+}
+
+async function performUpdateCheck() {
+	const update = await invoke('plugin:updater|check')
+	if (!update) {
+		console.log('No update available')
+		return 'up-to-date'
+	}
+
+	const isExistingUpdate = update.version === availableUpdate.value?.version
+
+	if (isExistingUpdate) {
+		console.log('Update is already known')
+		scheduleDelayedUpdatePopup()
+		return 'available'
+	}
+
+	appUpdateDownload.progress.value = 0
+	finishedDownloading.value = false
+	downloading.value = false
+	updateSize.value = null
+	availableUpdate.value = update
+
+	console.log(`Update ${update.version} is available.`)
+
+	metered.value = await isNetworkMetered()
+	if (!metered.value) {
+		console.log('Starting download of update')
+		downloadUpdate(update)
+	} else {
+		console.log(`Metered connection detected, not auto-downloading update.`)
+		markAppUpdateActionable(update.version)
+		scheduleDelayedUpdatePopup()
+	}
+
+	getUpdateSize(update.rid).then((size) => (updateSize.value = size))
+	return 'available'
+}
+
+// Comprobación única (la usan el bucle automático y el botón de Ajustes). Nunca lanza.
+async function checkUpdatesNow() {
+	try {
+		if (!(await areUpdatesEnabled())) {
+			updatesEnabled.value = false
+			return 'disabled'
+		}
+		return await performUpdateCheck()
+	} catch (e) {
+		console.error('Update check failed:', e)
+		return 'error'
+	}
 }
 
 async function checkLinuxUpdates() {
@@ -2041,7 +2074,8 @@ async function installUpdate() {
 setAppUpdateActions({
 	download: downloadAvailableUpdate,
 	install: installUpdate,
-	changelog: () => openUrl('https://modrinth.com/news/changelog?filter=app'),
+	changelog: () => openUrl('https://github.com/LastWardMZ/strata-launcher/releases/latest'),
+	check: checkUpdatesNow,
 })
 
 async function openModrinthProjectLinkInApp(parsed) {

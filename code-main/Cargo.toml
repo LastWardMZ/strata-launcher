@@ -322,7 +322,8 @@ opt-level = 3
 [profile.release]
 opt-level = "s"  # Optimize for binary size
 strip = true  # Remove debug symbols
-lto = true  # Enables link to optimizations
+lto = "thin"  # Link-time optimization más rápida que "fat" (compila bastante más rápido)
+codegen-units = 16  # Más paralelismo al compilar, a costa de un binario algo mayor
 panic = "abort"  # Strip expensive panic clean-up logic
 
 [profile.test]

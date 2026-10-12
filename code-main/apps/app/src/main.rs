@@ -203,6 +203,7 @@ fn main() {
             api::local_servers::start_backup_scheduler(app.handle().clone());
             api::p2p::start_in_background(app.handle().clone());
             api::accounts::start_in_background(app.handle().clone());
+            api::recording::start_in_background(app.handle().clone());
             #[cfg(target_os = "macos")]
             {
                 let payload = macos::deep_link::get_or_init_payload(app);
@@ -256,6 +257,7 @@ fn main() {
         .manage(api::local_servers::LocalServerState::default())
         .manage(api::p2p::P2pState::default())
         .manage(api::accounts::AccountsState::default())
+        .manage(api::recording::RecordingState::default())
         .plugin(api::mr_auth::init())
         .plugin(api::onboarding_checklist::init())
         .plugin(api::import::init())
@@ -323,6 +325,21 @@ fn main() {
             api::accounts::accounts_friend_action,
             api::accounts::accounts_delete,
             api::accounts::accounts_set_server,
+            api::recording::recording_support,
+            api::recording::recording_status,
+            api::recording::recording_set_settings,
+            api::recording::recording_install_ffmpeg,
+            api::recording::recording_remove_ffmpeg,
+            api::recording::recording_reprobe_encoders,
+            api::recording::recording_check_conflicts,
+            api::recording::recording_toggle,
+            api::recording::recording_list,
+            api::recording::recording_thumbnail,
+            api::recording::recording_delete,
+            api::recording::recording_reveal,
+            api::recording::recording_allow_playback,
+            api::recording::recording_trim_start,
+            api::recording::recording_trim_cancel,
             api::p2p::p2p_info,
             api::p2p::p2p_export_identity,
             api::p2p::p2p_import_identity,
@@ -341,6 +358,7 @@ fn main() {
             api::p2p::p2p_share_stop,
             api::p2p::p2p_shares,
             api::p2p::p2p_invite,
+            api::p2p::p2p_send_instance,
             api::p2p::p2p_join,
             api::p2p::p2p_join_stop,
             api::p2p::p2p_detect_lan_port,
@@ -380,6 +398,8 @@ fn main() {
                 }
 
                 if matches!(&event, tauri::RunEvent::Exit) {
+                    // Primero se cierra la grabación en curso (si la hay) para que el vídeo quede completo.
+                    app.state::<api::recording::RecordingState>().close();
                     app.state::<api::p2p::P2pState>().close();
                     api::local_servers::shutdown_all(
                         app.state::<api::local_servers::LocalServerState>().inner(),
