@@ -7,6 +7,10 @@
 
 const SKEW_MS = 5 * 60_000
 const BODY_LIMIT = 16_384
+// La foto (WebP en base64) es lo único que supera el límite normal; solo se admite en su ruta.
+const AVATAR_BYTES = 24 * 1024
+const AVATAR_BODY_LIMIT = 40_000
+const BASE64 = /^[A-Za-z0-9+/]+={0,2}$/
 const USERNAME = /^[a-zA-Z0-9_]{3,24}$/
 const CODE = /^[0-9a-f]{64}$/
 const SIGNATURE = /^[0-9a-f]{128}$/
@@ -86,13 +90,29 @@ export function createHandler(db) {
 	}
 
 	const settingsOf = (u) => ({ friend_privacy: u.friend_privacy, invite_privacy: u.invite_privacy, searchable: !!u.searchable })
-	const profileOf = (u) => ({ id: u.id, username: u.username, bio: u.bio, settings: settingsOf(u) })
+	const profileOf = (u) => ({ id: u.id, username: u.username, bio: u.bio, avatar_v: u.avatar_v, settings: settingsOf(u) })
 	const userById = (id) => first('SELECT * FROM users WHERE id=?', id)
 	const userByName = (name) => first('SELECT * FROM users WHERE username=?', name)
 
 	function validateUsername(name) {
 		if (typeof name !== 'string' || !USERNAME.test(name)) fail(400, 'El usuario debe tener entre 3 y 24 letras, números o guiones bajos.')
 		if (RESERVED.has(name.toLowerCase())) fail(400, 'Ese nombre de usuario no está disponible.', 'name-taken')
+	}
+	/** Decodifica y comprueba que sea un WebP bien formado y pequeño; si no, 400. */
+	function decodeAvatar(image) {
+		if (typeof image !== 'string' || !BASE64.test(image) || image.length % 4 !== 0) fail(400, 'La imagen no es válida.')
+		let bytes
+		try {
+			bytes = Uint8Array.from(atob(image), (c) => c.charCodeAt(0))
+		} catch {
+			fail(400, 'La imagen no es válida.')
+		}
+		if (bytes.length > AVATAR_BYTES) fail(413, 'La foto pesa demasiado (máximo 24 KB).')
+		const tag = (at, text) => text.split('').every((ch, i) => bytes[at + i] === ch.charCodeAt(0))
+		const declared = bytes.length >= 8 ? new DataView(bytes.buffer).getUint32(4, true) + 8 : -1
+		if (bytes.length < 16 || !tag(0, 'RIFF') || !tag(8, 'WEBP') || declared !== bytes.length) {
+			fail(400, 'La foto debe ser una imagen WebP.')
+		}
 	}
 	async function relationTo(me, other) {
 		const row = await first(
@@ -109,10 +129,10 @@ export function createHandler(db) {
 
 	async function social(id) {
 		const [friends, incoming, outgoing, blocked] = await Promise.all([
-			all("SELECT u.id,u.username,u.bio FROM users u JOIN relations r ON (r.sender=u.id OR r.receiver=u.id) WHERE r.status='accepted' AND (r.sender=? OR r.receiver=?) AND u.id<>? ORDER BY u.username", id, id, id),
-			all("SELECT u.id,u.username,u.bio FROM users u JOIN relations r ON r.sender=u.id WHERE r.receiver=? AND r.status='pending' ORDER BY u.username", id),
-			all("SELECT u.id,u.username,u.bio FROM users u JOIN relations r ON r.receiver=u.id WHERE r.sender=? AND r.status='pending' ORDER BY u.username", id),
-			all('SELECT u.id,u.username,u.bio FROM users u JOIN blocks b ON b.target=u.id WHERE b.owner=? ORDER BY u.username', id),
+			all("SELECT u.id,u.username,u.bio,u.avatar_v FROM users u JOIN relations r ON (r.sender=u.id OR r.receiver=u.id) WHERE r.status='accepted' AND (r.sender=? OR r.receiver=?) AND u.id<>? ORDER BY u.username", id, id, id),
+			all("SELECT u.id,u.username,u.bio,u.avatar_v FROM users u JOIN relations r ON r.sender=u.id WHERE r.receiver=? AND r.status='pending' ORDER BY u.username", id),
+			all("SELECT u.id,u.username,u.bio,u.avatar_v FROM users u JOIN relations r ON r.receiver=u.id WHERE r.sender=? AND r.status='pending' ORDER BY u.username", id),
+			all('SELECT u.id,u.username,u.bio,u.avatar_v FROM users u JOIN blocks b ON b.target=u.id WHERE b.owner=? ORDER BY u.username', id),
 		])
 		return { friends, incoming, outgoing, blocked }
 	}
@@ -191,6 +211,29 @@ export function createHandler(db) {
 					db.prepare('DELETE FROM users WHERE id=?').bind(id),
 				])
 				return { ok: true }
+			case 'PUT /me/avatar': {
+				await limit(`avatar:${id}`, 10, 3_600_000, 'Has cambiado la foto demasiadas veces. Inténtalo más tarde.')
+				decodeAvatar(body.image)
+				await run('UPDATE users SET avatar=?, avatar_v=? WHERE id=?', body.image, Date.now(), id)
+				return profileOf(await userById(id))
+			}
+			case 'POST /me/avatar/delete':
+				await run("UPDATE users SET avatar='', avatar_v=? WHERE id=?", Date.now(), id)
+				return profileOf(await userById(id))
+			case 'GET /avatar': {
+				await limit(`avatars:${id}`, 300, 3_600_000, 'Estás pidiendo demasiadas fotos. Inténtalo más tarde.')
+				const wanted = url.searchParams.get('user') || ''
+				const gone = () => fail(404, 'No hay foto disponible.')
+				if (!CODE.test(wanted)) gone()
+				if (wanted !== id) {
+					const owner = await userById(wanted)
+					const blocked = await first('SELECT 1 AS x FROM blocks WHERE (owner=? AND target=?) OR (owner=? AND target=?)', id, wanted, wanted, id)
+					// Solo la ven tú, tus amigos y quien tiene una solicitud pendiente contigo; el resto, igual que si no existiera.
+					if (!owner || blocked || (await relationTo(id, wanted)) === 'none') gone()
+					return { id: wanted, v: owner.avatar_v, image: owner.avatar }
+				}
+				return { id, v: me.avatar_v, image: me.avatar }
+			}
 			case 'GET /users/search': {
 				await limit(`search:${id}`, 30, 60_000, 'Estás buscando demasiado deprisa. Espera un momento.')
 				const q = (url.searchParams.get('q') || '').trim()
@@ -266,10 +309,11 @@ export function createHandler(db) {
 			// El launcher llama desde Rust y no envía Origin. Un navegador de otro sitio, sí: se rechaza.
 			if (request.headers.get('Origin')) fail(403, 'Origen no autorizado.')
 			const url = new URL(request.url)
+			const cap = request.method === 'PUT' && url.pathname === '/me/avatar' ? AVATAR_BODY_LIMIT : BODY_LIMIT
 			const declared = Number(request.headers.get('Content-Length') || 0)
-			if (declared > BODY_LIMIT) fail(413, 'Solicitud demasiado grande.')
+			if (declared > cap) fail(413, 'Solicitud demasiado grande.')
 			const bodyText = request.method === 'GET' || request.method === 'HEAD' ? '' : await request.text()
-			if (bodyText.length > BODY_LIMIT) fail(413, 'Solicitud demasiado grande.')
+			if (bodyText.length > cap) fail(413, 'Solicitud demasiado grande.')
 			const ip = options.ip || request.headers.get('CF-Connecting-IP') || 'desconocida'
 			return reply(200, await route(request, url, bodyText, ip))
 		} catch (error) {

@@ -246,3 +246,69 @@ test('sondeo de nombres [SEC-06]: las acciones de amistad tienen límite y no de
 	for (let i = 0; i < 20; i++) await call(dave, 'POST', '/friends/request', { username: `Nadie_${i}` }, { expected: 400 })
 	assert.equal((await call(dave, 'POST', '/friends/request', { username: 'Nadie_x' }, { expected: 429 })).code, 'rate-limit')
 })
+
+/** Un WebP mínimo bien formado (cabecera RIFF/WEBP con el tamaño correcto) de `size` bytes. */
+function fakeWebp(size = 40) {
+	const bytes = new Uint8Array(size)
+	bytes.set([0x52, 0x49, 0x46, 0x46], 0)
+	new DataView(bytes.buffer).setUint32(4, size - 8, true)
+	bytes.set([0x57, 0x45, 0x42, 0x50], 8)
+	return Buffer.from(bytes).toString('base64')
+}
+
+test('foto de perfil: solo WebP pequeño, visible para ti, tus amigos y solicitudes; no para extraños ni bloqueados', async () => {
+	const { call, register } = setup()
+	const alice = await register('Alice_QA')
+	const bob = await register('Bob_QA')
+	const carol = await register('Carol_QA')
+
+	// Validación: formato, tamaño y base64.
+	await call(alice, 'PUT', '/me/avatar', { image: 'no es base64!' }, { expected: 400 })
+	await call(alice, 'PUT', '/me/avatar', { image: Buffer.from('<svg onload=alert(1)>............').toString('base64') }, { expected: 400 })
+	await call(alice, 'PUT', '/me/avatar', { image: fakeWebp(24 * 1024 + 4) }, { expected: 413 })
+	const wrongSize = Buffer.from(fakeWebp(40), 'base64')
+	wrongSize.writeUInt32LE(9999, 4)
+	await call(alice, 'PUT', '/me/avatar', { image: wrongSize.toString('base64') }, { expected: 400 })
+	await call(alice, 'PUT', '/me/avatar', {}, { expected: 400 })
+
+	// Subida correcta: cambia `avatar_v` y se ve en el perfil propio.
+	const image = fakeWebp(200)
+	const before = (await call(alice, 'GET', '/me')).avatar_v
+	assert.equal(before, 0)
+	const updated = await call(alice, 'PUT', '/me/avatar', { image })
+	assert.ok(updated.avatar_v > 0)
+	assert.deepEqual(await call(alice, 'GET', `/avatar?user=${alice.code}`), { id: alice.code, v: updated.avatar_v, image })
+
+	// Un extraño no la ve (404 igual que si no existiera la cuenta).
+	const stranger = await call(bob, 'GET', `/avatar?user=${alice.code}`, undefined, { expected: 404 })
+	const missing = await call(bob, 'GET', `/avatar?user=${'a'.repeat(64)}`, undefined, { expected: 404 })
+	assert.deepEqual(stranger, missing)
+	await call(bob, 'GET', '/avatar?user=zzz', undefined, { expected: 404 })
+
+	// Con una solicitud pendiente y luego siendo amigos, sí.
+	await call(bob, 'POST', '/friends/request', { username: 'Alice_QA' })
+	assert.equal((await call(bob, 'GET', `/avatar?user=${alice.code}`)).image, image)
+	await call(alice, 'POST', '/friends/accept', { username: 'Bob_QA' })
+	assert.equal((await call(bob, 'GET', `/avatar?user=${alice.code}`)).v, updated.avatar_v)
+	// La lista de amigos trae solo la versión, no la imagen.
+	const sync = await call(bob, 'GET', '/sync')
+	assert.deepEqual(sync.social.friends.map((f) => [f.username, f.avatar_v, f.avatar]), [['Alice_QA', updated.avatar_v, undefined]])
+
+	// Quien no es amigo sigue sin verla, y un bloqueo la oculta.
+	await call(carol, 'GET', `/avatar?user=${alice.code}`, undefined, { expected: 404 })
+	await call(alice, 'POST', '/block', { username: 'Bob_QA' })
+	await call(bob, 'GET', `/avatar?user=${alice.code}`, undefined, { expected: 404 })
+
+	// Borrar la foto cambia la versión y deja la imagen vacía.
+	const removed = await call(alice, 'POST', '/me/avatar/delete', {})
+	assert.notEqual(removed.avatar_v, updated.avatar_v)
+	assert.equal((await call(alice, 'GET', `/avatar?user=${alice.code}`)).image, '')
+})
+
+test('foto de perfil: límite de cambios por hora y el cuerpo grande solo se admite en su ruta', async () => {
+	const { call, register } = setup()
+	const alice = await register('Alice_QA')
+	for (let i = 0; i < 10; i++) await call(alice, 'PUT', '/me/avatar', { image: fakeWebp(100 + i) })
+	assert.equal((await call(alice, 'PUT', '/me/avatar', { image: fakeWebp(300) }, { expected: 429 })).code, 'rate-limit')
+	await call(alice, 'PATCH', '/me', { bio: 'x'.repeat(20_000) }, { expected: 413 })
+})

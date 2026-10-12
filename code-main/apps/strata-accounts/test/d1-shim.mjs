@@ -1,14 +1,16 @@
 // Adaptador mínimo con la forma de la API de D1 sobre node:sqlite, solo para los tests de Node.
 // En producción la base de datos es la D1 real de Cloudflare.
 import { DatabaseSync } from 'node:sqlite'
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 
-const MIGRATION = new URL('../migrations/0001_init.sql', import.meta.url)
+const MIGRATIONS = new URL('../migrations/', import.meta.url)
 
 export function createD1(path = ':memory:') {
 	const sqlite = new DatabaseSync(path)
 	sqlite.exec('PRAGMA foreign_keys=ON;')
-	sqlite.exec(readFileSync(MIGRATION, 'utf-8'))
+	for (const file of readdirSync(MIGRATIONS).filter((name) => name.endsWith('.sql')).sort()) {
+		sqlite.exec(readFileSync(new URL(file, MIGRATIONS), 'utf-8'))
+	}
 
 	const statement = (sql, args = []) => ({
 		bind: (...bound) => statement(sql, bound),
