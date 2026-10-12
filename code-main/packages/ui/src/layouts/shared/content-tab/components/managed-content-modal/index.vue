@@ -107,7 +107,7 @@ const messages = defineMessages({
 	},
 	externalContentDescription: {
 		id: 'instances.managed-content-modal.external-content-description',
-		defaultMessage: 'This file is not published on catálogo.',
+		defaultMessage: 'This file is not published on Modrinth.',
 	},
 	openInSlicer: {
 		id: 'instances.managed-content-modal.open-in-slicer',

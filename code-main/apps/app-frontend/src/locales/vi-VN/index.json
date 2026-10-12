@@ -75,7 +75,7 @@
 		"message": "Cài đặt Minecraft thất bại"
 	},
 	"app.action-bar.install.summary.modrinth-unreachable": {
-		"message": "Không thể kết nối được với catálogo"
+		"message": "Không thể kết nối được với Modrinth"
 	},
 	"app.action-bar.install.summary.no-write-permission": {
 		"message": "Không có quyền để viết"
@@ -132,7 +132,7 @@
 		"message": "Chấp nhận tất cả"
 	},
 	"app.ads-consent.body": {
-		"message": "Quảng cáo giúp catálogo hoạt động và tài trợ cho việc thanh toán cho người sáng tạo nội dung. Các đối tác của chúng tôi có thể lưu trữ hoặc truy cập cookie trong ứng dụng để cá nhân hóa quảng cáo và đo lường hiệu suất."
+		"message": "Quảng cáo giúp Modrinth hoạt động và tài trợ cho việc thanh toán cho người sáng tạo nội dung. Các đối tác của chúng tôi có thể lưu trữ hoặc truy cập cookie trong ứng dụng để cá nhân hóa quảng cáo và đo lường hiệu suất."
 	},
 	"app.ads-consent.manage": {
 		"message": "Quản lý tùy chọn"
@@ -141,7 +141,7 @@
 		"message": "Từ chối tất cả"
 	},
 	"app.ads-consent.title": {
-		"message": "Quyền riêng tư của bạn và cách quảng cáo hỗ trợ catálogo"
+		"message": "Quyền riêng tư của bạn và cách quảng cáo hỗ trợ Modrinth"
 	},
 	"app.appearance-settings.compact-mode.description": {
 		"message": "Hiển thị thư viện phiên bản theo bố cục hàng nhỏ gọn."
@@ -162,7 +162,7 @@
 		"message": "Ẩn thẻ tên"
 	},
 	"app.appearance-settings.minimize-launcher.description": {
-		"message": "Thu nhỏ ứng dụng catálogo khi Minecraft khởi động."
+		"message": "Thu nhỏ ứng dụng Strata khi Minecraft khởi động."
 	},
 	"app.appearance-settings.minimize-launcher.title": {
 		"message": "Thu nhỏ ứng dụng"
@@ -186,7 +186,7 @@
 		"message": "Ẩn thanh bên"
 	},
 	"app.appearance-settings.unknown-pack-warning.description": {
-		"message": "Hiển thị cảnh báo an toàn trước khi cài đặt một gói catálogo (.mrpack) không được lưu trữ trên catálogo."
+		"message": "Hiển thị cảnh báo an toàn trước khi cài đặt một gói Modrinth (.mrpack) không được lưu trữ trên Modrinth."
 	},
 	"app.appearance-settings.unknown-pack-warning.title": {
 		"message": "Cảnh báo tôi trước khi cài đặt các modpacks không rõ nguồn gốc"
@@ -210,7 +210,7 @@
 		"message": "Sử dụng các cài đặt hành vi này ở mọi nơi bạn đăng nhập. Hãy tắt tùy chọn này nếu muốn duy trì các cài đặt riêng cho thiết bị này."
 	},
 	"app.behavior-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "Đăng nhập vào tài khoản catálogo để đồng bộ hóa cài đặt."
+		"message": "Đăng nhập vào tài khoản Modrinth để đồng bộ hóa cài đặt."
 	},
 	"app.behavior-settings.sync-across-devices.title": {
 		"message": "Đồng bộ hóa hành vi trên các thiết bị"
@@ -345,13 +345,13 @@
 		"message": "Xem phiên bản"
 	},
 	"app.hosting.update-required.description": {
-		"message": "Bạn cần cập nhật để sử dụng Hosting thông qua ứng dụng catálogo"
+		"message": "Bạn cần cập nhật để sử dụng Hosting thông qua ứng dụng Strata"
 	},
 	"app.hosting.update-required.download": {
 		"message": "Tải xuống để cập nhật"
 	},
 	"app.hosting.update-required.title": {
-		"message": "Yêu cầu cập nhật ứng dụng catálogo"
+		"message": "Yêu cầu cập nhật ứng dụng Modrinth"
 	},
 	"app.install.phase.downloading_content": {
 		"message": "Đang tải nội dung"
@@ -765,13 +765,13 @@
 		"message": "MINECON Earth 2017"
 	},
 	"app.skins.section.modrinth": {
-		"message": "catálogo"
+		"message": "Modrinth"
 	},
 	"app.skins.section.modrinth-pride": {
-		"message": "catálogo Pride"
+		"message": "Modrinth Pride"
 	},
 	"app.skins.section.modrinth-pride.tooltip": {
-		"message": "Bạn đã được tặng những skin này sau khi quyên góp cho catálogo trong tháng tự hào LGBT thế giới."
+		"message": "Bạn đã được tặng những skin này sau khi quyên góp cho Modrinth trong tháng tự hào LGBT thế giới."
 	},
 	"app.skins.section.mounts-of-mayhem": {
 		"message": "Mounts of Mayhem"
@@ -795,13 +795,13 @@
 		"message": "Đổi skin"
 	},
 	"app.update-popup.body.download-complete": {
-		"message": "Phiên bản v{version} của catálogo đã sẵn sàng để có thể cài đặt. Khởi động lại ứng dụng để cập nhật ngay bây giờ, hoặc tự động cập nhật sau khi bạn tắt catálogo."
+		"message": "Phiên bản v{version} của Modrinth đã sẵn sàng để có thể cài đặt. Khởi động lại ứng dụng để cập nhật ngay bây giờ, hoặc tự động cập nhật sau khi bạn tắt Modrinth."
 	},
 	"app.update-popup.body.linux": {
-		"message": "Phiên bản v{version} của catálogo hiện đang khả dụng. Hãy sử dụng trình quản lý gói của bạn để cập nhật các tính năng và bản vá lỗi mới nhất!"
+		"message": "Phiên bản v{version} của Modrinth hiện đang khả dụng. Hãy sử dụng trình quản lý gói của bạn để cập nhật các tính năng và bản vá lỗi mới nhất!"
 	},
 	"app.update-popup.body.metered": {
-		"message": "Phiên bản v{version} của catálogo hiện đang khả dụng ngay bây giờ! Vì bạn đang sử dụng mạng có tính phí theo dung lượng nên chúng tôi không tự động tải xuống."
+		"message": "Phiên bản v{version} của Modrinth hiện đang khả dụng ngay bây giờ! Vì bạn đang sử dụng mạng có tính phí theo dung lượng nên chúng tôi không tự động tải xuống."
 	},
 	"app.update-popup.changelog": {
 		"message": "Nhật ký thay đổi"

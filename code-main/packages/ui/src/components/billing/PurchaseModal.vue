@@ -292,7 +292,7 @@
 					<p class="my-2 text-lg font-bold text-primary">Purchase details</p>
 					<div class="mb-2 flex justify-between">
 						<span class="text-secondary">
-							{{ mutatedProduct.metadata.type === 'midas' ? 'Premium del catálogo' : 'Hosting' }}
+							{{ mutatedProduct.metadata.type === 'midas' ? 'Modrinth+' : 'Hosting' }}
 							{{
 								existingPlan
 									? `(${dayjs(renewalDate).diff(dayjs(), 'days')} days prorated)`

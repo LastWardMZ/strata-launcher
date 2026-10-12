@@ -59,7 +59,7 @@
 	>
 		<ErrorInformationCard
 			title="An error occured."
-			description="Please contact catálogo Support."
+			description="Please contact Modrinth Support."
 			:icon="TransferIcon"
 			icon-color="orange"
 			:error-details="generalErrorDetails"
@@ -80,7 +80,7 @@
 			<template #description>
 				<div class="text-md space-y-4">
 					<p class="leading-[170%] text-secondary">
-						Your server's node, where your catálogo Server is physically hosted, is not accessible
+						Your server's node, where your Modrinth Server is physically hosted, is not accessible
 						at the moment. We are working to resolve the issue as quickly as possible.
 					</p>
 					<p class="leading-[170%] text-secondary">
@@ -88,7 +88,7 @@
 						the issue is resolved.
 					</p>
 					<p class="leading-[170%] text-secondary">
-						If reloading does not work initially, please contact catálogo Support via the chat
+						If reloading does not work initially, please contact Modrinth Support via the chat
 						bubble in the bottom right corner and we'll be happy to help.
 					</p>
 				</div>
@@ -1173,12 +1173,12 @@ const nodeUnavailableDetails = computed(() => [
 
 const suspendedDescription = computed(() => {
 	if (serverData.value?.suspension_reason === 'cancelled') {
-		return 'Your subscription has been cancelled.\nContact catálogo Support if you believe this is an error.'
+		return 'Your subscription has been cancelled.\nContact Modrinth Support if you believe this is an error.'
 	}
 	if (serverData.value?.suspension_reason) {
 		return `Your server has been suspended: ${serverData.value.suspension_reason}\nContact Modrinth Support if you believe this is an error.`
 	}
-	return 'Your server has been suspended.\nContact catálogo Support if you believe this is an error.'
+	return 'Your server has been suspended.\nContact Modrinth Support if you believe this is an error.'
 })
 
 const generalErrorDetails = computed(() => [

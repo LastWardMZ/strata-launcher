@@ -146,7 +146,7 @@ const messages = defineMessages({
 	},
 	signInButton: {
 		id: 'servers.list-empty.sign-in-button',
-		defaultMessage: 'Sign in to catálogo',
+		defaultMessage: 'Sign in to Modrinth',
 	},
 })
 

@@ -557,7 +557,7 @@ export const WithCustomItemButtons: Story = {
 					</IconButton>
 				</template>
 				<template #itemButtonsRight="{ item }">
-					<IconButton type="quiet" label="View on catálogo" v-tooltip="'View on catálogo'" @click="console.log('View', item.id)">
+					<IconButton type="quiet" label="View on Modrinth" v-tooltip="'View on Modrinth'" @click="console.log('View', item.id)">
 						<EyeIcon class="size-5 text-secondary" />
 					</IconButton>
 					<IconButton type="quiet" label="Open folder" v-tooltip="'Open folder'" @click="console.log('Open folder', item.id)">

@@ -116,8 +116,8 @@ export const Default: StoryObj = {
 			const showBlocking = () => {
 				popupManager.addPopupNotification({
 					contentType: 'standard',
-					title: 'Your privacy and how ads support catálogo',
-					text: 'Ads make catálogo possible and fund creator rewards. Our partners may store unique identifiers to personalize ads and measure performance.',
+					title: 'Your privacy and how ads support Modrinth',
+					text: 'Ads make Modrinth possible and fund creator rewards. Our partners may store unique identifiers to personalize ads and measure performance.',
 					type: 'info',
 					autoCloseMs: null,
 					dismissible: false,

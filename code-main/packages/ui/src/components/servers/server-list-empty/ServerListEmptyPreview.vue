@@ -111,7 +111,7 @@
 						</p>
 						<p class="m-0 flex items-center gap-1">
 							<Avatar :src="modrinthSmpIcon" size="1.25rem" no-shadow />
-							<span class="font-medium text-contrast">catálogo SMP</span>
+							<span class="font-medium text-contrast">Modrinth SMP</span>
 							<span>{{ formatMessage(messages.serverSuffix) }}</span>
 						</p>
 					</div>
@@ -168,7 +168,7 @@ const messages = defineMessages({
 	},
 	searchPlaceholder: {
 		id: 'sharing.invite-players-modal.search-placeholder',
-		defaultMessage: 'Enter catálogo username',
+		defaultMessage: 'Enter Modrinth username',
 	},
 	addButton: {
 		id: 'sharing.invite-players-modal.add',

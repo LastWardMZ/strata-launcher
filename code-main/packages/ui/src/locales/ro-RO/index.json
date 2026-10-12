@@ -90,7 +90,7 @@
 		"defaultMessage": "Niciun rezultat găsit pentru query-ul tău!"
 	},
 	"browse.offline": {
-		"defaultMessage": "Sunteți offline! Conectați-vă la internet ca să puteți căuta pe catálogo!"
+		"defaultMessage": "Sunteți offline! Conectați-vă la internet ca să puteți căuta pe Modrinth!"
 	},
 	"browse.search.placeholder": {
 		"defaultMessage": "Caută {projectType}..."
@@ -222,7 +222,7 @@
 		"defaultMessage": "Deschide în folder"
 	},
 	"button.open-in-modrinth": {
-		"defaultMessage": "Deschide în catálogo"
+		"defaultMessage": "Deschide în Modrinth"
 	},
 	"button.play": {
 		"defaultMessage": "Joacă"
@@ -1599,16 +1599,16 @@
 		"defaultMessage": "Mențineți fișierele actualizate atunci când serverul se modifică"
 	},
 	"modal.open-in-app.get-app": {
-		"defaultMessage": "Descărcați aplicația catálogo"
+		"defaultMessage": "Descărcați aplicația Modrinth"
 	},
 	"modal.open-in-app.opening-automatically": {
-		"defaultMessage": "Aplicația catálogo se va deschide automat..."
+		"defaultMessage": "Aplicația Modrinth se va deschide automat..."
 	},
 	"modal.open-in-app.title": {
-		"defaultMessage": "Deschiderea aplicației catálogo"
+		"defaultMessage": "Deschiderea aplicației Modrinth"
 	},
 	"modal.open-in-app.why-use": {
-		"defaultMessage": "De ce să folosiți aplicația catálogo"
+		"defaultMessage": "De ce să folosiți aplicația Modrinth"
 	},
 	"notification.error.title": {
 		"defaultMessage": "A avut loc o eroare"
@@ -1641,7 +1641,7 @@
 		"defaultMessage": "Moderator"
 	},
 	"omorphia.component.badge.label.modrinth-team": {
-		"defaultMessage": "Echipa catálogo"
+		"defaultMessage": "Echipa Modrinth"
 	},
 	"omorphia.component.badge.label.pending": {
 		"defaultMessage": "În așteptare"
@@ -2061,7 +2061,7 @@
 		"defaultMessage": "{count} {countPlural, plural, one {recent jucat} other {recent jucate}}"
 	},
 	"project.recent-plays.tooltip": {
-		"defaultMessage": "{count} {countPlural, plural, one {recent jucat} other {recent jucate}} de la catálogo în ultimele 2 săptămâni"
+		"defaultMessage": "{count} {countPlural, plural, one {recent jucat} other {recent jucate}} de la Modrinth în ultimele 2 săptămâni"
 	},
 	"project.server.customModpackTooltip": {
 		"defaultMessage": "Acest proiect folosește un pachet de resurse personalizat"
@@ -2226,7 +2226,7 @@
 		"defaultMessage": "Proiectul tău are mai multe environment-uri"
 	},
 	"project.settings.environment.notice.review-options.description": {
-		"defaultMessage": "Tocmai am revizuit sistemul Environments pe catálogo și acum sunt disponibile noi opțiuni. Asigurați-vă că ați selectat opțiunea corectă mai jos și apoi faceți clic pe „Verificați” când ați terminat!"
+		"defaultMessage": "Tocmai am revizuit sistemul Environments pe Modrinth și acum sunt disponibile noi opțiuni. Asigurați-vă că ați selectat opțiunea corectă mai jos și apoi faceți clic pe „Verificați” când ați terminat!"
 	},
 	"project.settings.environment.notice.review-options.title": {
 		"defaultMessage": "Vă rugăm să examinați opțiunile de mai jos"

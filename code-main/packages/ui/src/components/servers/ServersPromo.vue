@@ -32,7 +32,7 @@ withDefaults(
 				>Want to play with <br />
 				<span class="text-brand">your friends?</span></span
 			>
-			<span class="text-sm font-medium">Create a server with catálogo in just a few clicks.</span>
+			<span class="text-sm font-medium">Create a server with Modrinth in just a few clicks.</span>
 		</div>
 		<div class="flex flex-col items-end justify-end z-10">
 			<ButtonLink type="colored" color="brand" :to="link">

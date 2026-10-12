@@ -78,7 +78,7 @@
 		"message": "Installationen av Minecraft misslyckade"
 	},
 	"app.action-bar.install.summary.modrinth-unreachable": {
-		"message": "Kunde inte nå catálogo"
+		"message": "Kunde inte nå Modrinth"
 	},
 	"app.action-bar.install.summary.no-write-permission": {
 		"message": "Ingen behörighet att skriva"
@@ -135,7 +135,7 @@
 		"message": "Godkänn alla"
 	},
 	"app.ads-consent.body": {
-		"message": "Annonser gör catálogo möjligt och finansierar utbetalningar till skapare. Våra partner kan lagra eller komma åt kakor i appen för att rikta annonser och mäta statistik."
+		"message": "Annonser gör Modrinth möjligt och finansierar utbetalningar till skapare. Våra partner kan lagra eller komma åt kakor i appen för att rikta annonser och mäta statistik."
 	},
 	"app.ads-consent.manage": {
 		"message": "Hantera inställningar"
@@ -144,7 +144,7 @@
 		"message": "Avvisa alla"
 	},
 	"app.ads-consent.title": {
-		"message": "Din integritet och hur annonser stödjer catálogo"
+		"message": "Din integritet och hur annonser stödjer Modrinth"
 	},
 	"app.appearance-settings.compact-mode.description": {
 		"message": "Visa biblioteksinstanser i en kompakt radlayout."
@@ -189,7 +189,7 @@
 		"message": "Dölj högra sidofält"
 	},
 	"app.appearance-settings.unknown-pack-warning.description": {
-		"message": "Visa en säkerhetsvarning innan du installerar ett catálogo Pack (.mrpack) som inte finns på catálogo."
+		"message": "Visa en säkerhetsvarning innan du installerar ett Modrinth Pack (.mrpack) som inte finns på Modrinth."
 	},
 	"app.appearance-settings.unknown-pack-warning.title": {
 		"message": "Varna mig innan jag installerar okända modpaket"
@@ -213,7 +213,7 @@
 		"message": "Använd de här beteendeinställningarna överallt där du är inloggad. Stäng av det här för att ha andra inställningar på den här enheten."
 	},
 	"app.behavior-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "Logga in på ett catálogo-konto för att synkronisera inställningar."
+		"message": "Logga in på ett Modrinth-konto för att synkronisera inställningar."
 	},
 	"app.behavior-settings.sync-across-devices.title": {
 		"message": "Synkronisera beteende mellan enheter"
@@ -432,7 +432,7 @@
 		"message": "Använd dessa funktions inställningar överallt du är inloggad. Stäng av detta för att hålla inställningar separerade för denna enhet."
 	},
 	"app.features-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "Signera in till ett catálogo konto för att synka inställningar."
+		"message": "Signera in till ett Modrinth konto för att synka inställningar."
 	},
 	"app.features-settings.sync-across-devices.title": {
 		"message": "Synka funktioner mellan enheter"
@@ -471,7 +471,7 @@
 		"message": "Ladda ner för att uppdatera"
 	},
 	"app.hosting.update-required.rinthbot-alt": {
-		"message": "Exalterad catálogo-bot"
+		"message": "Exalterad Modrinth-bot"
 	},
 	"app.hosting.update-required.title": {
 		"message": "Strata-uppdatering krävs"
@@ -801,13 +801,13 @@
 		"message": "Logga in som"
 	},
 	"app.instance.shared-instance-wrong-account.signed-out-header": {
-		"message": "Du behöver logga in på catálogo"
+		"message": "Du behöver logga in på Modrinth"
 	},
 	"app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
 		"message": "för att få uppdateringar till den här delade instansen."
 	},
 	"app.instance.shared-instance-wrong-account.warning-header": {
-		"message": "Du använder fel catálogo-konto"
+		"message": "Du använder fModrinth-konto"
 	},
 	"app.instance.shortcut.created": {
 		"message": "Genväg skapad"
@@ -1227,10 +1227,10 @@
 		"message": "Installera"
 	},
 	"app.modal.install-to-play.invite-warning": {
-		"message": "Denna inbjudan skapades av en annan catálogo-användare, inte catálogo. Acceptera endast inbjudningar från personer du litar på."
+		"message": "Denna inbjudan skapades av en annan Modrinth-användare, inte Modrinth. Acceptera endast inbjudningar från personer du litar på."
 	},
 	"app.modal.install-to-play.invite-warning-with-creator": {
-		"message": "Denna inbjudan skapades av <creator>{username}</creator>, inte catálogo. Acceptera endast inbjudningar från personer du litar på."
+		"message": "Denna inbjudan skapades av <creator>{username}</creator>, inte Modrinth. Acceptera endast inbjudningar från personer du litar på."
 	},
 	"app.modal.install-to-play.managed-content.modpack-header": {
 		"message": "Modpaketsinnehåll"
@@ -1263,7 +1263,7 @@
 		"message": "För supportärenden, kontakta vårt <support-link>supportteam</support-link>. För buggrapporter, öppna ett <github-link>GitHub issue</github-link>."
 	},
 	"app.modal.install-to-play.reviewed-files": {
-		"message": "Filer som inte publiceras på catálogo granskas inte."
+		"message": "Filer som inte publiceras på Modrinth granskas inte."
 	},
 	"app.modal.install-to-play.shared-instance": {
 		"message": "Delad instans"
@@ -1272,10 +1272,10 @@
 		"message": "Delat instansinnehåll"
 	},
 	"app.modal.install-to-play.shared-instance-unknown-files-description": {
-		"message": "Denna delad instans innehåller filer som inte är publicerade på catálogo. Vi rekommenderar stark att du endast installerar filer från källor du litar på."
+		"message": "Denna delad instans innehåller filer som inte är publicerade på Modrinth. Vi rekommenderar stark att du endast installerar filer från källor du litar på."
 	},
 	"app.modal.install-to-play.unknown-files-description": {
-		"message": "Detta server-modpaket innehåller filer som inte är utgivna på catálogo. Vi rekommenderar att endast installera filer från källor du litar på."
+		"message": "Detta server-modpaket innehåller filer som inte är utgivna på Modrinth. Vi rekommenderar att endast installera filer från källor du litar på."
 	},
 	"app.modal.install-to-play.unknown-files-warning": {
 		"message": "Okända filvarningar"
@@ -1296,7 +1296,7 @@
 		"message": "Tog bort"
 	},
 	"app.modal.update-to-play.server-modpack-unknown-files-description": {
-		"message": "Uppdateringen för detta server-modpaket innehåller filer som inte är utgivna på catálogo. Vi rekommenderar att endast installera filer från källor du litar på."
+		"message": "Uppdateringen för detta server-modpaket innehåller filer som inte är utgivna på Modrinth. Vi rekommenderar att endast installera filer från källor du litar på."
 	},
 	"app.modal.update-to-play.shared-instance-added-label": {
 		"message": "Lade till"
@@ -1305,7 +1305,7 @@
 		"message": "Tog bort"
 	},
 	"app.modal.update-to-play.shared-instance-unknown-files-description": {
-		"message": "Uppdateringen för denna delad instans innehåller filer som inte är publicerade på catálogo. Vi rekommenderar stark att du endast installerar filer från källor du litar på."
+		"message": "Uppdateringen för denna delad instans innehåller filer som inte är publicerade på Modrinth. Vi rekommenderar stark att du endast installerar filer från källor du litar på."
 	},
 	"app.modal.update-to-play.update-required": {
 		"message": "Uppdatering krävs"
@@ -1326,7 +1326,7 @@
 		"message": "Läser in profil..."
 	},
 	"app.nav.modrinth-account": {
-		"message": "catálogo-konto"
+		"message": "Modrinth-konto"
 	},
 	"app.nav.modrinth-hosting": {
 		"message": "Hosting"
@@ -1338,13 +1338,13 @@
 		"message": "Skärmdumpar"
 	},
 	"app.nav.sign-in-to-modrinth-account": {
-		"message": "Logga in på catálogo"
+		"message": "Logga in på Modrinth"
 	},
 	"app.nav.switch-account": {
 		"message": "Byt konto"
 	},
 	"app.nav.upgrade-to-modrinth-plus": {
-		"message": "Uppgradera till Premium del catálogo"
+		"message": "Uppgradera till Modrinth+"
 	},
 	"app.nav.view-profile": {
 		"message": "Visa profil"
@@ -1554,7 +1554,7 @@
 		"message": "Exportera ZIP"
 	},
 	"app.screenshots.selection.global-export-filename": {
-		"message": "catálogo-skärmdumpar.zip"
+		"message": "Strata-skärmdumpar.zip"
 	},
 	"app.screenshots.selection.instance-export-filename": {
 		"message": "{instance}-skärmdumpar.zip"
@@ -2109,13 +2109,13 @@
 		"message": "macOS"
 	},
 	"app.settings.privacy.ads-consent.intro": {
-		"message": "Annonser gör catálogo möjligt och finansierar utbetalningar till skapare. Våra partner kan lagra eller komma åt kakor i appen för att rikta annonser och mäta statistik. Du kan välja bort eller hantera dina inställningar nedan."
+		"message": "Annonser gör Modrinth möjligt och finansierar utbetalningar till skapare. Våra partner kan lagra eller komma åt kakor i appen för att rikta annonser och mäta statistik. Du kan välja bort eller hantera dina inställningar nedan."
 	},
 	"app.settings.privacy.discord-rich-presence.description": {
 		"message": "Visa Strata som din nuvarande aktivitet på Discord. Detta påverkar inte Rich Presence som lagts till i instanser av moddar. Kräver en app omstart."
 	},
 	"app.settings.privacy.telemetry.description": {
-		"message": "catálogo samlar in anonymiserad statistik och användningsdata för att förbättra vår användarupplevelse och anpassa din upplevelse. Genom att inaktivera det här alternativet avanmäler du dig och din data kommer inte längre samlas in."
+		"message": "Strata doesn't collect or send usage data, so this setting has no effect. It's kept for compatibility."
 	},
 	"app.settings.privacy.telemetry.title": {
 		"message": "Telemetri"
@@ -2130,7 +2130,7 @@
 		"message": "Rensa app-cachen?"
 	},
 	"app.settings.resource-management.app-cache.description": {
-		"message": "Rensa cachad data och ladda ner den igen från catálogo. Appen kan laddas in långsammare tills cachen är återuppbyggd."
+		"message": "Rensa cachad data och ladda ner den igen från Modrinth. Appen kan laddas in långsammare tills cachen är återuppbyggd."
 	},
 	"app.settings.resource-management.app-cache.purge": {
 		"message": "Rensa cache"
@@ -2412,13 +2412,13 @@
 		"message": "MINECON Earth 2017"
 	},
 	"app.skins.section.modrinth": {
-		"message": "catálogo"
+		"message": "Modrinth"
 	},
 	"app.skins.section.modrinth-pride": {
-		"message": "catálogo Pride"
+		"message": "Modrinth Pride"
 	},
 	"app.skins.section.modrinth-pride.tooltip": {
-		"message": "Du har fått dessa utseende eftersom du donerat till en catálogo Pride insamling under pride månaden."
+		"message": "Du har fått dessa utseende eftersom du donerat till en Modrinth Pride insamling under pride månaden."
 	},
 	"app.skins.section.mounts-of-mayhem": {
 		"message": "Mounts of Mayhem"
@@ -2454,13 +2454,13 @@
 		"message": "Skulle du kunna svara på några frågor angående din upplevelse med Strata?"
 	},
 	"app.survey.footer": {
-		"message": "Den här återkopplingen kommer gå direkt till catálogo-teamet och hjälper till att vägleda framtida uppdateringar!"
+		"message": "Den här återkopplingen kommer gå direkt till Modrinth-teamet och hjälper till att vägleda framtida uppdateringar!"
 	},
 	"app.survey.no-thanks": {
 		"message": "Nej tack"
 	},
 	"app.survey.title": {
-		"message": "Hej där catálogo-användare!"
+		"message": "Hej där Modrinth-användare!"
 	},
 	"app.sync-instances-update.badge": {
 		"message": "Nytt den här uppdateringen"
@@ -2724,7 +2724,7 @@
 		"message": "Avpublicera delad instans"
 	},
 	"installation-settings.shared-instance.unpublish-description": {
-		"message": "Ta bort den delade instansen från catálogo och sluta skicka uppdateringar till alla som använder den. Din lokala instans kommer inte att påverkas."
+		"message": "Ta bort den delade instansen från Modrinth och sluta skicka uppdateringar till alla som använder den. Din lokala instans kommer inte att påverkas."
 	},
 	"installation-settings.shared-instance.unpublishing-button": {
 		"message": "Avpublicerar..."
@@ -2736,7 +2736,7 @@
 		"message": "Avlänka delad instans"
 	},
 	"installation-settings.unpublish-shared-instance.modal.admonition-body": {
-		"message": "Det här raderar den delade instansen från catálogos servrar. De som använder den i Strata kommer inte längre få uppdateringar, men din lokala instans och dess innehåll är kvar på den här enheten."
+		"message": "Det här raderar den delade instansen från Modrinths servrar. De som använder den i Strata kommer inte längre få uppdateringar, men din lokala instans och dess innehåll är kvar på den här enheten."
 	},
 	"installation-settings.unpublish-shared-instance.modal.admonition-header": {
 		"message": "Avpublicerar delad instans"
@@ -2994,7 +2994,7 @@
 		"message": "Dynamit"
 	},
 	"instance.icon-editor.symbol.wrenth-rinth": {
-		"message": "catálogo skiftnyckel"
+		"message": "Modrinth skiftnyckel"
 	},
 	"instance.icon-editor.symbol.zombie": {
 		"message": "Zombie"
@@ -3480,7 +3480,7 @@
 		"message": "Skapa ett konto"
 	},
 	"modal.modrinth-account-required.description": {
-		"message": "Du måste logga in på ditt catálogo-konto innan du kan använda den här funktionen."
+		"message": "Du måste logga in på ditt Modrinth-konto innan du kan använda den här funktionen."
 	},
 	"modal.modrinth-account-required.header": {
 		"message": "Konto krävs"
@@ -3489,10 +3489,10 @@
 		"message": "Öppna webbläsare igen"
 	},
 	"modal.modrinth-account-required.sign-in-button": {
-		"message": "Logga in på catálogo"
+		"message": "Logga in på Modrinth"
 	},
 	"modal.modrinth-account-required.sign-in-heading": {
-		"message": "Logga in på ett catálogo-konto"
+		"message": "Logga in på ett Modrinth-konto"
 	},
 	"modal.modrinth-account-required.signing-in-header": {
 		"message": "Loggar in"
@@ -3510,7 +3510,7 @@
 		"message": "Logga på Minecraft"
 	},
 	"onboarding-checklist.login-modrinth": {
-		"message": "Logga in på catálogo"
+		"message": "Logga in på Modrinth"
 	},
 	"onboarding-checklist.title": {
 		"message": "Kom igång"

@@ -78,7 +78,7 @@
 		"message": "La instalación de Minecraft falló"
 	},
 	"app.action-bar.install.summary.modrinth-unreachable": {
-		"message": "No pude comunicarme con catálogo"
+		"message": "No pude comunicarme con Modrinth"
 	},
 	"app.action-bar.install.summary.no-write-permission": {
 		"message": "No tiene permiso para escribir"
@@ -135,7 +135,7 @@
 		"message": "Aceptar todas"
 	},
 	"app.ads-consent.body": {
-		"message": "Los anuncios hacen posible a catálogo y financian los pagos a los creadores. Nuestros socios pueden guardar o acceder a cookies en la aplicación para personalizar anuncios y medir su rendimiento."
+		"message": "Los anuncios hacen posible a Modrinth y financian los pagos a los creadores. Nuestros socios pueden guardar o acceder a cookies en la aplicación para personalizar anuncios y medir su rendimiento."
 	},
 	"app.ads-consent.manage": {
 		"message": "Gestionar preferencias"
@@ -144,7 +144,7 @@
 		"message": "Rechazar todas"
 	},
 	"app.ads-consent.title": {
-		"message": "Tu privacidad y cómo los anuncios apoyan a catálogo"
+		"message": "Tu privacidad y cómo los anuncios apoyan a Modrinth"
 	},
 	"app.appearance-settings.compact-mode.description": {
 		"message": "Muestra las instancias de la biblioteca en un diseño compacto de filas."
@@ -165,7 +165,7 @@
 		"message": "Ocultar etiqueta de nombre"
 	},
 	"app.appearance-settings.minimize-launcher.description": {
-		"message": "Minimiza la app de catálogo al iniciar Minecraft."
+		"message": "Minimiza la app de Strata al iniciar Minecraft."
 	},
 	"app.appearance-settings.minimize-launcher.title": {
 		"message": "Minimizar app"
@@ -189,7 +189,7 @@
 		"message": "Mostrar u ocultar la barra lateral"
 	},
 	"app.appearance-settings.unknown-pack-warning.description": {
-		"message": "Muestra una advertencia antes de instalar un catálogo Pack (.mrpack) que no provenga de los servidores de catálogo."
+		"message": "Muestra una advertencia antes de instalar un Modrinth Pack (.mrpack) que no provenga de los servidores de Modrinth."
 	},
 	"app.appearance-settings.unknown-pack-warning.title": {
 		"message": "Advertir antes de instalar modpacks desconocidos"
@@ -213,7 +213,7 @@
 		"message": "Utiliza estos ajustes de comportamiento en todos los dispositivos en que hayas iniciado sesión. Desactive esta opción para mantener los ajustes separados en este dispositivo."
 	},
 	"app.behavior-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "Inicia sesión en catálogo para sincronizar los ajustes."
+		"message": "Inicia sesión en Modrinth para sincronizar los ajustes."
 	},
 	"app.behavior-settings.sync-across-devices.title": {
 		"message": "Sincronizar comportamiento entre dispositivos"
@@ -453,7 +453,7 @@
 		"message": "Utilice estas funciones en cualquier lugar en que has iniciado sesión. Desactive esta opción para mantener los ajustes separados en este dispositivo."
 	},
 	"app.features-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "Inicia sesión en catálogo para sincronizar los ajustes."
+		"message": "Inicia sesión en Modrinth para sincronizar los ajustes."
 	},
 	"app.features-settings.sync-across-devices.title": {
 		"message": "Función de sincronización entre dispositivos"
@@ -486,16 +486,16 @@
 		"message": "Ver instancia"
 	},
 	"app.hosting.update-required.description": {
-		"message": "Necesitas actualizar para usar Hosting a través de la aplicación de catálogo"
+		"message": "Necesitas actualizar para usar Hosting a través de la aplicación de Strata"
 	},
 	"app.hosting.update-required.download": {
 		"message": "Descarga para actualizar"
 	},
 	"app.hosting.update-required.rinthbot-alt": {
-		"message": "catálogo Both emocionado"
+		"message": "Modrinth Both emocionado"
 	},
 	"app.hosting.update-required.title": {
-		"message": "Se requiere actualizar la aplicación de catálogo"
+		"message": "Se requiere actualizar la aplicación de Modrinth"
 	},
 	"app.install.phase.downloading_content": {
 		"message": "Descargando contenido"
@@ -822,7 +822,7 @@
 		"message": "Inicia sesión con"
 	},
 	"app.instance.shared-instance-wrong-account.signed-out-header": {
-		"message": "Debes iniciar sesión en catálogo"
+		"message": "Debes iniciar sesión en Modrinth"
 	},
 	"app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
 		"message": "para recibir actualizaciones de esta instancia compartida."
@@ -1254,10 +1254,10 @@
 		"message": "Instalar"
 	},
 	"app.modal.install-to-play.invite-warning": {
-		"message": "Esta invitación la creó otro usuario de catálogo, no catálogo. Solo acepta invitaciones de personas en las que confíes."
+		"message": "Esta invitación la creó otro usuario de Modrinth, no Modrinth. Solo acepta invitaciones de personas en las que confíes."
 	},
 	"app.modal.install-to-play.invite-warning-with-creator": {
-		"message": "Esta invitación fue creada por <creator>{username}</creator>, no por catálogo. Nunca aceptes invitaciones de gente que no conozcas."
+		"message": "Esta invitación fue creada por <creator>{username}</creator>, no por Modrinth. Nunca aceptes invitaciones de gente que no conozcas."
 	},
 	"app.modal.install-to-play.managed-content.modpack-header": {
 		"message": "Contenido del Modpack"
@@ -1290,7 +1290,7 @@
 		"message": "Para solicitudes de ayuda, contacte a nuestro <support-link>equipo de soporte</support-link>. Para reportar un bug, abra una <github-link>issue en GitHub</github-link>."
 	},
 	"app.modal.install-to-play.reviewed-files": {
-		"message": "Los archivos que no se publican en catálogo no se revisan."
+		"message": "Los archivos que no se publican en Modrinth no se revisan."
 	},
 	"app.modal.install-to-play.shared-instance": {
 		"message": "Instancia compartida"
@@ -1299,10 +1299,10 @@
 		"message": "Contenido de la instancia compartida"
 	},
 	"app.modal.install-to-play.shared-instance-unknown-files-description": {
-		"message": "Esta instancia contiene archivos que no están publicados en catálogo. Recomendamos encarecidamente instalar únicamente archivos de fuentes de confianza."
+		"message": "Esta instancia contiene archivos que no están publicados en Modrinth. Recomendamos encarecidamente instalar únicamente archivos de fuentes de confianza."
 	},
 	"app.modal.install-to-play.unknown-files-description": {
-		"message": "Este modpack para servidor contiene archivos que no están publicados en catálogo. Recomendamos encarecidamente instalar únicamente archivos de fuentes de confianza."
+		"message": "Este modpack para servidor contiene archivos que no están publicados en Modrinth. Recomendamos encarecidamente instalar únicamente archivos de fuentes de confianza."
 	},
 	"app.modal.install-to-play.unknown-files-warning": {
 		"message": "Advertencia sobre archivos desconocidos"
@@ -1323,7 +1323,7 @@
 		"message": "Se eliminó"
 	},
 	"app.modal.update-to-play.server-modpack-unknown-files-description": {
-		"message": "Esta actualización de modpack para servidor contiene archivos que no están publicados en catálogo. Recomendamos encarecidamente instalar únicamente archivos de fuentes de confianza."
+		"message": "Esta actualización de modpack para servidor contiene archivos que no están publicados en Modrinth. Recomendamos encarecidamente instalar únicamente archivos de fuentes de confianza."
 	},
 	"app.modal.update-to-play.shared-instance-added-label": {
 		"message": "Se añadió"
@@ -1332,7 +1332,7 @@
 		"message": "Se eliminó"
 	},
 	"app.modal.update-to-play.shared-instance-unknown-files-description": {
-		"message": "Esta actualización de instancia contiene archivos que no están publicados en catálogo. Recomendamos encarecidamente instalar únicamente archivos de fuentes de confianza."
+		"message": "Esta actualización de instancia contiene archivos que no están publicados en Modrinth. Recomendamos encarecidamente instalar únicamente archivos de fuentes de confianza."
 	},
 	"app.modal.update-to-play.update-required": {
 		"message": "Es necesario actualizar"
@@ -1353,7 +1353,7 @@
 		"message": "Cargando perfil..."
 	},
 	"app.nav.modrinth-account": {
-		"message": "Cuenta catálogo"
+		"message": "Cuenta Modrinth"
 	},
 	"app.nav.modrinth-hosting": {
 		"message": "Hosting"
@@ -1365,13 +1365,13 @@
 		"message": "Screenshots"
 	},
 	"app.nav.sign-in-to-modrinth-account": {
-		"message": "Inicia sesión en catálogo"
+		"message": "Inicia sesión en Modrinth"
 	},
 	"app.nav.switch-account": {
 		"message": "Cambiar de cuenta"
 	},
 	"app.nav.upgrade-to-modrinth-plus": {
-		"message": "Mejorar a Premium del catálogo"
+		"message": "Mejorar a Modrinth+"
 	},
 	"app.nav.view-profile": {
 		"message": "Ver perfil"
@@ -1587,7 +1587,7 @@
 		"message": "Exportar a ZIP"
 	},
 	"app.screenshots.selection.global-export-filename": {
-		"message": "Screenshots de catálogo.zip"
+		"message": "Screenshots de Strata.zip"
 	},
 	"app.screenshots.selection.instance-export-filename": {
 		"message": "Screenshots de {instance}.zip"
@@ -1617,7 +1617,7 @@
 		"message": "Más antiguos"
 	},
 	"app.settings.app-version": {
-		"message": "App de catálogo {version}"
+		"message": "App de Modrinth {version}"
 	},
 	"app.settings.default-instance-options.environment-variables.description": {
 		"message": "Variables de entorno puestas al iniciar una instancia."
@@ -1893,7 +1893,7 @@
 		"message": "Algunas de tus instancias no pueden usar esta configuración"
 	},
 	"app.settings.game-options.compatibility.reason.launcher-controlled": {
-		"message": "Este ajuste es administrado por los ajustes de lanzamiento de catálogo."
+		"message": "Este ajuste es administrado por los ajustes de lanzamiento de Strata."
 	},
 	"app.settings.game-options.custom-value.placeholder": {
 		"message": "Introducir un valor"
@@ -2727,16 +2727,16 @@
 		"message": "macOS"
 	},
 	"app.settings.privacy.ads-consent.intro": {
-		"message": "Los anuncios hacen posible a catálogo y financian los pagos a los creadores. Nuestros socios pueden guardar o acceder a cookies en la aplicación para personalizar anuncios y medir su rendimiento. Puedes rechazar esto o administrar tus preferencias abajo."
+		"message": "Los anuncios hacen posible a Modrinth y financian los pagos a los creadores. Nuestros socios pueden guardar o acceder a cookies en la aplicación para personalizar anuncios y medir su rendimiento. Puedes rechazar esto o administrar tus preferencias abajo."
 	},
 	"app.settings.privacy.discord-rich-presence.description": {
-		"message": "Mostrar la aplicación de catálogo como tu actividad actual en Discord. Esto no afecta a cualquier Rich Presence añadida a instancias con mods. Necesita reiniciar la app."
+		"message": "Mostrar la aplicación de Modrinth como tu actividad actual en Discord. Esto no afecta a cualquier Rich Presence añadida a instancias con mods. Necesita reiniciar la app."
 	},
 	"app.settings.privacy.discord-rich-presence.title": {
 		"message": "Discord Rich Presence"
 	},
 	"app.settings.privacy.telemetry.description": {
-		"message": "catálogo recolecta datos analíticos anónimos y datos de uso para mejorar la experiencia de nuestros usuarios y para personalizar tu experiencia. Al desactivar esta opción, tus datos dejarán de ser recolectados."
+		"message": "Strata no recopila ni envía datos de uso, así que este ajuste no tiene efecto. Se conserva por compatibilidad."
 	},
 	"app.settings.privacy.telemetry.title": {
 		"message": "Telemetría"
@@ -2754,7 +2754,7 @@
 		"message": "¿Limpiar el caché?"
 	},
 	"app.settings.resource-management.app-cache.description": {
-		"message": "Borra todos los datos en caché y los redescarga de catálogo. La app cargará más lento hasta que se reconstruya completamente el caché."
+		"message": "Borra todos los datos en caché y los redescarga de Modrinth. La app cargará más lento hasta que se reconstruya completamente el caché."
 	},
 	"app.settings.resource-management.app-cache.purge": {
 		"message": "Limpiar caché"
@@ -2961,7 +2961,7 @@
 		"message": "Estos ajustes han cambiado en otro lugar"
 	},
 	"app.settings.synced-options.game-settings.custom-empty": {
-		"message": "Los ajustes añadidos por mods aparecerán aquí después de que catálogo los encuentre en una de tus instancias."
+		"message": "Los ajustes añadidos por mods aparecerán aquí después de que Strata los encuentre en una de tus instancias."
 	},
 	"app.settings.synced-options.game-settings.description": {
 		"message": "Usa las mismas opciones de juego en tus instancias."
@@ -3243,13 +3243,13 @@
 		"message": "MINECON Earth 2017"
 	},
 	"app.skins.section.modrinth": {
-		"message": "catálogo"
+		"message": "Modrinth"
 	},
 	"app.skins.section.modrinth-pride": {
-		"message": "Orgullo catálogo"
+		"message": "Orgullo Modrinth"
 	},
 	"app.skins.section.modrinth-pride.tooltip": {
-		"message": "Has recibido estas skins por donar a la fundación Orgullo catálogo durante el Mes del Orgullo."
+		"message": "Has recibido estas skins por donar a la fundación Orgullo Modrinth durante el Mes del Orgullo."
 	},
 	"app.skins.section.mounts-of-mayhem": {
 		"message": "Monturas del Caos"
@@ -3282,10 +3282,10 @@
 		"message": "Activar"
 	},
 	"app.survey.body": {
-		"message": "¿Te importaría responder unas cuantas preguntas sobre tu experiencia con la aplicación de catálogo?"
+		"message": "¿Te importaría responder unas cuantas preguntas sobre tu experiencia con la aplicación de Modrinth?"
 	},
 	"app.survey.footer": {
-		"message": "¡Tus comentarios llegarán directamente al equipo de catálogo, y los ayudará a hacer mejores actualizaciones!"
+		"message": "¡Tus comentarios llegarán directamente al equipo de Modrinth, y los ayudará a hacer mejores actualizaciones!"
 	},
 	"app.survey.no-thanks": {
 		"message": "No, gracias"
@@ -3294,7 +3294,7 @@
 		"message": "Aceptar encuesta"
 	},
 	"app.survey.title": {
-		"message": "¡Hola, usuario de catálogo!"
+		"message": "¡Hola, usuario de Modrinth!"
 	},
 	"app.sync-instances-update.badge": {
 		"message": "Nuevo en esta actualización"
@@ -3615,7 +3615,7 @@
 		"message": "Despublicar instancia compartida"
 	},
 	"installation-settings.shared-instance.unpublish-description": {
-		"message": "Borra esta instancia compartida de catálogo y deja de enviar actualizaciones a cualquiera que la tenga. Tu instancia local no se verá afectada."
+		"message": "Borra esta instancia compartida de Modrinth y deja de enviar actualizaciones a cualquiera que la tenga. Tu instancia local no se verá afectada."
 	},
 	"installation-settings.shared-instance.unpublishing-button": {
 		"message": "Despublicando..."
@@ -3630,7 +3630,7 @@
 		"message": "Desvincular instancia compartida"
 	},
 	"installation-settings.unpublish-shared-instance.modal.admonition-body": {
-		"message": "Esto borrará la instancia compartida de los servidores de catálogo. La gente que esté usando esta instancia dejará de recibir actualizaciones, pero tu instancia local y sus contenidos se quedarán en este dispositivo."
+		"message": "Esto borrará la instancia compartida de los servidores de Modrinth. La gente que esté usando esta instancia dejará de recibir actualizaciones, pero tu instancia local y sus contenidos se quedarán en este dispositivo."
 	},
 	"installation-settings.unpublish-shared-instance.modal.admonition-header": {
 		"message": "Despublicando instancia compartida"
@@ -3915,7 +3915,7 @@
 		"message": "Dinamita"
 	},
 	"instance.icon-editor.symbol.wrenth-rinth": {
-		"message": "Llave Inglesa de catálogo"
+		"message": "Llave Inglesa de Modrinth"
 	},
 	"instance.icon-editor.symbol.zombie": {
 		"message": "Zombi"
@@ -4482,7 +4482,7 @@
 		"message": "Crea una cuenta"
 	},
 	"modal.modrinth-account-required.description": {
-		"message": "Necesitas iniciar sesión con tu cuenta catálogo antes de que puedas usar esto."
+		"message": "Necesitas iniciar sesión con tu cuenta Modrinth antes de que puedas usar esto."
 	},
 	"modal.modrinth-account-required.header": {
 		"message": "Cuenta requerida"
@@ -4491,10 +4491,10 @@
 		"message": "Abrir el navegador otra vez"
 	},
 	"modal.modrinth-account-required.sign-in-button": {
-		"message": "Inicia sesión en catálogo"
+		"message": "Inicia sesión en Modrinth"
 	},
 	"modal.modrinth-account-required.sign-in-heading": {
-		"message": "Iniciar sesión con una cuenta de catálogo"
+		"message": "Iniciar sesión con una cuenta de Modrinth"
 	},
 	"modal.modrinth-account-required.signing-in-header": {
 		"message": "Iniciando sesión"
@@ -4512,7 +4512,7 @@
 		"message": "Inicia sesión en Minecraft"
 	},
 	"onboarding-checklist.login-modrinth": {
-		"message": "Inicia sesión en catálogo"
+		"message": "Inicia sesión en Modrinth"
 	},
 	"onboarding-checklist.title": {
 		"message": "Empezar"

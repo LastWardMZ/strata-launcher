@@ -35,7 +35,7 @@ const modpackCard = {
 const serverCard = {
 	kind: 'server',
 	manager: {
-		name: 'catálogo SMP',
+		name: 'Modrinth SMP',
 		iconUrl: serverIcon,
 		link: '/server/modrinth-smp',
 	},
@@ -131,7 +131,7 @@ export const MissingManagerIcon: Story = {
 		data: {
 			...serverCard,
 			manager: {
-				name: 'catálogo SMP',
+				name: 'Modrinth SMP',
 			},
 		},
 	},

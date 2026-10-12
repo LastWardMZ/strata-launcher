@@ -75,7 +75,7 @@
 		"message": "Minecraftのセットアップに失敗しました"
 	},
 	"app.action-bar.install.summary.modrinth-unreachable": {
-		"message": "catálogoに接続できませんでした"
+		"message": "Modrinthに接続できませんでした"
 	},
 	"app.action-bar.install.summary.no-write-permission": {
 		"message": "書き込み権限がありません"
@@ -132,7 +132,7 @@
 		"message": "すべて受け入れる"
 	},
 	"app.ads-consent.body": {
-		"message": "catálogoは広告収益によって運営され、クリエイターへの報酬もその収益から支払われています。当社のパートナーは、広告のパーソナライズや効果測定のために、アプリ内でCookieを保存・利用する場合があります。"
+		"message": "Modrinthは広告収益によって運営され、クリエイターへの報酬もその収益から支払われています。当社のパートナーは、広告のパーソナライズや効果測定のために、アプリ内でCookieを保存・利用する場合があります。"
 	},
 	"app.ads-consent.manage": {
 		"message": "設定の管理"
@@ -141,7 +141,7 @@
 		"message": "すべて拒否する"
 	},
 	"app.ads-consent.title": {
-		"message": "プライバシーと広告がcatálogoを支える仕組み"
+		"message": "プライバシーと広告がModrinthを支える仕組み"
 	},
 	"app.appearance-settings.compact-mode.description": {
 		"message": "ライブラリをコンパクトに表示します。"
@@ -186,7 +186,7 @@
 		"message": "右のサイドバーを隠す"
 	},
 	"app.appearance-settings.unknown-pack-warning.description": {
-		"message": "catálogo以外でホストされているcatálogoパック（.mrpack）をインストールする前に、安全警告を表示します。"
+		"message": "Modrinth以外でホストされているModrinthパック（.mrpack）をインストールする前に、安全警告を表示します。"
 	},
 	"app.appearance-settings.unknown-pack-warning.title": {
 		"message": "不明なModパックのインストール前に警告する"
@@ -210,7 +210,7 @@
 		"message": "ログイン中のすべての端末で同じ設定を使用します。オフにすると、端末ごとに個別の設定を使用できます。"
 	},
 	"app.behavior-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "設定を同期するには、catálogoアカウントにログインしてください。"
+		"message": "設定を同期するには、Modrinthアカウントにログインしてください。"
 	},
 	"app.behavior-settings.sync-across-devices.title": {
 		"message": "端末間での設定の同期"
@@ -450,7 +450,7 @@
 		"message": "サインインされているすべてのデバイスでこれらの機能はすべて共有されます。デバイスごとに設定した場合はこの機能をオフにしてください。"
 	},
 	"app.features-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "設定を同期するには、catálogoアカウントにログインしてください。"
+		"message": "設定を同期するには、Modrinthアカウントにログインしてください。"
 	},
 	"app.features-settings.sync-across-devices.title": {
 		"message": "デバイス間での同期機能を同期する"
@@ -489,7 +489,7 @@
 		"message": "ダウンロードして更新"
 	},
 	"app.hosting.update-required.rinthbot-alt": {
-		"message": "ワクワクしているcatálogo Bot"
+		"message": "ワクワクしているModrinth Bot"
 	},
 	"app.hosting.update-required.title": {
 		"message": "Strataの更新が必要です"
@@ -819,13 +819,13 @@
 		"message": "このアカウントでサインインすることで"
 	},
 	"app.instance.shared-instance-wrong-account.signed-out-header": {
-		"message": "catálogoへのサインインが必要です"
+		"message": "Modrinthへのサインインが必要です"
 	},
 	"app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
 		"message": "インスタンスのアップデートを受け取ることができます。"
 	},
 	"app.instance.shared-instance-wrong-account.warning-header": {
-		"message": "catálogoのアカウントが間違っています"
+		"message": "Modrinthのアカウントが間違っています"
 	},
 	"app.instance.shortcut.created": {
 		"message": "ショートカットを作成しました"
@@ -1251,10 +1251,10 @@
 		"message": "インストール"
 	},
 	"app.modal.install-to-play.invite-warning": {
-		"message": "この招待は他のcatálogoユーザーによって作成されたものであり、catálogo公式のものではありません。信頼できる人からの招待のみ承諾してください。"
+		"message": "この招待は他のModrinthユーザーによって作成されたものであり、Modrinth公式のものではありません。信頼できる人からの招待のみ承諾してください。"
 	},
 	"app.modal.install-to-play.invite-warning-with-creator": {
-		"message": "この招待はcatálogoではなく<creator>{username}</creator>によって作成されました。信頼できる人物からの招待のみ受諾してください。"
+		"message": "この招待はModrinthではなく<creator>{username}</creator>によって作成されました。信頼できる人物からの招待のみ受諾してください。"
 	},
 	"app.modal.install-to-play.managed-content.modpack-header": {
 		"message": "Modパックのコンテンツ"
@@ -1287,7 +1287,7 @@
 		"message": "サポートに関するお問い合わせは、<support-link>サポートチーム</support-link>までご連絡ください。バグの報告は、<github-link>GitHubのIssue</github-link>を作成してください。"
 	},
 	"app.modal.install-to-play.reviewed-files": {
-		"message": "追加するファイルはcatálogoの認証を受けていません。"
+		"message": "追加するファイルはModrinthの認証を受けていません。"
 	},
 	"app.modal.install-to-play.shared-instance": {
 		"message": "共有インスタンス"
@@ -1296,10 +1296,10 @@
 		"message": "共有インスタンスの内容"
 	},
 	"app.modal.install-to-play.shared-instance-unknown-files-description": {
-		"message": "この共有インスタンスには、catálogoで公開されていないファイルが含まれています。信頼できる提供元からのファイルのみをインストールすることを強くお勧めします。"
+		"message": "この共有インスタンスには、Modrinthで公開されていないファイルが含まれています。信頼できる提供元からのファイルのみをインストールすることを強くお勧めします。"
 	},
 	"app.modal.install-to-play.unknown-files-description": {
-		"message": "このサーバーModパックには、catálogoに公開されていないファイルが含まれています。信頼できるソースからのファイルのみをインストールすることを強く推奨します。"
+		"message": "このサーバーModパックには、Modrinthに公開されていないファイルが含まれています。信頼できるソースからのファイルのみをインストールすることを強く推奨します。"
 	},
 	"app.modal.install-to-play.unknown-files-warning": {
 		"message": "不明なファイルの警告"
@@ -1320,7 +1320,7 @@
 		"message": "削除されました"
 	},
 	"app.modal.update-to-play.server-modpack-unknown-files-description": {
-		"message": "このサーバーModパックのアップデートには、catálogoに公開されていないファイルが含まれています。信頼できるソースからのファイルのみをインストールすることを強く推奨します。"
+		"message": "このサーバーModパックのアップデートには、Modrinthに公開されていないファイルが含まれています。信頼できるソースからのファイルのみをインストールすることを強く推奨します。"
 	},
 	"app.modal.update-to-play.shared-instance-added-label": {
 		"message": "追加済み"
@@ -1329,7 +1329,7 @@
 		"message": "削除済み"
 	},
 	"app.modal.update-to-play.shared-instance-unknown-files-description": {
-		"message": "この共有インスタンスのアップデートには、catálogoで公開されていないファイルが含まれています。信頼できる提供元からのファイルのみをインストールすることを強くお勧めします。"
+		"message": "この共有インスタンスのアップデートには、Modrinthで公開されていないファイルが含まれています。信頼できる提供元からのファイルのみをインストールすることを強くお勧めします。"
 	},
 	"app.modal.update-to-play.update-required": {
 		"message": "更新が必要です"
@@ -1350,7 +1350,7 @@
 		"message": "プロフィールを読み込み中…"
 	},
 	"app.nav.modrinth-account": {
-		"message": "catálogoアカウント"
+		"message": "Modrinthアカウント"
 	},
 	"app.nav.modrinth-hosting": {
 		"message": "Hosting"
@@ -1362,13 +1362,13 @@
 		"message": "スクリーンショット"
 	},
 	"app.nav.sign-in-to-modrinth-account": {
-		"message": "catálogoへサインイン"
+		"message": "Modrinthへサインイン"
 	},
 	"app.nav.switch-account": {
 		"message": "アカウントの切り替え"
 	},
 	"app.nav.upgrade-to-modrinth-plus": {
-		"message": "Premium del catálogoにアップグレード"
+		"message": "Modrinth+にアップグレード"
 	},
 	"app.nav.view-profile": {
 		"message": "プロフィールを表示"
@@ -1584,7 +1584,7 @@
 		"message": "ZIPをエクスポート"
 	},
 	"app.screenshots.selection.global-export-filename": {
-		"message": "catálogo screenshots.zip"
+		"message": "Strata screenshots.zip"
 	},
 	"app.screenshots.selection.instance-export-filename": {
 		"message": "{instance} screenshots.zip"
@@ -1785,7 +1785,7 @@
 		"message": "macOS"
 	},
 	"app.settings.privacy.ads-consent.intro": {
-		"message": "catálogoは広告収益によって運営され、クリエイターへの報酬もその収益から支払われています。当社のパートナーは、広告のパーソナライズや効果測定のために、アプリ内でCookieを保存・利用する場合があります。この機能は下のボタンから個別に拒否や許可または変更することができます。"
+		"message": "Modrinthは広告収益によって運営され、クリエイターへの報酬もその収益から支払われています。当社のパートナーは、広告のパーソナライズや効果測定のために、アプリ内でCookieを保存・利用する場合があります。この機能は下のボタンから個別に拒否や許可または変更することができます。"
 	},
 	"app.settings.privacy.discord-rich-presence.description": {
 		"message": "Discordの現在のプレイ中に Strata を表示します。これはModによってインスタンスに追加されるRich Presenceには影響しません。適用にはアプリの再起動が必要です。"
@@ -1794,7 +1794,7 @@
 		"message": "Discord Rich Presence"
 	},
 	"app.settings.privacy.telemetry.description": {
-		"message": "catálogoはユーザー体験の向上および最適化のために、匿名化されたアナリティクスと利用データを収集しています。このオプションをオフにすることで無効化（オプトアウト）され、以降データの収集は行われません。"
+		"message": "Strata doesn't collect or send usage data, so this setting has no effect. It's kept for compatibility."
 	},
 	"app.settings.privacy.telemetry.title": {
 		"message": "テレメトリ"
@@ -1812,7 +1812,7 @@
 		"message": "アプリのキャッシュを破棄しますか？"
 	},
 	"app.settings.resource-management.app-cache.description": {
-		"message": "キャッシュデータを消去し、catálogoから再ダウンロードします。キャッシュが再構築されるまで、アプリの読み込みが遅くなる場合があります。"
+		"message": "キャッシュデータを消去し、Modrinthから再ダウンロードします。キャッシュが再構築されるまで、アプリの読み込みが遅くなる場合があります。"
 	},
 	"app.settings.resource-management.app-cache.purge": {
 		"message": "キャッシュを破棄"
@@ -2046,13 +2046,13 @@
 		"message": "MINECON Earth 2017"
 	},
 	"app.skins.section.modrinth": {
-		"message": "catálogo"
+		"message": "Modrinth"
 	},
 	"app.skins.section.modrinth-pride": {
-		"message": "catálogo プライド"
+		"message": "Modrinth プライド"
 	},
 	"app.skins.section.modrinth-pride.tooltip": {
-		"message": "これらのスキンは、プライド月間中にcatálogoのプライド募金活動に寄付したことで獲得したものです。"
+		"message": "これらのスキンは、プライド月間中にModrinthのプライド募金活動に寄付したことで獲得したものです。"
 	},
 	"app.skins.section.mounts-of-mayhem": {
 		"message": "マウント・オブ・メイヘム"
@@ -2088,7 +2088,7 @@
 		"message": "Strata の使用感についての簡単なアンケートにご協力いただけますか？"
 	},
 	"app.survey.footer": {
-		"message": "このフィードバックはcatálogoチームに直接届けられ、今後のアップデートの改善に役立てられます！"
+		"message": "このフィードバックはModrinthチームに直接届けられ、今後のアップデートの改善に役立てられます！"
 	},
 	"app.survey.no-thanks": {
 		"message": "結構です"
@@ -2097,7 +2097,7 @@
 		"message": "アンケートに回答"
 	},
 	"app.survey.title": {
-		"message": "catálogoユーザーのみなさん、こんにちは！"
+		"message": "Modrinthユーザーのみなさん、こんにちは！"
 	},
 	"app.update-popup.body.download-complete": {
 		"message": "Strata v{version} のダウンロードが完了しました。今すぐ更新するには再読み込みするか、Strataを閉じる際に自動更新されます。"
@@ -2289,7 +2289,7 @@
 		"message": "共有インスタンスを非公開にする"
 	},
 	"installation-settings.shared-instance.unpublish-description": {
-		"message": "この共有インスタンスをcatálogoから削除し、使用者へのアップデート送信を停止します。ローカルのインスタンスには影響しません。"
+		"message": "この共有インスタンスをModrinthから削除し、使用者へのアップデート送信を停止します。ローカルのインスタンスには影響しません。"
 	},
 	"installation-settings.shared-instance.unpublishing-button": {
 		"message": "非公開に設定中…"
@@ -2304,7 +2304,7 @@
 		"message": "共有インスタンスのリンクを解除"
 	},
 	"installation-settings.unpublish-shared-instance.modal.admonition-body": {
-		"message": "catálogoのサーバーからこの共有インスタンスを削除します。catálogoアプリでこれを使用しているユーザーへのアップデート配信は停止しますが、ローカルのインスタンスとそのコンテンツはこのデバイスに残ります。"
+		"message": "Modrinthのサーバーからこの共有インスタンスを削除します。Strataアプリでこれを使用しているユーザーへのアップデート配信は停止しますが、ローカルのインスタンスとそのコンテンツはこのデバイスに残ります。"
 	},
 	"installation-settings.unpublish-shared-instance.modal.admonition-header": {
 		"message": "共有インスタンスの非公開化"
@@ -2586,7 +2586,7 @@
 		"message": "TNT"
 	},
 	"instance.icon-editor.symbol.wrenth-rinth": {
-		"message": "catálogoのレンチ"
+		"message": "Modrinthのレンチ"
 	},
 	"instance.icon-editor.symbol.zombie": {
 		"message": "ゾンビ"
@@ -3114,7 +3114,7 @@
 		"message": "アカウントを作成"
 	},
 	"modal.modrinth-account-required.description": {
-		"message": "この機能を利用するには、catálogoアカウントにログインする必要があります。"
+		"message": "この機能を利用するには、Modrinthアカウントにログインする必要があります。"
 	},
 	"modal.modrinth-account-required.header": {
 		"message": "アカウントが必要です"
@@ -3123,10 +3123,10 @@
 		"message": "もう一度ブラウザを開く"
 	},
 	"modal.modrinth-account-required.sign-in-button": {
-		"message": "catálogoへサインイン"
+		"message": "Modrinthへサインイン"
 	},
 	"modal.modrinth-account-required.sign-in-heading": {
-		"message": "catálogoアカウントにサインインしてください"
+		"message": "Modrinthアカウントにサインインしてください"
 	},
 	"modal.modrinth-account-required.signing-in-header": {
 		"message": "サインイン"
@@ -3144,7 +3144,7 @@
 		"message": "Minecraftにサインイン"
 	},
 	"onboarding-checklist.login-modrinth": {
-		"message": "catálogoへサインイン"
+		"message": "Modrinthへサインイン"
 	},
 	"onboarding-checklist.title": {
 		"message": "はじめる"

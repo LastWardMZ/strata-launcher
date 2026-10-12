@@ -22,12 +22,12 @@ const settings = ref(await get())
 const messages = defineMessages({
 	adsConsentTitle: {
 		id: 'app.ads-consent.title',
-		defaultMessage: 'Your privacy and how ads support catálogo',
+		defaultMessage: 'Your privacy and how ads support Modrinth',
 	},
 	adsConsentIntro: {
 		id: 'app.settings.privacy.ads-consent.intro',
 		defaultMessage:
-			'Ads make catálogo possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance. You can opt out or manage your preferences below.',
+			'Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance. You can opt out or manage your preferences below.',
 	},
 	adsConsentManage: {
 		id: 'app.ads-consent.manage',
@@ -40,7 +40,7 @@ const messages = defineMessages({
 	telemetryDescription: {
 		id: 'app.settings.privacy.telemetry.description',
 		defaultMessage:
-			'catálogo collects anonymized analytics and usage data to improve our user experience and customize your experience. By disabling this option, you opt out and your data will no longer be collected.',
+			"Strata doesn't collect or send usage data, so this setting has no effect. It's kept for compatibility.",
 	},
 	discordRichPresenceTitle: {
 		id: 'app.settings.privacy.discord-rich-presence.title',

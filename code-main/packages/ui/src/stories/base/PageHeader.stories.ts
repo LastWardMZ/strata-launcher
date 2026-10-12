@@ -186,7 +186,7 @@ export const CreatorHeader: Story = {
 			}
 		},
 		template: `
-			<PageHeader title="Prospector" summary="A catálogo creator with a handful of popular projects.">
+			<PageHeader title="Prospector" summary="A Modrinth creator with a handful of popular projects.">
 				<template #leading>
 					<Avatar src="" alt="Prospector" size="96px" tint-by="Prospector" circle />
 				</template>

@@ -114,7 +114,7 @@
 		"defaultMessage": "لم يتم العثور على نتائج لبحثك!"
 	},
 	"browse.offline": {
-		"defaultMessage": "أنت غير متصل حاليًا. اتصل بالإنترنت لتصفح catálogo!"
+		"defaultMessage": "أنت غير متصل حاليًا. اتصل بالإنترنت لتصفح Modrinth!"
 	},
 	"browse.search.placeholder": {
 		"defaultMessage": "البحث {projectType}..."
@@ -255,7 +255,7 @@
 		"defaultMessage": "فتح في المجلد"
 	},
 	"button.open-in-modrinth": {
-		"defaultMessage": "فتح في catálogo"
+		"defaultMessage": "فتح في Modrinth"
 	},
 	"button.play": {
 		"defaultMessage": "لعب"
@@ -966,7 +966,7 @@
 		"defaultMessage": "إزالة الصورة"
 	},
 	"external-files.permissions-card.editor.proof-warning.title": {
-		"defaultMessage": "قد يتحقق فريق catálogo من الإثبات المُقدَّم"
+		"defaultMessage": "قد يتحقق فريق Modrinth من الإثبات المُقدَّم"
 	},
 	"external-files.permissions-card.editor.save": {
 		"defaultMessage": "حفظ الإسناد"
@@ -1053,7 +1053,7 @@
 		"defaultMessage": "تم الإسناد تلقائيًا"
 	},
 	"external-files.permissions-card.reason.globally-allowed.description": {
-		"defaultMessage": "لقد سبق أن رأينا هذا الملف، وأعددنا لك إسنادًا له. إذا كان هناك شيء غير صحيح، يُرجى التواصل مع دعم catálogo عبر مركز المساعدة"
+		"defaultMessage": "لقد سبق أن رأينا هذا الملف، وأعددنا لك إسنادًا له. إذا كان هناك شيء غير صحيح، يُرجى التواصل مع دعم Modrinth عبر مركز المساعدة"
 	},
 	"external-files.permissions-card.reason.license": {
 		"defaultMessage": "الترخيص"

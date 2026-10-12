@@ -35,7 +35,7 @@ const messages = defineMessages({
 	},
 	excitedRinthbotAlt: {
 		id: 'app.hosting.update-required.rinthbot-alt',
-		defaultMessage: 'Excited catálogo Bot',
+		defaultMessage: 'Excited Modrinth Bot',
 	},
 })
 

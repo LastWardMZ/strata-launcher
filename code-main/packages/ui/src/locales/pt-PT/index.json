@@ -1176,7 +1176,7 @@
 		"defaultMessage": "Moderador"
 	},
 	"omorphia.component.badge.label.modrinth-team": {
-		"defaultMessage": "Equipa do catálogo"
+		"defaultMessage": "Equipa do Modrinth"
 	},
 	"omorphia.component.badge.label.pending": {
 		"defaultMessage": "Pendente"
@@ -1290,10 +1290,10 @@
 		"defaultMessage": "Visa"
 	},
 	"profile.bio.fallback.creator": {
-		"defaultMessage": "Um criador catálogo."
+		"defaultMessage": "Um criador Modrinth."
 	},
 	"profile.bio.fallback.user": {
-		"defaultMessage": "Um utilizador catálogo."
+		"defaultMessage": "Um utilizador Modrinth."
 	},
 	"profile.button.block": {
 		"defaultMessage": "Bloquear"
@@ -1851,7 +1851,7 @@
 		"defaultMessage": "O teu projeto tem múltiplos ambientes"
 	},
 	"project.settings.environment.notice.review-options.description": {
-		"defaultMessage": "Reformulámos o sistema de Ambientes no catálogo e estão agora disponíveis novas opções. Certifica-te de que a opção correta está selecionada abaixo e clica em \"Verificar\" quando terminares!"
+		"defaultMessage": "Reformulámos o sistema de Ambientes no Modrinth e estão agora disponíveis novas opções. Certifica-te de que a opção correta está selecionada abaixo e clica em \"Verificar\" quando terminares!"
 	},
 	"project.settings.environment.notice.review-options.title": {
 		"defaultMessage": "Por favor, revê as opções abaixo"
@@ -2754,10 +2754,10 @@
 		"defaultMessage": "Tens alterações por guardar."
 	},
 	"unknown-file-warning-modal.mod-warning-body": {
-		"defaultMessage": " não está publicado no catálogo. Recomendamos fortemente que apenas instales ficheiros de fontes que confies."
+		"defaultMessage": " não está publicado no Modrinth. Recomendamos fortemente que apenas instales ficheiros de fontes que confies."
 	},
 	"unknown-file-warning-modal.modpack-warning-body": {
-		"defaultMessage": " contém ficheiros que não foram publicados no catálogo. Recomendamos fortemente que apenas instales ficheiros de fontes que confies."
+		"defaultMessage": " contém ficheiros que não foram publicados no Modrinth. Recomendamos fortemente que apenas instales ficheiros de fontes que confies."
 	},
 	"version.content.name": {
 		"defaultMessage": "Nome"

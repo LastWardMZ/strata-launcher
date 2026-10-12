@@ -75,7 +75,7 @@
 		"message": "Configurarea Minecraft a eșuat"
 	},
 	"app.action-bar.install.summary.modrinth-unreachable": {
-		"message": "catálogo nu a putut fi accesat"
+		"message": "Modrinth nu a putut fi accesat"
 	},
 	"app.action-bar.install.summary.no-write-permission": {
 		"message": "Nu există permisiunea de scriere"
@@ -132,7 +132,7 @@
 		"message": "Acceptă tot"
 	},
 	"app.ads-consent.body": {
-		"message": "Anunțurile fac posibil catálogo și finanțează plățile creatorilor. Partenerii noștri pot stoca sau accesa cookie-uri în aplicație pentru a personaliza reclamele și a măsura performanța."
+		"message": "Anunțurile fac posibil Modrinth și finanțează plățile creatorilor. Partenerii noștri pot stoca sau accesa cookie-uri în aplicație pentru a personaliza reclamele și a măsura performanța."
 	},
 	"app.ads-consent.manage": {
 		"message": "Gestionează preferințele"
@@ -141,7 +141,7 @@
 		"message": "Refuză tot"
 	},
 	"app.ads-consent.title": {
-		"message": "Confidențialitatea ta și modul în care anunțurile susțin catálogo"
+		"message": "Confidențialitatea ta și modul în care anunțurile susțin Modrinth"
 	},
 	"app.appearance-settings.compact-mode.description": {
 		"message": "Afișează instanțele bibliotecii într-un layout compact."
@@ -162,7 +162,7 @@
 		"message": "Ascunde nametag-ul"
 	},
 	"app.appearance-settings.minimize-launcher.description": {
-		"message": "Minimizează aplicația catálogo atunci când Minecraft pornește."
+		"message": "Minimizează aplicația Strata atunci când Minecraft pornește."
 	},
 	"app.appearance-settings.minimize-launcher.title": {
 		"message": "Minimizează aplicația"
@@ -186,7 +186,7 @@
 		"message": "Ascundeți bara laterală dreapta"
 	},
 	"app.appearance-settings.unknown-pack-warning.description": {
-		"message": "Afișați un avertisment de siguranța înainte de a instala un catálogo Pack (.mrpack) care nu este găzduit de catálogo."
+		"message": "Afișați un avertisment de siguranța înainte de a instala un Modrinth Pack (.mrpack) care nu este găzduit de Modrinth."
 	},
 	"app.appearance-settings.unknown-pack-warning.title": {
 		"message": "Avertizează-ma înainte de a instala modpackuri necunoscute"
@@ -210,7 +210,7 @@
 		"message": "Utilizați aceste setări de comportament pretutindeni unde sunteți conectat. Dezactivați această opțiune pentru a păstra setări separate pe acest dispozitiv."
 	},
 	"app.behavior-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "Conectează-te la un cont catálogo pentru a sincroniza setările."
+		"message": "Conectează-te la un cont Modrinth pentru a sincroniza setările."
 	},
 	"app.behavior-settings.sync-across-devices.title": {
 		"message": "Sincronizați comportamentul între dispozitive"
@@ -381,7 +381,7 @@
 		"message": "Bară laterală"
 	},
 	"app.features-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "Conectează-te la un cont catálogo pentru a sincroniza setările."
+		"message": "Conectează-te la un cont Modrinth pentru a sincroniza setările."
 	},
 	"app.home.jump-back-in.more-options": {
 		"message": "Mai multe opțiuni"
@@ -486,13 +486,13 @@
 		"message": "Administrare resurse"
 	},
 	"app.update-popup.body.download-complete": {
-		"message": "Aplicația catálogo v{version} a terminat descărcarea. Reîncărcați pentru a actualiza acum sau automat când închideți aplicația catálogo."
+		"message": "Aplicația Modrinth v{version} a terminat descărcarea. Reîncărcați pentru a actualiza acum sau automat când închideți aplicația Modrinth."
 	},
 	"app.update-popup.body.linux": {
-		"message": "Aplicația catálogo v{version} este disponibil. Utilizați managerul de pachete pentru a actualiza pentru cele mai recente funcții și remedieri!"
+		"message": "Aplicația Modrinth v{version} este disponibil. Utilizați managerul de pachete pentru a actualiza pentru cele mai recente funcții și remedieri!"
 	},
 	"app.update-popup.body.metered": {
-		"message": "Aplicația catálogo v{version} este disponibil acum! Deoarece sunteți într-o rețea cu contorizare, nu am descărcat-o automat."
+		"message": "Aplicația Modrinth v{version} este disponibil acum! Deoarece sunteți într-o rețea cu contorizare, nu am descărcat-o automat."
 	},
 	"app.update-popup.changelog": {
 		"message": "Jurnalul modificărilor"

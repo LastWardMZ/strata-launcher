@@ -75,7 +75,7 @@
 		"message": "A instalação do Minecraft falhou"
 	},
 	"app.action-bar.install.summary.modrinth-unreachable": {
-		"message": "Não foi possível carregar o catálogo."
+		"message": "Não foi possível carregar o Modrinth."
 	},
 	"app.action-bar.install.summary.no-write-permission": {
 		"message": "Sem autorização para editar."
@@ -132,7 +132,7 @@
 		"message": "Aceitar tudo"
 	},
 	"app.ads-consent.body": {
-		"message": "Os anúncios tornam o catálogo possível e financiam os pagamentos aos criadores. Os nossos parceiros podem armazenar ou aceder a cookies na aplicação para personalizar anúncios e medir o desempenho."
+		"message": "Os anúncios tornam o Modrinth possível e financiam os pagamentos aos criadores. Os nossos parceiros podem armazenar ou aceder a cookies na aplicação para personalizar anúncios e medir o desempenho."
 	},
 	"app.ads-consent.manage": {
 		"message": "Gerir preferências"
@@ -141,7 +141,7 @@
 		"message": "Rejeitar tudo"
 	},
 	"app.ads-consent.title": {
-		"message": "A sua privacidade e como os anúncios são financiados pela catálogo"
+		"message": "A sua privacidade e como os anúncios são financiados pela Modrinth"
 	},
 	"app.appearance-settings.compact-mode.description": {
 		"message": "Exibir instâncias da biblioteca numa disposição de linhas compacta."
@@ -186,7 +186,7 @@
 		"message": "Esconder barra lateral direita"
 	},
 	"app.appearance-settings.unknown-pack-warning.description": {
-		"message": "Mostrar um aviso de segurança antes de instalar um catálogo Pack (.mrpack) que não está hospedado no catálogo."
+		"message": "Mostrar um aviso de segurança antes de instalar um Modrinth Pack (.mrpack) que não está hospedado no Modrinth."
 	},
 	"app.appearance-settings.unknown-pack-warning.title": {
 		"message": "Avise-me antes de instalar pacotes de mods desconhecidos."
@@ -210,7 +210,7 @@
 		"message": "Use estas configurações de comportamento em todos os lugares em que estiver conectado. Desative esta opção para manter configurações separadas neste dispositivo."
 	},
 	"app.behavior-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "Registe-se com uma conta catálogo para sincronizar as definições."
+		"message": "Registe-se com uma conta Modrinth para sincronizar as definições."
 	},
 	"app.behavior-settings.sync-across-devices.title": {
 		"message": "Sincronizar o comportamento entre dispositivos"
@@ -537,7 +537,7 @@
 		"message": "Instalar"
 	},
 	"app.modal.install-to-play.invite-warning": {
-		"message": "Este convite foi criado por outro utilizador do catálogo, não pelo catálogo. Aceite convites apenas de pessoas em quem confia."
+		"message": "Este convite foi criado por outro utilizador do Modrinth, não pelo Modrinth. Aceite convites apenas de pessoas em quem confia."
 	},
 	"app.modal.install-to-play.mod-count": {
 		"message": "{count, plural, one {mod} other {mods}}"
@@ -546,7 +546,7 @@
 		"message": "Instância partilhada"
 	},
 	"app.modal.install-to-play.unknown-files-description": {
-		"message": "Este pacote de mods para o servidor contém ficheiros que não estão publicados no catálogo. Recomendamos vivamente que instale apenas ficheiros de fontes fidedignas."
+		"message": "Este pacote de mods para o servidor contém ficheiros que não estão publicados no Modrinth. Recomendamos vivamente que instale apenas ficheiros de fontes fidedignas."
 	},
 	"app.modal.install-to-play.unknown-files-warning": {
 		"message": "Aviso de ficheiros desconhecidos"
@@ -603,7 +603,7 @@
 		"message": "macOS"
 	},
 	"app.settings.privacy.ads-consent.intro": {
-		"message": "Os anúncios tornam o catálogo possível e financiam os pagamentos aos criadores. Os nossos parceiros podem armazenar ou aceder a cookies na aplicação para personalizar anúncios e medir o desempenho."
+		"message": "Os anúncios tornam o Modrinth possível e financiam os pagamentos aos criadores. Os nossos parceiros podem armazenar ou aceder a cookies na aplicação para personalizar anúncios e medir o desempenho."
 	},
 	"app.settings.tabs.appearance": {
 		"message": "Aparência"
@@ -669,7 +669,7 @@
 		"message": "O seu pedido de skin não pôde ser guardado."
 	},
 	"app.skins.section.modrinth": {
-		"message": "catálogo"
+		"message": "Modrinth"
 	},
 	"app.update-popup.body.download-complete": {
 		"message": "Strata v{version} acabou de ser transferida. Recarrega para atualizar agora, ou automaticamente quando fechares a Strata."

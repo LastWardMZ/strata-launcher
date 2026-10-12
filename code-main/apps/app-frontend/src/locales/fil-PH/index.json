@@ -279,10 +279,10 @@
 		"message": "Texture"
 	},
 	"app.skins.section.modrinth": {
-		"message": "catálogo"
+		"message": "Modrinth"
 	},
 	"app.skins.section.modrinth-pride": {
-		"message": "catálogo Pride"
+		"message": "Modrinth Pride"
 	},
 	"app.update-popup.body.download-complete": {
 		"message": "Tapos nang ma-download ang Strata v{version}. Mag-reload upang ma-update ngayon, o awtomatiko sa pagsara ng Strata."

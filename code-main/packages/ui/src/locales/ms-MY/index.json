@@ -99,7 +99,7 @@
 		"defaultMessage": "Tiada hasil ditemui untuk carian anda!"
 	},
 	"browse.offline": {
-		"defaultMessage": "Anda sedang berada di luar talian. Sambung ke internet untuk melayari catálogo!"
+		"defaultMessage": "Anda sedang berada di luar talian. Sambung ke internet untuk melayari Modrinth!"
 	},
 	"browse.selected-projects-floating-bar.aria-label": {
 		"defaultMessage": "Projek yang dipilih"
@@ -222,7 +222,7 @@
 		"defaultMessage": "Buka dalam folder"
 	},
 	"button.open-in-modrinth": {
-		"defaultMessage": "Buka dalam catálogo"
+		"defaultMessage": "Buka dalam Modrinth"
 	},
 	"button.play": {
 		"defaultMessage": "Main"
@@ -792,7 +792,7 @@
 		"defaultMessage": "Lesen"
 	},
 	"external-files.permissions-card.editor.modrinth-link-to-work": {
-		"defaultMessage": "Nampaknya ini pautan catálogo. Jika kandungan ini tersedia di catálogo, pek anda mungkin telah dieksport secara salah. Jika anda memuat turunnya dari tapak lain, cuba muat turun versi catálogo; kadangkala ia bukan fail yang sama."
+		"defaultMessage": "Nampaknya ini pautan Modrinth. Jika kandungan ini tersedia di Modrinth, pek anda mungkin telah dieksport secara salah. Jika anda memuat turunnya dari tapak lain, cuba muat turun versi Modrinth; kadangkala ia bukan fail yang sama."
 	},
 	"external-files.permissions-card.editor.notes-label": {
 		"defaultMessage": "Catatan"
@@ -2244,7 +2244,7 @@
 		"defaultMessage": "Penyederhana"
 	},
 	"omorphia.component.badge.label.modrinth-team": {
-		"defaultMessage": "Pasukan catálogo"
+		"defaultMessage": "Pasukan Modrinth"
 	},
 	"omorphia.component.badge.label.pending": {
 		"defaultMessage": "Menunggu"
@@ -2667,7 +2667,7 @@
 		"defaultMessage": "{count} {countPlural, plural, other {sesi permainan terkini}}"
 	},
 	"project.recent-plays.tooltip": {
-		"defaultMessage": "{count} {countPlural, plural, other {sesi permainan terkini}} daripada catálogo dalam 2 minggu yang lalu"
+		"defaultMessage": "{count} {countPlural, plural, other {sesi permainan terkini}} daripada Modrinth dalam 2 minggu yang lalu"
 	},
 	"project.server.customModpackTooltip": {
 		"defaultMessage": "Projek ini menggunakan pek mod tersuai"
@@ -2979,7 +2979,7 @@
 		"defaultMessage": "Projek anda mempunyai berbilang persekitaran"
 	},
 	"project.settings.environment.notice.review-options.description": {
-		"defaultMessage": "Kami baru sahaja merombak sistem Persekitaran pada catálogo dan pilihan baharu kini tersedia. Sila pastikan pilihan yang betul dipilih di bawah dan kemudian klik 'Sahkan' apabila anda selesai!"
+		"defaultMessage": "Kami baru sahaja merombak sistem Persekitaran pada Modrinth dan pilihan baharu kini tersedia. Sila pastikan pilihan yang betul dipilih di bawah dan kemudian klik 'Sahkan' apabila anda selesai!"
 	},
 	"project.settings.environment.notice.review-options.title": {
 		"defaultMessage": "Sila semak pilihan di bawah"
@@ -3942,7 +3942,7 @@
 		"defaultMessage": "Langganan anda ditetapkan untuk dibatalkan pada <date>{formattedDate}</date>. "
 	},
 	"servers.listing.notice.suspended": {
-		"defaultMessage": "Pelayan anda telah digantung. Sila hubungi Sokongan catálogo untuk maklumat lanjut."
+		"defaultMessage": "Pelayan anda telah digantung. Sila hubungi Sokongan Modrinth untuk maklumat lanjut."
 	},
 	"servers.listing.notice.upgrading": {
 		"defaultMessage": "Perkakasan pelayan anda sedang dinaik taraf dan akan kembali beroperasi tidak lama lagi."
@@ -3972,7 +3972,7 @@
 		"defaultMessage": "Muat naik sedang berjalan"
 	},
 	"servers.manage.contact-support-button": {
-		"defaultMessage": "Hubungi Sokongan catálogo"
+		"defaultMessage": "Hubungi Sokongan Modrinth"
 	},
 	"servers.manage.error.alert-notice": {
 		"defaultMessage": "Sistem kami akan memaklumkan pasukan kami secara automatik apabila terdapat masalah. Kami sedang berusaha untuk membawa mereka kembali dalam talian."
@@ -3987,7 +3987,7 @@
 		"defaultMessage": "Jika anda baru-baru ini membeli pelayan Hosting anda, ia sedang berada dalam barisan dan akan muncul di sini sebaik sahaja ia siap. <warning>Jangan cuba membeli pelayan baharu.</warning>"
 	},
 	"servers.manage.error.support-notice": {
-		"defaultMessage": "Jika anda memerlukan sokongan peribadi mengenai status pelayan anda, sila hubungi Sokongan catálogo."
+		"defaultMessage": "Jika anda memerlukan sokongan peribadi mengenai status pelayan anda, sila hubungi Sokongan Modrinth."
 	},
 	"servers.manage.error.title": {
 		"defaultMessage": "Pelayan tidak dapat dimuatkan"
@@ -4011,7 +4011,7 @@
 		"defaultMessage": "Muat semula"
 	},
 	"servers.manage.resubscribe-error.text": {
-		"defaultMessage": "Sebuah ralat telah berlaku semasa melanggan semula pelayan catálogo anda."
+		"defaultMessage": "Sebuah ralat telah berlaku semasa melanggan semula pelayan Modrinth anda."
 	},
 	"servers.manage.resubscribe-error.title": {
 		"defaultMessage": "Ralat semasa melanggan semula"
@@ -4056,10 +4056,10 @@
 		"defaultMessage": "Percubaan pelayan Medal anda telah tamat dan pelayan anda telah digantung. Sila naik taraf untuk terus menggunakan pelayan anda."
 	},
 	"servers.medal-listing.notice.suspended": {
-		"defaultMessage": "Pelayan anda telah digantung. Sila kemas kini maklumat pengebilan anda atau hubungi Sokongan catálogo untuk maklumat lanjut."
+		"defaultMessage": "Pelayan anda telah digantung. Sila kemas kini maklumat pengebilan anda atau hubungi Sokongan Modrinth untuk maklumat lanjut."
 	},
 	"servers.medal-listing.notice.suspended-with-reason": {
-		"defaultMessage": "Pelayan anda telah digantung: {reason}. Sila kemas kini maklumat pengebilan anda atau hubungi Sokongan catálogo untuk maklumat lanjut."
+		"defaultMessage": "Pelayan anda telah digantung: {reason}. Sila kemas kini maklumat pengebilan anda atau hubungi Sokongan Modrinth untuk maklumat lanjut."
 	},
 	"servers.medal-listing.notice.upgrading": {
 		"defaultMessage": "Perkakasan pelayan anda sedang dinaik taraf dan akan kembali beroperasi tidak lama lagi."
@@ -4224,7 +4224,7 @@
 		"defaultMessage": "Sediakan pelayan"
 	},
 	"servers.setup.onboarding.step.choose.description": {
-		"defaultMessage": "Pilih pek mod kegemaran anda daripada catálogo, atau pilih pemuat dan tambahkan mod yang anda inginkan."
+		"defaultMessage": "Pilih pek mod kegemaran anda daripada Modrinth, atau pilih pemuat dan tambahkan mod yang anda inginkan."
 	},
 	"servers.setup.onboarding.step.choose.title": {
 		"defaultMessage": "Pilih apa yang hendak dimainkan"
@@ -4872,52 +4872,52 @@
 		"defaultMessage": "Ketepikan semua"
 	},
 	"user.profile.badge.alpha.about.1": {
-		"defaultMessage": "Pengguna ini telah wujud sejak catálogo Alpha, yang berakhir pada November 2020."
+		"defaultMessage": "Pengguna ini telah wujud sejak Modrinth Alpha, yang berakhir pada November 2020."
 	},
 	"user.profile.badge.beta.about.1": {
-		"defaultMessage": "Pengguna ini telah wujud sejak catálogo Beta, yang berakhir pada Februari 2022."
+		"defaultMessage": "Pengguna ini telah wujud sejak Modrinth Beta, yang berakhir pada Februari 2022."
 	},
 	"user.profile.badge.beta.link": {
-		"defaultMessage": "Klik untuk membaca tentang pelancaran catálogo Beta."
+		"defaultMessage": "Klik untuk membaca tentang pelancaran Modrinth Beta."
 	},
 	"user.profile.badge.beta.name": {
 		"defaultMessage": "Penguji Beta"
 	},
 	"user.profile.badge.early-datapack-adopter.about.1": {
-		"defaultMessage": "Pengguna ini telah membantu kami menguji projek Pek Data di catálogo sebelum kami melancarkannya pada Januari 2023."
+		"defaultMessage": "Pengguna ini telah membantu kami menguji projek Pek Data di Modrinth sebelum kami melancarkannya pada Januari 2023."
 	},
 	"user.profile.badge.early-modpack-adopter.about.1": {
-		"defaultMessage": "Pengguna ini telah membantu kami menguji projek Pek Mod di catálogo sebelum kami melancarkannya pada Mei 2022."
+		"defaultMessage": "Pengguna ini telah membantu kami menguji projek Pek Mod di Modrinth sebelum kami melancarkannya pada Mei 2022."
 	},
 	"user.profile.badge.early-plugin-adopter.about.1": {
-		"defaultMessage": "Pengguna ini telah membantu kami menguji projek Pemalam di catálogo sebelum kami melancarkannya pada Ogos 2022."
+		"defaultMessage": "Pengguna ini telah membantu kami menguji projek Pemalam di Modrinth sebelum kami melancarkannya pada Ogos 2022."
 	},
 	"user.profile.badge.early-resourcepack-adopter.about.1": {
-		"defaultMessage": "Pengguna ini telah membantu kami menguji projek Pek Sumber di catálogo sebelum kami melancarkannya pada Ogos 2022."
+		"defaultMessage": "Pengguna ini telah membantu kami menguji projek Pek Sumber di Modrinth sebelum kami melancarkannya pada Ogos 2022."
 	},
 	"user.profile.badge.early-server-adopter.about.1": {
-		"defaultMessage": "Pengguna ini telah membantu kami menguji projek Pelayan di catálogo sebelum kami melancarkannya pada Mac 2026."
+		"defaultMessage": "Pengguna ini telah membantu kami menguji projek Pelayan di Modrinth sebelum kami melancarkannya pada Mac 2026."
 	},
 	"user.profile.badge.early-shader-adopter.about.1": {
-		"defaultMessage": "Pengguna ini telah membantu kami menguji projek Pembayang di catálogo sebelum kami melancarkannya pada Januari 2023."
+		"defaultMessage": "Pengguna ini telah membantu kami menguji projek Pembayang di Modrinth sebelum kami melancarkannya pada Januari 2023."
 	},
 	"user.profile.badge.hosting-alpha.about.1": {
 		"defaultMessage": "Pengguna ini telah menyertai ujian alfa tertutup Hosting sebelum kami melancarkan Hosting Beta pada November 2024."
 	},
 	"user.profile.badge.moderator.about.2": {
-		"defaultMessage": "Penyederhana Kandungan di catálogo menyemak projek, mengendalikan laporan dan membantu memastikan catálogo selamat."
+		"defaultMessage": "Penyederhana Kandungan di Modrinth menyemak projek, mengendalikan laporan dan membantu memastikan Modrinth selamat."
 	},
 	"user.profile.badge.plus.about.1": {
-		"defaultMessage": "Pengguna ini berusaha keras untuk menyokong catálogo dan para pencipta pada platform ini."
+		"defaultMessage": "Pengguna ini berusaha keras untuk menyokong Modrinth dan para pencipta pada platform ini."
 	},
 	"user.profile.badge.pride.about.1": {
-		"defaultMessage": "Pengguna ini telah menyertai sekurang-kurangnya satu daripada pengumpulan dana catálogo's Pride untuk komuniti LGBTQ+."
+		"defaultMessage": "Pengguna ini telah menyertai sekurang-kurangnya satu daripada pengumpulan dana Modrinth's Pride untuk komuniti LGBTQ+."
 	},
 	"user.profile.badge.pride.link": {
 		"defaultMessage": "Klik untuk melawati pengumpulan dana Pride terkini kami."
 	},
 	"user.profile.badge.staff.name": {
-		"defaultMessage": "Pasukan catálogo"
+		"defaultMessage": "Pasukan Modrinth"
 	},
 	"version.content.name": {
 		"defaultMessage": "Nama"

@@ -114,7 +114,7 @@
 		"defaultMessage": "検索が見つかりませんでした"
 	},
 	"browse.offline": {
-		"defaultMessage": "現在オフラインです。インターネットに接続してcatálogoを閲覧しましょう！"
+		"defaultMessage": "現在オフラインです。インターネットに接続してModrinthを閲覧しましょう！"
 	},
 	"browse.search.placeholder": {
 		"defaultMessage": "{projectType}を検索..."
@@ -543,13 +543,13 @@
 		"defaultMessage": "{count}件 削除済み（無効）"
 	},
 	"content.diff-modal.reviewed-files": {
-		"defaultMessage": "追加するファイルはcatálogoの認証を受けていません。"
+		"defaultMessage": "追加するファイルはModrinthの認証を受けていません。"
 	},
 	"content.diff-modal.unknown-content-body": {
 		"defaultMessage": "サーバー上のコンテンツの一部は分析できず、この変更の影響を受ける可能性があります。"
 	},
 	"content.diff-modal.unknown-files-description": {
-		"defaultMessage": "この更新は、catálogoに公開されていないファイルが含まれています。私たちは、信頼のあるウェブサイトからのインストールを強くおすすめします。"
+		"defaultMessage": "この更新は、Modrinthに公開されていないファイルが含まれています。私たちは、信頼のあるウェブサイトからのインストールを強くおすすめします。"
 	},
 	"content.diff-modal.unknown-files-warning": {
 		"defaultMessage": "不明なファイルの警告"
@@ -1188,7 +1188,7 @@
 		"defaultMessage": "作品へのリンク"
 	},
 	"external-files.permissions-card.editor.modrinth-link-to-work": {
-		"defaultMessage": "これはcatálogoのリンクのようです。もしこのコンテンツがcatálogoで入手可能であるなら、お使いのパックは正しくエクスポートされていない可能性があります。別のサイトからダウンロードした場合は、代わりにcatálogo版をダウンロードしてみてください。ファイルが完全に同一ではない場合があるためです。"
+		"defaultMessage": "これはModrinthのリンクのようです。もしこのコンテンツがModrinthで入手可能であるなら、お使いのパックは正しくエクスポートされていない可能性があります。別のサイトからダウンロードした場合は、代わりにModrinth版をダウンロードしてみてください。ファイルが完全に同一ではない場合があるためです。"
 	},
 	"external-files.permissions-card.editor.notes-label": {
 		"defaultMessage": "ノート"
@@ -1212,7 +1212,7 @@
 		"defaultMessage": "虚偽の申告や画像の改ざんが発覚した場合、プロジェクトの削除およびアカウントの停止措置が取られる可能性があります。"
 	},
 	"external-files.permissions-card.editor.proof-warning.title": {
-		"defaultMessage": "catálogoスタッフが提出された証明を確認・検証する場合があります"
+		"defaultMessage": "Modrinthスタッフが提出された証明を確認・検証する場合があります"
 	},
 	"external-files.permissions-card.editor.save": {
 		"defaultMessage": "帰属情報を保存"
@@ -1299,7 +1299,7 @@
 		"defaultMessage": "自動的に出典が追加されました"
 	},
 	"external-files.permissions-card.reason.globally-allowed.description": {
-		"defaultMessage": "このファイルは以前確認済みであり、帰属表示又は、クレジットの記載内容を準備いたしました。もし誤りなどございましたら、ヘルプセンター経由でcatálogoサポートまでご連絡ください"
+		"defaultMessage": "このファイルは以前確認済みであり、帰属表示又は、クレジットの記載内容を準備いたしました。もし誤りなどございましたら、ヘルプセンター経由でModrinthサポートまでご連絡ください"
 	},
 	"external-files.permissions-card.reason.license": {
 		"defaultMessage": "ライセンス"
@@ -2406,7 +2406,7 @@
 		"defaultMessage": "外部コンテンツ"
 	},
 	"instances.managed-content-modal.external-content-description": {
-		"defaultMessage": "このファイルは catálogo 上で公開されていません"
+		"defaultMessage": "このファイルは Modrinth 上で公開されていません"
 	},
 	"instances.managed-content-modal.header": {
 		"defaultMessage": "コンテンツを管理"
@@ -3090,7 +3090,7 @@
 		"defaultMessage": "モデレーター"
 	},
 	"omorphia.component.badge.label.modrinth-team": {
-		"defaultMessage": "catálogo チーム"
+		"defaultMessage": "Modrinth チーム"
 	},
 	"omorphia.component.badge.label.pending": {
 		"defaultMessage": "保留中"
@@ -3210,10 +3210,10 @@
 		"defaultMessage": "Visa"
 	},
 	"profile.bio.fallback.creator": {
-		"defaultMessage": "catálogo クリエイター"
+		"defaultMessage": "Modrinth クリエイター"
 	},
 	"profile.bio.fallback.user": {
-		"defaultMessage": "catálogo ユーザー"
+		"defaultMessage": "Modrinth ユーザー"
 	},
 	"profile.block-user.admonition-body": {
 		"defaultMessage": "{username} はあなたにフレンドリクエストの送信、共有インスタンスへの招待、および Hosting サーバーへの招待ができなくなります。"
@@ -3270,7 +3270,7 @@
 		"defaultMessage": "ブロック解除"
 	},
 	"profile.details.error.github-popup-blocked": {
-		"defaultMessage": "catálogo でのポップアップを許可してから、もう一度お試しください。"
+		"defaultMessage": "Modrinth でのポップアップを許可してから、もう一度お試しください。"
 	},
 	"profile.details.error.github-profile-message": {
 		"defaultMessage": "GitHubプロファイルを取得できませんでした。もう一度やり直してください。"
@@ -3339,7 +3339,7 @@
 		"defaultMessage": "組織"
 	},
 	"profile.official-account": {
-		"defaultMessage": "catálogo 公式アカウント"
+		"defaultMessage": "Modrinth 公式アカウント"
 	},
 	"profile.unblock-user.error-description": {
 		"defaultMessage": "このユーザーのブロック解除中にエラーが発生しました。もう一度やり直してください。"
@@ -3675,7 +3675,7 @@
 		"defaultMessage": "{count}件の最近のプレイ"
 	},
 	"project.recent-plays.tooltip": {
-		"defaultMessage": "{count}件の過去2週間のcatálogoからのプレイ"
+		"defaultMessage": "{count}件の過去2週間のModrinthからのプレイ"
 	},
 	"project.server.customModpackTooltip": {
 		"defaultMessage": "このプロジェクトはカスタムModパックを使用しています"
@@ -4002,7 +4002,7 @@
 		"defaultMessage": "プロジェクトに複数の環境があります。"
 	},
 	"project.settings.environment.notice.review-options.description": {
-		"defaultMessage": "catálogoの環境システムを刷新し、新しいオプションがご利用いただけるようになりました。以下のオプションが正しく選択されていることを確認し「確認」ボタンを押してください！"
+		"defaultMessage": "Modrinthの環境システムを刷新し、新しいオプションがご利用いただけるようになりました。以下のオプションが正しく選択されていることを確認し「確認」ボタンを押してください！"
 	},
 	"project.settings.environment.notice.review-options.title": {
 		"defaultMessage": "以下のオプションを確認してください"
@@ -5001,13 +5001,13 @@
 		"defaultMessage": "Minecraftのユーザーネームを使わないでください。"
 	},
 	"servers.grant-access-modal.target.label": {
-		"defaultMessage": "catálogoのユーザーネーム"
+		"defaultMessage": "Modrinthのユーザーネーム"
 	},
 	"servers.grant-access-modal.target.no-suggestions": {
 		"defaultMessage": "一致するユーザーは見つかりませんでした。"
 	},
 	"servers.grant-access-modal.target.placeholder": {
-		"defaultMessage": "catálogoのユーザーネームを入力する"
+		"defaultMessage": "Modrinthのユーザーネームを入力する"
 	},
 	"servers.grant-access-modal.target.searching": {
 		"defaultMessage": "検索中…"
@@ -5100,7 +5100,7 @@
 		"defaultMessage": "成功"
 	},
 	"servers.manage.servers-title": {
-		"defaultMessage": "catálogo ホスティング"
+		"defaultMessage": "Modrinth ホスティング"
 	},
 	"servers.manage.settings-hint.description": {
 		"defaultMessage": "こちらに移動しました！"
@@ -5127,10 +5127,10 @@
 		"defaultMessage": "Medalサーバーの試用期間が終了し、サーバーがサスペンド（停止）されました。サーバーを引き続き利用するにはアップグレードしてください。"
 	},
 	"servers.medal-listing.notice.suspended": {
-		"defaultMessage": "サーバーがサスペンド（停止）されました。請求情報を更新するか、詳細は catálogo サポートにお問い合わせください。"
+		"defaultMessage": "サーバーがサスペンド（停止）されました。請求情報を更新するか、詳細は Modrinth サポートにお問い合わせください。"
 	},
 	"servers.medal-listing.notice.suspended-with-reason": {
-		"defaultMessage": "サーバーがサスペンド（停止）されました: {reason}。請求情報を更新するか、詳細は catálogo サポートにお問い合わせください。"
+		"defaultMessage": "サーバーがサスペンド（停止）されました: {reason}。請求情報を更新するか、詳細は Modrinth サポートにお問い合わせください。"
 	},
 	"servers.medal-listing.notice.upgrading": {
 		"defaultMessage": "サーバーのハードウェアをアップグレード中です。まもなくオンラインに戻ります。"
@@ -5178,7 +5178,7 @@
 		"defaultMessage": "閉じられない"
 	},
 	"servers.purchase.notification.success.text": {
-		"defaultMessage": "あなたのcatálogoホースティングの購入は正常に完了しました。"
+		"defaultMessage": "あなたのModrinthホースティングの購入は正常に完了しました。"
 	},
 	"servers.purchase.notification.success.title": {
 		"defaultMessage": "購入完了"
@@ -5337,7 +5337,7 @@
 		"defaultMessage": "サーバーをセットアップ"
 	},
 	"servers.setup.onboarding.step.choose.description": {
-		"defaultMessage": "catálogoからお気に入りのモッドパックを選ぶか、ローダーを選択して好きなModを追加してください"
+		"defaultMessage": "Modrinthからお気に入りのモッドパックを選ぶか、ローダーを選択して好きなModを追加してください"
 	},
 	"servers.setup.onboarding.step.choose.title": {
 		"defaultMessage": "プレイするものを選ぶ"
@@ -5364,7 +5364,7 @@
 		"defaultMessage": "サーバーの準備が完了しました。プレイを開始する手順は以下の通りです！"
 	},
 	"servers.setup.onboarding.welcome.title": {
-		"defaultMessage": "catálogo ホスティングへようこそ"
+		"defaultMessage": "Modrinth ホスティングへようこそ"
 	},
 	"servers.setup.rate-limit.text": {
 		"defaultMessage": "レート制限に達しました。時間をおいて再試行してください。"
@@ -6042,16 +6042,16 @@
 		"defaultMessage": "一般的にマルウェアは、Discord等のプラットフォーム上でModファイルを配布して拡散されます"
 	},
 	"user.profile.badge.alpha.about.1": {
-		"defaultMessage": "2020年11月までのcatálogoがAlpha版の頃から活動しています"
+		"defaultMessage": "2020年11月までのModrinthがAlpha版の頃から活動しています"
 	},
 	"user.profile.badge.alpha.name": {
 		"defaultMessage": "Alpha Tester"
 	},
 	"user.profile.badge.beta.about.1": {
-		"defaultMessage": "2022年2月までのcatálogoがBeta版の頃から活動しています"
+		"defaultMessage": "2022年2月までのModrinthがBeta版の頃から活動しています"
 	},
 	"user.profile.badge.beta.link": {
-		"defaultMessage": "クリックするとcatálogoのBeta版リリース記事を読むことができます"
+		"defaultMessage": "クリックするとModrinthのBeta版リリース記事を読むことができます"
 	},
 	"user.profile.badge.beta.name": {
 		"defaultMessage": "Beta Tester"
@@ -6066,19 +6066,19 @@
 		"defaultMessage": "コンテンツモデレーター"
 	},
 	"user.profile.badge.plus.about.1": {
-		"defaultMessage": "catálogoとクリエイターに特別なサポートを贈っています！"
+		"defaultMessage": "Modrinthとクリエイターに特別なサポートを贈っています！"
 	},
 	"user.profile.badge.plus.link": {
-		"defaultMessage": "クリックしてPremium del catálogoのメンバーになる方法を知る"
+		"defaultMessage": "クリックしてModrinth+のメンバーになる方法を知る"
 	},
 	"user.profile.badge.plus.name": {
-		"defaultMessage": "Premium del catálogoメンバー"
+		"defaultMessage": "Modrinth+メンバー"
 	},
 	"user.profile.badge.staff.about.1": {
-		"defaultMessage": "catálogoのスタッフです"
+		"defaultMessage": "Modrinthのスタッフです"
 	},
 	"user.profile.badge.staff.name": {
-		"defaultMessage": "catálogo Team"
+		"defaultMessage": "Modrinth Team"
 	},
 	"version.content.name": {
 		"defaultMessage": "名前"

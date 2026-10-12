@@ -75,7 +75,7 @@
 		"message": "Minecraft kurulumu başarısız oldu"
 	},
 	"app.action-bar.install.summary.modrinth-unreachable": {
-		"message": "catálogo'e erişilemiyor"
+		"message": "Modrinth'e erişilemiyor"
 	},
 	"app.action-bar.install.summary.no-write-permission": {
 		"message": "Yazmak için yetkiniz yok"
@@ -132,7 +132,7 @@
 		"message": "Tümünü kabul et"
 	},
 	"app.ads-consent.body": {
-		"message": "Reklamlar, catálogo'i mümkün kılıyor ve içerik üreticilerine yapılan ödemeleri finanse ediyor. Partnerlerimiz, reklamları kişiselleştirmek ve performansı ölçmek amacıyla uygulama içinde çerez depolayabilir veya bunlara erişebilir."
+		"message": "Reklamlar, Modrinth'i mümkün kılıyor ve içerik üreticilerine yapılan ödemeleri finanse ediyor. Partnerlerimiz, reklamları kişiselleştirmek ve performansı ölçmek amacıyla uygulama içinde çerez depolayabilir veya bunlara erişebilir."
 	},
 	"app.ads-consent.manage": {
 		"message": "Tercihleri yönet"
@@ -141,7 +141,7 @@
 		"message": "Tümünü reddet"
 	},
 	"app.ads-consent.title": {
-		"message": "Sizin mahremiyetiniz ve reklamlar catálogo'i nasıl destekler"
+		"message": "Sizin mahremiyetiniz ve reklamlar Modrinth'i nasıl destekler"
 	},
 	"app.appearance-settings.compact-mode.description": {
 		"message": "Kütüphane kurulumlarını kompakt satır düzeninde göster."
@@ -162,7 +162,7 @@
 		"message": "İsim etiketini gizle"
 	},
 	"app.appearance-settings.minimize-launcher.description": {
-		"message": "Minecraft başladığında catálogo uygulamasını küçült."
+		"message": "Minecraft başladığında Strata uygulamasını küçült."
 	},
 	"app.appearance-settings.minimize-launcher.title": {
 		"message": "Uygulamayı küçült"
@@ -186,7 +186,7 @@
 		"message": "Sağ kenar çubuğunu gizle"
 	},
 	"app.appearance-settings.unknown-pack-warning.description": {
-		"message": "catálogo'te yayınlanmayan bir catálogo Pack (.mrpack) kurulmadan önce bir güvenlik uyarısı göster."
+		"message": "Modrinth'te yayınlanmayan bir Modrinth Pack (.mrpack) kurulmadan önce bir güvenlik uyarısı göster."
 	},
 	"app.appearance-settings.unknown-pack-warning.title": {
 		"message": "Bilinmeyen mod paketlerini indirmeden önce beni uyar"
@@ -210,7 +210,7 @@
 		"message": "Bu davranış ayarlarını oturum açtığınız her yerde kullanın. Bu cihazda ayrı ayarlar tutmak için bunu kapatın."
 	},
 	"app.behavior-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "Ayarları senkronize etmek için catálogo'e giriş yapın."
+		"message": "Ayarları senkronize etmek için Modrinth'e giriş yapın."
 	},
 	"app.behavior-settings.sync-across-devices.title": {
 		"message": "Cihazlar arası senkronizasyon davranışı"
@@ -447,7 +447,7 @@
 		"message": "Bu özellik ayarlarını oturumunuzun açık olduğu her yerde kullanın. Bu cihazda farklı ayarlar tutmak için bu özelliği kapatın."
 	},
 	"app.features-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "Ayarları eşitlemek için bir catálogo Hesabı'yla oturum açın."
+		"message": "Ayarları eşitlemek için bir Modrinth Hesabı'yla oturum açın."
 	},
 	"app.features-settings.sync-across-devices.title": {
 		"message": "Cihazlar arası özellikleri eşitle"
@@ -486,7 +486,7 @@
 		"message": "Güncellemeyi indir"
 	},
 	"app.hosting.update-required.rinthbot-alt": {
-		"message": "Heyecanlı catálogo Botu"
+		"message": "Heyecanlı Modrinth Botu"
 	},
 	"app.hosting.update-required.title": {
 		"message": "Strata güncellemesi gerekli"
@@ -816,13 +816,13 @@
 		"message": "Olarak giriş yap"
 	},
 	"app.instance.shared-instance-wrong-account.signed-out-header": {
-		"message": "catálogo'e giriş yapmanız gerek"
+		"message": "Modrinth'e giriş yapmanız gerek"
 	},
 	"app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
 		"message": "paylaşımlı örnek hakkında güncellemeler almak için."
 	},
 	"app.instance.shared-instance-wrong-account.warning-header": {
-		"message": "Yanlış catálogo hesabını kullanıyorsunuz"
+		"message": "Yanlış Modrinth hesabını kullanıyorsunuz"
 	},
 	"app.instance.shortcut.created": {
 		"message": "Kısayol oluşturuldu"
@@ -1248,10 +1248,10 @@
 		"message": "Yükle"
 	},
 	"app.modal.install-to-play.invite-warning": {
-		"message": "Bu davetiye catálogo tarafından değil, başka bir catálogo kullanıcısı tarafından oluşturulmuştur. Sadece güvendiğiniz kişilerden gelen davetleri kabul edin."
+		"message": "Bu davetiye Modrinth tarafından değil, başka bir Modrinth kullanıcısı tarafından oluşturulmuştur. Sadece güvendiğiniz kişilerden gelen davetleri kabul edin."
 	},
 	"app.modal.install-to-play.invite-warning-with-creator": {
-		"message": "Bu davet catálogo aksine, <creator>{username}</creator> tarafından oluşturuldu. Yalnızca güvendiğiniz kişilerden gelen davetleri kabul edin."
+		"message": "Bu davet Modrinth aksine, <creator>{username}</creator> tarafından oluşturuldu. Yalnızca güvendiğiniz kişilerden gelen davetleri kabul edin."
 	},
 	"app.modal.install-to-play.managed-content.modpack-header": {
 		"message": "Modpack içeriği"
@@ -1284,7 +1284,7 @@
 		"message": "Yardım talepleri için <support-link>yardım ekibimizle</support-link> iletişime geçin. Hata raporları için <github-link>Github raporu</github-link> açın."
 	},
 	"app.modal.install-to-play.reviewed-files": {
-		"message": "catálogo'te paylaşılmayan dosyalar incelenmemiştir."
+		"message": "Modrinth'te paylaşılmayan dosyalar incelenmemiştir."
 	},
 	"app.modal.install-to-play.shared-instance": {
 		"message": "Paylaşılan Kurulum"
@@ -1293,10 +1293,10 @@
 		"message": "Paylaşılan kurulum içeriği"
 	},
 	"app.modal.install-to-play.shared-instance-unknown-files-description": {
-		"message": "Bu paylaşımlı örnek catálogo'te paylaşılmayan dosyalar içeriyor. Yalnızca güvendiğiniz kaynaklardan gelen dosyaları yüklemenizi şiddetle tavsiye ederiz."
+		"message": "Bu paylaşımlı örnek Modrinth'te paylaşılmayan dosyalar içeriyor. Yalnızca güvendiğiniz kaynaklardan gelen dosyaları yüklemenizi şiddetle tavsiye ederiz."
 	},
 	"app.modal.install-to-play.unknown-files-description": {
-		"message": "Bu sunucunun mod paketi catálogo'te yayınlanmamış doysaları mevcut. Yalnızca güvendiğiniz kaynaklardan dosya indirmenizi önemle tavsiye ederiz."
+		"message": "Bu sunucunun mod paketi Modrinth'te yayınlanmamış doysaları mevcut. Yalnızca güvendiğiniz kaynaklardan dosya indirmenizi önemle tavsiye ederiz."
 	},
 	"app.modal.install-to-play.unknown-files-warning": {
 		"message": "Bilinmeyen dosya uyarısı"
@@ -1317,7 +1317,7 @@
 		"message": "Silindi"
 	},
 	"app.modal.update-to-play.server-modpack-unknown-files-description": {
-		"message": "Bu sunucunun modpack güncellemesi catálogo'te paylaşılmayan dosyalar içeriyor. Yalnızca güvendiğiniz kaynaklardan gelen dosyaları yüklemenizi şiddetle tavsiye ederiz."
+		"message": "Bu sunucunun modpack güncellemesi Modrinth'te paylaşılmayan dosyalar içeriyor. Yalnızca güvendiğiniz kaynaklardan gelen dosyaları yüklemenizi şiddetle tavsiye ederiz."
 	},
 	"app.modal.update-to-play.shared-instance-added-label": {
 		"message": "Eklendi"
@@ -1326,7 +1326,7 @@
 		"message": "Kaldırıldı"
 	},
 	"app.modal.update-to-play.shared-instance-unknown-files-description": {
-		"message": "Bu örnek catálogo'te paylaşılmayan dosyaları içeriyor. Yalnızca güvendiğiniz kaynaklardan gelen dosyaları yüklemenizi şiddetle tavsiye ederiz."
+		"message": "Bu örnek Modrinth'te paylaşılmayan dosyaları içeriyor. Yalnızca güvendiğiniz kaynaklardan gelen dosyaları yüklemenizi şiddetle tavsiye ederiz."
 	},
 	"app.modal.update-to-play.update-required": {
 		"message": "Güncelleme gerekiyor"
@@ -1347,7 +1347,7 @@
 		"message": "Profil yükleniyor..."
 	},
 	"app.nav.modrinth-account": {
-		"message": "catálogo hesabı"
+		"message": "Modrinth hesabı"
 	},
 	"app.nav.modrinth-hosting": {
 		"message": "Hosting"
@@ -1359,13 +1359,13 @@
 		"message": "Ekran görüntüleri"
 	},
 	"app.nav.sign-in-to-modrinth-account": {
-		"message": "catálogo'e giriş yapın"
+		"message": "Modrinth'e giriş yapın"
 	},
 	"app.nav.switch-account": {
 		"message": "Hesap değiştir"
 	},
 	"app.nav.upgrade-to-modrinth-plus": {
-		"message": "Premium del catálogo'a yükselt"
+		"message": "Modrinth+'a yükselt"
 	},
 	"app.nav.view-profile": {
 		"message": "Profili görüntüle"
@@ -1578,7 +1578,7 @@
 		"message": "ZIP dışa aktar"
 	},
 	"app.screenshots.selection.global-export-filename": {
-		"message": "catálogo ekran görüntüleri.zip"
+		"message": "Strata ekran görüntüleri.zip"
 	},
 	"app.screenshots.selection.instance-export-filename": {
 		"message": "{instance} ekran görüntüleri.zip"
@@ -1608,7 +1608,7 @@
 		"message": "En eski"
 	},
 	"app.settings.app-version": {
-		"message": "catálogo Uygulaması {version}"
+		"message": "Modrinth Uygulaması {version}"
 	},
 	"app.settings.default-instance-options.environment-variables.description": {
 		"message": "Ortam değişkenleri örnekler açılırken ayarlanır."
@@ -1884,7 +1884,7 @@
 		"message": "Bazı profilleriniz bu ayarı kullanamaz"
 	},
 	"app.settings.game-options.compatibility.reason.launcher-controlled": {
-		"message": "Bu ayar catálogo'in başlatma seçenekleri tarafından yönetiliyor"
+		"message": "Bu ayar Strata'in başlatma seçenekleri tarafından yönetiliyor"
 	},
 	"app.settings.game-options.custom-value.placeholder": {
 		"message": "Bir değer gir"
@@ -2190,7 +2190,7 @@
 		"message": "macOS"
 	},
 	"app.settings.privacy.ads-consent.intro": {
-		"message": "Reklamlar, catálogo'i mümkün kılıyor ve içerik üreticilerine yapılan ödemeleri finanse ediyor. Partnerlerimiz, reklamları kişiselleştirmek ve performansı ölçmek amacıyla uygulama içinde çerez depolayabilir veya bunlara erişebilir. Aşağıdan tercihinizi yönetebilir veya vazgeçebilirsiniz."
+		"message": "Reklamlar, Modrinth'i mümkün kılıyor ve içerik üreticilerine yapılan ödemeleri finanse ediyor. Partnerlerimiz, reklamları kişiselleştirmek ve performansı ölçmek amacıyla uygulama içinde çerez depolayabilir veya bunlara erişebilir. Aşağıdan tercihinizi yönetebilir veya vazgeçebilirsiniz."
 	},
 	"app.settings.privacy.discord-rich-presence.description": {
 		"message": "Şu anki Discord aktiviteniz olarak, Strata'i gösterin. Bu, örneğe modlar tarafından eklenen Rich Presence'ı etkilemez. Uygulamayı yeniden başlatmayı gerektirir."
@@ -2199,7 +2199,7 @@
 		"message": "Discord Rich Presence"
 	},
 	"app.settings.privacy.telemetry.description": {
-		"message": "catálogo kullanıcı deneyimimizi geliştirmek için ve deneyiminizi kişiselleştirmek için anonimleştirilmiş analiz ve kullanım verilerini toplar. Bu seçeneği devre dışı bırakarak, bundan vazgeçmiş olursunuz ve verileriniz artık toplanmayacaktır."
+		"message": "Strata doesn't collect or send usage data, so this setting has no effect. It's kept for compatibility."
 	},
 	"app.settings.privacy.telemetry.title": {
 		"message": "Telemetri"
@@ -2217,7 +2217,7 @@
 		"message": "Uygulama önbelleğini temizle?"
 	},
 	"app.settings.resource-management.app-cache.description": {
-		"message": "Önbelleklenmiş veriyi temizle ve catálogo'den tekrar indir. Önbellek yeniden inşa edilene kadar uygulama daha yavaş yüklenebilir."
+		"message": "Önbelleklenmiş veriyi temizle ve Modrinth'den tekrar indir. Önbellek yeniden inşa edilene kadar uygulama daha yavaş yüklenebilir."
 	},
 	"app.settings.resource-management.app-cache.purge": {
 		"message": "Önbelleği temizle"
@@ -2451,13 +2451,13 @@
 		"message": "MINECON Earth 2017"
 	},
 	"app.skins.section.modrinth": {
-		"message": "catálogo"
+		"message": "Modrinth"
 	},
 	"app.skins.section.modrinth-pride": {
-		"message": "catálogo Onuru"
+		"message": "Modrinth Onuru"
 	},
 	"app.skins.section.modrinth-pride.tooltip": {
-		"message": "Bu skinleri, Onur Ayı boyunca catálogo'in düzenlediği bir bağış kampanyasına yaptığınız bağış karşılığında aldınız."
+		"message": "Bu skinleri, Onur Ayı boyunca Modrinth'in düzenlediği bir bağış kampanyasına yaptığınız bağış karşılığında aldınız."
 	},
 	"app.skins.section.mounts-of-mayhem": {
 		"message": "Kaos Dağları"
@@ -2493,7 +2493,7 @@
 		"message": "Strata deneyiminiz hakkında birkaç soruyu cevaplamak ister misiniz?"
 	},
 	"app.survey.footer": {
-		"message": "Bu geri bildirim doğrudan catálogo ekibine gidecek ve gelecek güncellemeleri şekillendirecek!"
+		"message": "Bu geri bildirim doğrudan Modrinth ekibine gidecek ve gelecek güncellemeleri şekillendirecek!"
 	},
 	"app.survey.no-thanks": {
 		"message": "Hayır teşekkürler"
@@ -2502,7 +2502,7 @@
 		"message": "Ankete katıl"
 	},
 	"app.survey.title": {
-		"message": "Merhaba catálogo kullanıcısı!"
+		"message": "Merhaba Modrinth kullanıcısı!"
 	},
 	"app.sync-instances-update.skip": {
 		"message": "Atla"
@@ -2697,7 +2697,7 @@
 		"message": "Paylaşımlı örneği yayından kaldır"
 	},
 	"installation-settings.shared-instance.unpublish-description": {
-		"message": "Bu paylaşımlı örneği catálogo'ten kaldırın ve onu kullanan kişilere güncelleme göndermeyi durdurun. Yerel örneğiniz bundan etkilenmeyecektir."
+		"message": "Bu paylaşımlı örneği Modrinth'ten kaldırın ve onu kullanan kişilere güncelleme göndermeyi durdurun. Yerel örneğiniz bundan etkilenmeyecektir."
 	},
 	"installation-settings.shared-instance.unpublishing-button": {
 		"message": "Yayından kaldırılıyor..."
@@ -2712,7 +2712,7 @@
 		"message": "Paylaşımlı örneğin bağlantısını kaldır"
 	},
 	"installation-settings.unpublish-shared-instance.modal.admonition-body": {
-		"message": "Bu paylaşımlı örneği catálogo'in sunucularından kaldırır. Strata'i kullanan kişiler güncelleme almayı bırakır fakat yerel örneğiniz ve içeriği bu cihazda kalacak."
+		"message": "Bu paylaşımlı örneği Modrinth'in sunucularından kaldırır. Strata'i kullanan kişiler güncelleme almayı bırakır fakat yerel örneğiniz ve içeriği bu cihazda kalacak."
 	},
 	"installation-settings.unpublish-shared-instance.modal.admonition-header": {
 		"message": "Paylaşımlı örnek yayından kaldırılıyor"
@@ -2994,7 +2994,7 @@
 		"message": "TNT"
 	},
 	"instance.icon-editor.symbol.wrenth-rinth": {
-		"message": "catálogo Anahtarı"
+		"message": "Modrinth Anahtarı"
 	},
 	"instance.icon-editor.symbol.zombie": {
 		"message": "Zombi"
@@ -3522,7 +3522,7 @@
 		"message": "Bir hesap oluştur"
 	},
 	"modal.modrinth-account-required.description": {
-		"message": "Bu özelliği kullanmadan önce catálogo hesabınıza giriş yapmanız gerekmektedir."
+		"message": "Bu özelliği kullanmadan önce Modrinth hesabınıza giriş yapmanız gerekmektedir."
 	},
 	"modal.modrinth-account-required.header": {
 		"message": "Hesap gerekli"
@@ -3531,10 +3531,10 @@
 		"message": "Tarayıcıyı yeniden aç"
 	},
 	"modal.modrinth-account-required.sign-in-button": {
-		"message": "catálogo'e giriş yap"
+		"message": "Modrinth'e giriş yap"
 	},
 	"modal.modrinth-account-required.sign-in-heading": {
-		"message": "Bir catálogo hesabına giriş yap"
+		"message": "Bir Modrinth hesabına giriş yap"
 	},
 	"modal.modrinth-account-required.signing-in-header": {
 		"message": "Giriş yapılıyor"
@@ -3552,7 +3552,7 @@
 		"message": "Minecraft'a giriş yap"
 	},
 	"onboarding-checklist.login-modrinth": {
-		"message": "catálogo'e giriş yap"
+		"message": "Modrinth'e giriş yap"
 	},
 	"onboarding-checklist.title": {
 		"message": "Başlarken"

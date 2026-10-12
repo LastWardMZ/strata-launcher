@@ -32,10 +32,23 @@ const { isStuck: isInstallHeaderStuck } = useStickyObserver(
 	'BrowseInstallHeader',
 )
 
+// `display` viene en inglés de los datos compartidos: se traduce por el nombre del criterio (y se conserva si no se conoce).
+const sortLabels: Record<string, () => string> = {
+	relevance: () => formatMessage(sortMessages.relevance),
+	downloads: () => formatMessage(sortMessages.downloads),
+	follows: () => formatMessage(sortMessages.followers),
+	newest: () => formatMessage(sortMessages.datePublished),
+	date_created: () => formatMessage(sortMessages.datePublished),
+	updated: () => formatMessage(sortMessages.dateUpdated),
+	date_modified: () => formatMessage(sortMessages.dateUpdated),
+	'minecraft_java_server.verified_plays_2w': () => formatMessage(sortMessages.verifiedPlays),
+	'minecraft_java_server.ping.data.players_online': () => formatMessage(sortMessages.players),
+}
+
 const sortOptions = computed<ComboboxOption<SortType>[]>(() =>
 	ctx.effectiveSortTypes.value.map((st) => ({
 		value: st,
-		label: st.display,
+		label: sortLabels[st.name]?.() ?? st.display,
 	})),
 )
 
@@ -45,6 +58,16 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 		label: String(n),
 	})),
 )
+
+const sortMessages = defineMessages({
+	relevance: { id: 'browse.sort.relevance', defaultMessage: 'Relevance' },
+	downloads: { id: 'browse.sort.downloads', defaultMessage: 'Downloads' },
+	followers: { id: 'browse.sort.followers', defaultMessage: 'Followers' },
+	datePublished: { id: 'browse.sort.date-published', defaultMessage: 'Date published' },
+	dateUpdated: { id: 'browse.sort.date-updated', defaultMessage: 'Date updated' },
+	verifiedPlays: { id: 'browse.sort.verified-plays', defaultMessage: 'Verified plays' },
+	players: { id: 'browse.sort.players', defaultMessage: 'Players' },
+})
 
 const messages = defineMessages({
 	searchPlaceholder: {
@@ -61,7 +84,7 @@ const messages = defineMessages({
 	},
 	offline: {
 		id: 'browse.offline',
-		defaultMessage: 'You are currently offline. Connect to the internet to browse catálogo!',
+		defaultMessage: 'You are currently offline. Connect to the internet to browse Modrinth!',
 	},
 	noResults: {
 		id: 'browse.no-results',

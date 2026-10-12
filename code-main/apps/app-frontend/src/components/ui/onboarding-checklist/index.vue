@@ -37,7 +37,7 @@ const messages = defineMessages({
 	},
 	loginModrinth: {
 		id: 'onboarding-checklist.login-modrinth',
-		defaultMessage: 'Sign in to catálogo',
+		defaultMessage: 'Sign in to Modrinth',
 	},
 })
 

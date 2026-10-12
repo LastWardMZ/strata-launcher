@@ -546,7 +546,7 @@ const messages = defineMessages({
 	},
 	githubPopupBlockedMessage: {
 		id: 'profile.details.error.github-popup-blocked',
-		defaultMessage: 'Allow pop-ups for catálogo, then try again.',
+		defaultMessage: 'Allow pop-ups for Modrinth, then try again.',
 	},
 	paymentMethodsLabel: {
 		id: 'profile.details.label.payment-methods',
@@ -562,11 +562,11 @@ const messages = defineMessages({
 	},
 	bioFallbackUser: {
 		id: 'profile.bio.fallback.user',
-		defaultMessage: 'A catálogo user.',
+		defaultMessage: 'A Modrinth user.',
 	},
 	bioFallbackCreator: {
 		id: 'profile.bio.fallback.creator',
-		defaultMessage: 'A catálogo creator.',
+		defaultMessage: 'A Modrinth creator.',
 	},
 	collectionLabel: {
 		id: 'profile.label.collection',
@@ -615,7 +615,7 @@ const messages = defineMessages({
 	officialAccountBio: {
 		id: 'profile.official-account.bio',
 		defaultMessage:
-			'The official user account of catálogo. Get support at <support-link></support-link> or via email at <email></email>',
+			'The official user account of Modrinth. Get support at <support-link></support-link> or via email at <email></email>',
 	},
 	blockButton: {
 		id: 'profile.button.block',

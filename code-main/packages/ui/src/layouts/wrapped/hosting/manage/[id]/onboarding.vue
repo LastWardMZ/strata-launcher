@@ -144,7 +144,7 @@ const messages = defineMessages({
 	chooseWhatToPlayDescription: {
 		id: 'servers.setup.onboarding.step.choose.description',
 		defaultMessage:
-			'Pick your favorite modpack from catálogo, or choose a loader and add the mods you want.',
+			'Pick your favorite modpack from Modrinth, or choose a loader and add the mods you want.',
 	},
 	configureWorldTitle: {
 		id: 'servers.setup.onboarding.step.configure-world.title',

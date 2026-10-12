@@ -36,7 +36,7 @@
 		"defaultMessage": "查看数据信息"
 	},
 	"app.appearance-settings.native-decorations.description": {
-		"defaultMessage": "使用操作系统的标题栏和窗口控件，需要重启 catálogo 后生效。"
+		"defaultMessage": "使用操作系统的标题栏和窗口控件，需要重启 Modrinth 后生效。"
 	},
 	"app.appearance-settings.native-decorations.title": {
 		"defaultMessage": "系统窗口框架"
@@ -114,7 +114,7 @@
 		"defaultMessage": "找不到你查询的结果！"
 	},
 	"browse.offline": {
-		"defaultMessage": "你目前处于离线状态。连接互联网来浏览 catálogo！"
+		"defaultMessage": "你目前处于离线状态。连接互联网来浏览 Modrinth！"
 	},
 	"browse.search.placeholder": {
 		"defaultMessage": "搜索 {projectType}..."
@@ -255,7 +255,7 @@
 		"defaultMessage": "在文件夹中打开"
 	},
 	"button.open-in-modrinth": {
-		"defaultMessage": "在 catálogo 中打开"
+		"defaultMessage": "在 Modrinth 中打开"
 	},
 	"button.play": {
 		"defaultMessage": "开始游戏"
@@ -555,13 +555,13 @@
 		"defaultMessage": "已移除（已禁用） {count} 项"
 	},
 	"content.diff-modal.reviewed-files": {
-		"defaultMessage": "未发布到 catálogo 的文件未经过审核。"
+		"defaultMessage": "未发布到 Modrinth 的文件未经过审核。"
 	},
 	"content.diff-modal.unknown-content-body": {
 		"defaultMessage": "你服务器上的部分内容未能完成分析，可能受此变更影响。"
 	},
 	"content.diff-modal.unknown-files-description": {
-		"defaultMessage": "这个更新包含一些未在 catálogo 发布的文件。我们强烈建议只从你信任的来源安装文件。"
+		"defaultMessage": "这个更新包含一些未在 Modrinth 发布的文件。我们强烈建议只从你信任的来源安装文件。"
 	},
 	"content.diff-modal.unknown-files-warning": {
 		"defaultMessage": "未知文件警告"
@@ -1209,7 +1209,7 @@
 		"defaultMessage": "作品链接"
 	},
 	"external-files.permissions-card.editor.modrinth-link-to-work": {
-		"defaultMessage": "这看起来像是一个catálogo链接，如果这个内容存在于Modrinrh平台上，你的包很可能导出不正确。如果你是从其他网站下载的，尝试下载catálogo版本的文件，有时它们不是相同文件。"
+		"defaultMessage": "这看起来像是一个Modrinth链接，如果这个内容存在于Modrinrh平台上，你的包很可能导出不正确。如果你是从其他网站下载的，尝试下载Modrinth版本的文件，有时它们不是相同文件。"
 	},
 	"external-files.permissions-card.editor.notes-label": {
 		"defaultMessage": "笔记"
@@ -1233,7 +1233,7 @@
 		"defaultMessage": "如果您被发现造假或者篡改上传的图像，您的项目和帐户可能会被终止。"
 	},
 	"external-files.permissions-card.editor.proof-warning.title": {
-		"defaultMessage": "catálogo 工作人员可能核验上传的证据"
+		"defaultMessage": "Modrinth 工作人员可能核验上传的证据"
 	},
 	"external-files.permissions-card.editor.save": {
 		"defaultMessage": "保存归属信息"
@@ -1320,7 +1320,7 @@
 		"defaultMessage": "已自动署名"
 	},
 	"external-files.permissions-card.reason.globally-allowed.description": {
-		"defaultMessage": "我们之前已经见过这个文件，并为您准备好了署名信息。如果有什么地方看起来不对劲，请通过帮助中心联系 catálogo"
+		"defaultMessage": "我们之前已经见过这个文件，并为您准备好了署名信息。如果有什么地方看起来不对劲，请通过帮助中心联系 Modrinth"
 	},
 	"external-files.permissions-card.reason.license": {
 		"defaultMessage": "许可协议"
@@ -2433,7 +2433,7 @@
 		"defaultMessage": "外部储存"
 	},
 	"instances.managed-content-modal.external-content-description": {
-		"defaultMessage": "此文件未发布于 catálogo 平台。"
+		"defaultMessage": "此文件未发布于 Modrinth 平台。"
 	},
 	"instances.managed-content-modal.header": {
 		"defaultMessage": "管理内容"
@@ -3120,7 +3120,7 @@
 		"defaultMessage": "管理员"
 	},
 	"omorphia.component.badge.label.modrinth-team": {
-		"defaultMessage": "catálogo 团队"
+		"defaultMessage": "Modrinth 团队"
 	},
 	"omorphia.component.badge.label.pending": {
 		"defaultMessage": "待确认"
@@ -3240,10 +3240,10 @@
 		"defaultMessage": "Visa"
 	},
 	"profile.bio.fallback.creator": {
-		"defaultMessage": "一位 catálogo 创作者。"
+		"defaultMessage": "一位 Modrinth 创作者。"
 	},
 	"profile.bio.fallback.user": {
-		"defaultMessage": "一位 catálogo 用户。"
+		"defaultMessage": "一位 Modrinth 用户。"
 	},
 	"profile.block-user.admonition-body": {
 		"defaultMessage": "{username} 将无法向你发送好友请求、将你邀请到共享实例或 Hosting 服务器。"
@@ -3303,7 +3303,7 @@
 		"defaultMessage": "{count, plural, other {# 个项目}}"
 	},
 	"profile.details.error.github-popup-blocked": {
-		"defaultMessage": "请在来自 catálogo 的弹出窗口中选择允许，然后重试。"
+		"defaultMessage": "请在来自 Modrinth 的弹出窗口中选择允许，然后重试。"
 	},
 	"profile.details.error.github-profile-message": {
 		"defaultMessage": "无法获取 GitHub 个人资料。请重试。"
@@ -3381,10 +3381,10 @@
 		"defaultMessage": "{count, plural, other {项目}}"
 	},
 	"profile.official-account": {
-		"defaultMessage": "官方 catálogo 账户"
+		"defaultMessage": "官方 Modrinth 账户"
 	},
 	"profile.official-account.bio": {
-		"defaultMessage": "catálogo 的官方用户账号。可通过 <support-link></support-link> 或电子邮件 <email></email> 获取支持"
+		"defaultMessage": "Modrinth 的官方用户账号。可通过 <support-link></support-link> 或电子邮件 <email></email> 获取支持"
 	},
 	"profile.unblock-user.error-description": {
 		"defaultMessage": "解除屏蔽该用户时发生了错误。请重试。"
@@ -3759,7 +3759,7 @@
 		"defaultMessage": "{count} {countPlural, plural, other {人最近游玩}}"
 	},
 	"project.recent-plays.tooltip": {
-		"defaultMessage": "在过去两周内共有 {count} {countPlural, plural, other {人}}通过 catálogo 游玩"
+		"defaultMessage": "在过去两周内共有 {count} {countPlural, plural, other {人}}通过 Modrinth 游玩"
 	},
 	"project.server.customModpackTooltip": {
 		"defaultMessage": "这个项目使用了自定义整合包"
@@ -4092,7 +4092,7 @@
 		"defaultMessage": "你的项目包含多个运行环境"
 	},
 	"project.settings.environment.notice.review-options.description": {
-		"defaultMessage": "我们最近升级了 catálogo 的运行环境系统，引入了一些新选项。请确保在下方选择正确的选项，然后点击“验证”！"
+		"defaultMessage": "我们最近升级了 Modrinth 的运行环境系统，引入了一些新选项。请确保在下方选择正确的选项，然后点击“验证”！"
 	},
 	"project.settings.environment.notice.review-options.title": {
 		"defaultMessage": "请复核以下选项"
@@ -4464,13 +4464,13 @@
 		"defaultMessage": "加载器"
 	},
 	"search.photosensitivity-warning-modal.body.1": {
-		"defaultMessage": "我们不能保证catálogo上的所有内容都已正确标注。"
+		"defaultMessage": "我们不能保证Modrinth上的所有内容都已正确标注。"
 	},
 	"search.photosensitivity-warning-modal.body.2": {
-		"defaultMessage": "光敏感内容的标签是由将内容上传到catálogo的创作者自行标注的。这些项目没有经过任何安全测试。"
+		"defaultMessage": "光敏感内容的标签是由将内容上传到Modrinth的创作者自行标注的。这些项目没有经过任何安全测试。"
 	},
 	"search.photosensitivity-warning-modal.body.3": {
-		"defaultMessage": "使用catálogo上的任何内容，风险由你自行承担。请注意安全！💚"
+		"defaultMessage": "使用Modrinth上的任何内容，风险由你自行承担。请注意安全！💚"
 	},
 	"search.photosensitivity-warning-modal.dont-show-again": {
 		"defaultMessage": "以后不再显示"
@@ -5253,13 +5253,13 @@
 		"defaultMessage": "不要使用他们的 Minecraft 用户名。"
 	},
 	"servers.grant-access-modal.target.label": {
-		"defaultMessage": "catálogo 用户名"
+		"defaultMessage": "Modrinth 用户名"
 	},
 	"servers.grant-access-modal.target.no-suggestions": {
 		"defaultMessage": "未找到匹配的用户。"
 	},
 	"servers.grant-access-modal.target.placeholder": {
-		"defaultMessage": "输入 catálogo 用户名"
+		"defaultMessage": "输入 Modrinth 用户名"
 	},
 	"servers.grant-access-modal.target.searching": {
 		"defaultMessage": "正在搜索…"
@@ -5343,7 +5343,7 @@
 		"defaultMessage": "与好友同乐"
 	},
 	"servers.list-empty.sign-in-button": {
-		"defaultMessage": "登录到 catálogo"
+		"defaultMessage": "登录到 Modrinth"
 	},
 	"servers.list-empty.simple-setup-description": {
 		"defaultMessage": "像设置单人游戏世界一样配置你的服务器。"
@@ -5400,7 +5400,7 @@
 		"defaultMessage": "你的订阅将于 <date>{formattedDate}</date> 取消。"
 	},
 	"servers.listing.notice.suspended": {
-		"defaultMessage": "你的服务器已被停用。请联系 catálogo 支持以获取更多信息。"
+		"defaultMessage": "你的服务器已被停用。请联系 Modrinth 支持以获取更多信息。"
 	},
 	"servers.listing.notice.upgrading": {
 		"defaultMessage": "你的服务器硬件正在升级，很快就会重新上线。"
@@ -5433,7 +5433,7 @@
 		"defaultMessage": "正在上传"
 	},
 	"servers.manage.contact-support-button": {
-		"defaultMessage": "联系 catálogo 支持"
+		"defaultMessage": "联系 Modrinth 支持"
 	},
 	"servers.manage.error.alert-notice": {
 		"defaultMessage": "当出现问题时，我们的系统会自动提醒团队。我们已在努力让服务器恢复上线。"
@@ -5445,10 +5445,10 @@
 		"defaultMessage": "错误详情："
 	},
 	"servers.manage.error.queue-notice": {
-		"defaultMessage": "如果你最近购买了 catálogo 托管服务器，它当前正在队列中，一旦准备就绪就会显示在此处。<warning>不要尝试购买新服务器。</warning>"
+		"defaultMessage": "如果你最近购买了 Modrinth 托管服务器，它当前正在队列中，一旦准备就绪就会显示在此处。<warning>不要尝试购买新服务器。</warning>"
 	},
 	"servers.manage.error.support-notice": {
-		"defaultMessage": "如果你需要关于服务器状态的个性化支持，请联系 catálogo 支持团队。"
+		"defaultMessage": "如果你需要关于服务器状态的个性化支持，请联系 Modrinth 支持团队。"
 	},
 	"servers.manage.error.title": {
 		"defaultMessage": "服务器无法加载"
@@ -5481,7 +5481,7 @@
 		"defaultMessage": "重新启动"
 	},
 	"servers.manage.resubscribe-error.text": {
-		"defaultMessage": "在重新订阅你的 catálogo 服务器时发生了错误。"
+		"defaultMessage": "在重新订阅你的 Modrinth 服务器时发生了错误。"
 	},
 	"servers.manage.resubscribe-error.title": {
 		"defaultMessage": "重新订阅时出错"
@@ -5529,10 +5529,10 @@
 		"defaultMessage": "你的 Medal 服务器试用期已结束，服务器已被停用。请升级以继续使用你的服务器。"
 	},
 	"servers.medal-listing.notice.suspended": {
-		"defaultMessage": "你的服务器已被停用。请更新你的账单信息，或联系 catálogo 支持以获取更多信息。"
+		"defaultMessage": "你的服务器已被停用。请更新你的账单信息，或联系 Modrinth 支持以获取更多信息。"
 	},
 	"servers.medal-listing.notice.suspended-with-reason": {
-		"defaultMessage": "你的服务器已被停用：{reason}。请更新你的账单信息，或联系 catálogo 支持以获取更多信息。"
+		"defaultMessage": "你的服务器已被停用：{reason}。请更新你的账单信息，或联系 Modrinth 支持以获取更多信息。"
 	},
 	"servers.medal-listing.notice.upgrading": {
 		"defaultMessage": "你的服务器硬件正在升级，很快就会重新上线。"
@@ -5763,7 +5763,7 @@
 		"defaultMessage": "初始化服务器"
 	},
 	"servers.setup.onboarding.step.choose.description": {
-		"defaultMessage": "从 catálogo 选择你喜爱的整合包，或者选择一个加载器并添加你想要的模组。"
+		"defaultMessage": "从 Modrinth 选择你喜爱的整合包，或者选择一个加载器并添加你想要的模组。"
 	},
 	"servers.setup.onboarding.step.choose.title": {
 		"defaultMessage": "选择要游玩的内容"
@@ -5868,7 +5868,7 @@
 		"defaultMessage": "高级渲染"
 	},
 	"settings.display.sidebar.external-links-new-tab.description": {
-		"defaultMessage": "在新标签页中打开跳出 catálogo 的站外链接。但同一域名下的链接、Markdown 描述中的链接始终在当前标签页打开，广告和编辑页面上的链接则始终在新标签页打开。"
+		"defaultMessage": "在新标签页中打开跳出 Modrinth 的站外链接。但同一域名下的链接、Markdown 描述中的链接始终在当前标签页打开，广告和编辑页面上的链接则始终在新标签页打开。"
 	},
 	"settings.display.sidebar.external-links-new-tab.title": {
 		"defaultMessage": "在新标签页中打开外部链接"
@@ -5889,7 +5889,7 @@
 		"defaultMessage": "深色"
 	},
 	"settings.display.theme.description": {
-		"defaultMessage": "选择你偏好的 catálogo 颜色主题。"
+		"defaultMessage": "选择你偏好的 Modrinth 颜色主题。"
 	},
 	"settings.display.theme.light": {
 		"defaultMessage": "浅色"
@@ -5913,7 +5913,7 @@
 		"defaultMessage": "在你登录的所有设备上使用这个主题。关闭它后可以单独设置设备主题。"
 	},
 	"settings.display.theme.sync-across-devices.sign-in-tooltip": {
-		"defaultMessage": "登录到 catálogo 以同步主题"
+		"defaultMessage": "登录到 Modrinth 以同步主题"
 	},
 	"settings.display.theme.system": {
 		"defaultMessage": "跟随系统"
@@ -5970,7 +5970,7 @@
 		"defaultMessage": "个人访问令牌"
 	},
 	"settings.preferences.update-failed.description": {
-		"defaultMessage": "您的设置无法保存到您的 catálogo 帐户。请重试。"
+		"defaultMessage": "您的设置无法保存到您的 Modrinth 帐户。请重试。"
 	},
 	"settings.preferences.update-failed.title": {
 		"defaultMessage": "同步设置失败"
@@ -5988,7 +5988,7 @@
 		"defaultMessage": "头像"
 	},
 	"settings.profile.public-information.description": {
-		"defaultMessage": "您的个人资料信息可以在 <profile-link>catálogo 上公开查看</profile-link>，也可通过 <docs-link>catálogo API</docs-link> 获取。"
+		"defaultMessage": "您的个人资料信息可以在 <profile-link>Modrinth 上公开查看</profile-link>，也可通过 <docs-link>Modrinth API</docs-link> 获取。"
 	},
 	"settings.profile.save-error": {
 		"defaultMessage": "更新档案失败"
@@ -5997,10 +5997,10 @@
 		"defaultMessage": "更新个人资料失败，请稍后重试。"
 	},
 	"settings.profile.sign-in-required.description": {
-		"defaultMessage": "登录 catálogo 账号以自定义您的公开资料。"
+		"defaultMessage": "登录 Modrinth 账号以自定义您的公开资料。"
 	},
 	"settings.profile.sign-in-required.title": {
-		"defaultMessage": "需要 catálogo 账户"
+		"defaultMessage": "需要 Modrinth 账户"
 	},
 	"settings.profile.username.description": {
 		"defaultMessage": "用于识别您个人资料的唯一名称。"
@@ -6015,7 +6015,7 @@
 		"defaultMessage": "用户"
 	},
 	"settings.social.blocked-users.description": {
-		"defaultMessage": "这些是你在 catálogo 中屏蔽的用户。他们无法："
+		"defaultMessage": "这些是你在 Modrinth 中屏蔽的用户。他们无法："
 	},
 	"settings.social.blocked-users.empty": {
 		"defaultMessage": "你还没有屏蔽任何人。"
@@ -6030,7 +6030,7 @@
 		"defaultMessage": "给你发送好友邀请"
 	},
 	"settings.social.blocked-users.restriction.hosting": {
-		"defaultMessage": "邀请你管理 catálogo 托管服务器。"
+		"defaultMessage": "邀请你管理 Modrinth 托管服务器。"
 	},
 	"settings.social.blocked-users.restriction.shared-instances": {
 		"defaultMessage": "邀请你加入共享实例"
@@ -6054,7 +6054,7 @@
 		"defaultMessage": "{username} 的头像"
 	},
 	"settings.social.friend-requests.description": {
-		"defaultMessage": "控制谁可以在 catálogo 上向你发送好友申请。"
+		"defaultMessage": "控制谁可以在 Modrinth 上向你发送好友申请。"
 	},
 	"settings.social.friend-requests.title": {
 		"defaultMessage": "好友邀请"
@@ -6093,10 +6093,10 @@
 		"defaultMessage": "共享实例邀请"
 	},
 	"settings.social.sign-in-required.description": {
-		"defaultMessage": "使用 catálogo 账号，你可以控制谁能与你互动，并管理黑名单用户"
+		"defaultMessage": "使用 Modrinth 账号，你可以控制谁能与你互动，并管理黑名单用户"
 	},
 	"settings.social.sign-in-required.title": {
-		"defaultMessage": "需要登录 catálogo 账号"
+		"defaultMessage": "需要登录 Modrinth 账号"
 	},
 	"settings.social.title": {
 		"defaultMessage": "社交"
@@ -6195,7 +6195,7 @@
 		"defaultMessage": "保存"
 	},
 	"sharing.invite-players-modal.search-placeholder": {
-		"defaultMessage": "输入 catálogo 用户名"
+		"defaultMessage": "输入 Modrinth 用户名"
 	},
 	"sharing.invite-players-modal.searching": {
 		"defaultMessage": "搜索中……"
@@ -6780,34 +6780,34 @@
 		"defaultMessage": "恶意软件经常通过在像 Discord 这样的平台上分享的 mod 文件传播。"
 	},
 	"unknown-file-warning-modal.mod-warning-body": {
-		"defaultMessage": "没有在 catálogo 上发布。我们强烈建议只安装你信任来源的文件。"
+		"defaultMessage": "没有在 Modrinth 上发布。我们强烈建议只安装你信任来源的文件。"
 	},
 	"unknown-file-warning-modal.mod-warning-title": {
 		"defaultMessage": "未知文件警告"
 	},
 	"unknown-file-warning-modal.modpack-warning-body": {
-		"defaultMessage": "包含一些未在 catálogo 发布的文件。我们强烈建议只从你信任的来源安装文件。"
+		"defaultMessage": "包含一些未在 Modrinth 发布的文件。我们强烈建议只从你信任的来源安装文件。"
 	},
 	"unknown-file-warning-modal.modpack-warning-title": {
 		"defaultMessage": "未知文件警告"
 	},
 	"unknown-file-warning-modal.reviewed-files": {
-		"defaultMessage": "未发布到 catálogo 的文件未经过审核。"
+		"defaultMessage": "未发布到 Modrinth 的文件未经过审核。"
 	},
 	"unknown-file-warning-modal.unrecognized-files": {
 		"defaultMessage": "未识别文件"
 	},
 	"user.profile.badge.alpha.about.1": {
-		"defaultMessage": "该用户自 catálogo 内测时期便已加入平台，该测试版于 2020 年 11 月收官。"
+		"defaultMessage": "该用户自 Modrinth 内测时期便已加入平台，该测试版于 2020 年 11 月收官。"
 	},
 	"user.profile.badge.alpha.name": {
 		"defaultMessage": "内测用户"
 	},
 	"user.profile.badge.beta.about.1": {
-		"defaultMessage": "该用户自 catálogo 公测时期便已加入平台，该测试版于 2022 年 2 月收官。"
+		"defaultMessage": "该用户自 Modrinth 公测时期便已加入平台，该测试版于 2022 年 2 月收官。"
 	},
 	"user.profile.badge.beta.link": {
-		"defaultMessage": "点击阅读关于 catálogo 公测版本发布的信息。"
+		"defaultMessage": "点击阅读关于 Modrinth 公测版本发布的信息。"
 	},
 	"user.profile.badge.beta.name": {
 		"defaultMessage": "公测用户"
@@ -6819,37 +6819,37 @@
 		"defaultMessage": "{download_sum} 次下载"
 	},
 	"user.profile.badge.early-datapack-adopter.about.1": {
-		"defaultMessage": "该用户在数据包功能于 2023 年 1 月正式上线前，协助我们在 catálogo 平台完成了数据包项目的测试工作。"
+		"defaultMessage": "该用户在数据包功能于 2023 年 1 月正式上线前，协助我们在 Modrinth 平台完成了数据包项目的测试工作。"
 	},
 	"user.profile.badge.early-datapack-adopter.name": {
 		"defaultMessage": "数据包功能首发体验者"
 	},
 	"user.profile.badge.early-modpack-adopter.about.1": {
-		"defaultMessage": "该用户在整合包功能于 2022 年 5 月正式上线前，协助我们在 catálogo 平台参与了整合包项目的测试工作。"
+		"defaultMessage": "该用户在整合包功能于 2022 年 5 月正式上线前，协助我们在 Modrinth 平台参与了整合包项目的测试工作。"
 	},
 	"user.profile.badge.early-modpack-adopter.name": {
 		"defaultMessage": "整合包功能首发体验者"
 	},
 	"user.profile.badge.early-plugin-adopter.about.1": {
-		"defaultMessage": "该用户在插件功能于 2022 年 8 月正式上线前，协助我们在 catálogo 平台测试插件相关项目。"
+		"defaultMessage": "该用户在插件功能于 2022 年 8 月正式上线前，协助我们在 Modrinth 平台测试插件相关项目。"
 	},
 	"user.profile.badge.early-plugin-adopter.name": {
 		"defaultMessage": "插件功能首发体验者"
 	},
 	"user.profile.badge.early-resourcepack-adopter.about.1": {
-		"defaultMessage": "该用户在资源包功能于 2022 年 8 月上线前，协助我们在 catálogo 平台测试资源包相关项目。"
+		"defaultMessage": "该用户在资源包功能于 2022 年 8 月上线前，协助我们在 Modrinth 平台测试资源包相关项目。"
 	},
 	"user.profile.badge.early-resourcepack-adopter.name": {
 		"defaultMessage": "资源包功能首发体验者"
 	},
 	"user.profile.badge.early-server-adopter.about.1": {
-		"defaultMessage": "该用户在服务器项目于 2026 年 3 月正式上线前，协助我们在 catálogo 平台测试服务器相关项目。"
+		"defaultMessage": "该用户在服务器项目于 2026 年 3 月正式上线前，协助我们在 Modrinth 平台测试服务器相关项目。"
 	},
 	"user.profile.badge.early-server-adopter.name": {
 		"defaultMessage": "服务器功能首发体验者"
 	},
 	"user.profile.badge.early-shader-adopter.about.1": {
-		"defaultMessage": "该用户在光影包项目于 2023 年 1 月正式上线前，协助我们在 catálogo 平台参与光影包项目测试。"
+		"defaultMessage": "该用户在光影包项目于 2023 年 1 月正式上线前，协助我们在 Modrinth 平台参与光影包项目测试。"
 	},
 	"user.profile.badge.early-shader-adopter.name": {
 		"defaultMessage": "光影包功能首发体验者"
@@ -6861,25 +6861,25 @@
 		"defaultMessage": "托管服务内测用户"
 	},
 	"user.profile.badge.moderator.about.1": {
-		"defaultMessage": "该用户任职于 catálogo，担任内容审核员。"
+		"defaultMessage": "该用户任职于 Modrinth，担任内容审核员。"
 	},
 	"user.profile.badge.moderator.about.2": {
-		"defaultMessage": "catálogo 的内容审核员负责审核各类项目、处理用户举报，维护平台安全环境。"
+		"defaultMessage": "Modrinth 的内容审核员负责审核各类项目、处理用户举报，维护平台安全环境。"
 	},
 	"user.profile.badge.moderator.name": {
 		"defaultMessage": "内容审核员"
 	},
 	"user.profile.badge.plus.about.1": {
-		"defaultMessage": "该用户尽心尽力支持 catálogo 平台与站内创作者。"
+		"defaultMessage": "该用户尽心尽力支持 Modrinth 平台与站内创作者。"
 	},
 	"user.profile.badge.plus.link": {
 		"defaultMessage": "点击了解如何成为会员。"
 	},
 	"user.profile.badge.plus.name": {
-		"defaultMessage": "Premium del catálogo 会员成员"
+		"defaultMessage": "Modrinth+ 会员成员"
 	},
 	"user.profile.badge.pride.about.1": {
-		"defaultMessage": "该用户至少参与过一次 catálogo 为 LGBTQ+ 群体举办的骄傲月公益募捐活动。"
+		"defaultMessage": "该用户至少参与过一次 Modrinth 为 LGBTQ+ 群体举办的骄傲月公益募捐活动。"
 	},
 	"user.profile.badge.pride.link": {
 		"defaultMessage": "点击访问我们最新的骄傲月筹款活动。"
@@ -6888,10 +6888,10 @@
 		"defaultMessage": "骄傲月活动筹款支持者"
 	},
 	"user.profile.badge.staff.about.1": {
-		"defaultMessage": "该用户任职于 catálogo 。"
+		"defaultMessage": "该用户任职于 Modrinth 。"
 	},
 	"user.profile.badge.staff.name": {
-		"defaultMessage": "catálogo 团队"
+		"defaultMessage": "Modrinth 团队"
 	},
 	"user.role.moderator": {
 		"defaultMessage": "内容审核员"

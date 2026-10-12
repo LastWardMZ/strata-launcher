@@ -114,7 +114,7 @@
 		"defaultMessage": "Nie znaleziono wyników dla twojego wyszukiwania!"
 	},
 	"browse.offline": {
-		"defaultMessage": "Jesteś offline. Połącz się z internetem, aby przeglądać catálogo!"
+		"defaultMessage": "Jesteś offline. Połącz się z internetem, aby przeglądać Modrinth!"
 	},
 	"browse.search.placeholder": {
 		"defaultMessage": "Szukaj {projectType}..."
@@ -255,7 +255,7 @@
 		"defaultMessage": "Otwórz w folderze"
 	},
 	"button.open-in-modrinth": {
-		"defaultMessage": "Otwórz na catálogo"
+		"defaultMessage": "Otwórz na Modrinth"
 	},
 	"button.play": {
 		"defaultMessage": "Graj"
@@ -555,13 +555,13 @@
 		"defaultMessage": "Usunięto (wyłączono) {count}"
 	},
 	"content.diff-modal.reviewed-files": {
-		"defaultMessage": "Pliki nieopublikowane w catálogo nie są sprawdzane."
+		"defaultMessage": "Pliki nieopublikowane w Modrinth nie są sprawdzane."
 	},
 	"content.diff-modal.unknown-content-body": {
 		"defaultMessage": "Zawartość na Twoim serwerze nie mogła zostać przeanalizowana i może być objęta tą zmianą."
 	},
 	"content.diff-modal.unknown-files-description": {
-		"defaultMessage": "Ta aktualizacja zawiera pliki, które nie zostały opublikowane na catálogo. Zalecamy instalowanie plików tylko z źródeł, którym ufasz."
+		"defaultMessage": "Ta aktualizacja zawiera pliki, które nie zostały opublikowane na Modrinth. Zalecamy instalowanie plików tylko z źródeł, którym ufasz."
 	},
 	"content.diff-modal.unknown-files-warning": {
 		"defaultMessage": "Ostrzeżenie o nieznanych plikach"
@@ -1209,7 +1209,7 @@
 		"defaultMessage": "link-do-dzieła"
 	},
 	"external-files.permissions-card.editor.modrinth-link-to-work": {
-		"defaultMessage": "Wygląda na to, że jest to link do catálogo. Jeżeli ta zawartość jest dostępna na catálogo, Twoja paczka najprawdopodobniej została źle wyeksportowana. Jeżeli ta zawartość jest pobrana z innej strony, spróbuj pobrać ją ponownie z catálogo; czasami pliki z innych stron nie są identyczne."
+		"defaultMessage": "Wygląda na to, że jest to link do Modrinth. Jeżeli ta zawartość jest dostępna na Modrinth, Twoja paczka najprawdopodobniej została źle wyeksportowana. Jeżeli ta zawartość jest pobrana z innej strony, spróbuj pobrać ją ponownie z Modrinth; czasami pliki z innych stron nie są identyczne."
 	},
 	"external-files.permissions-card.editor.notes-label": {
 		"defaultMessage": "Notatki"
@@ -1233,7 +1233,7 @@
 		"defaultMessage": "Jeżeli okaże się, że skłamałeś/aś lub przesłane zdjęcia są sfałszowane, Twoje konto i projekt mogą zostać zawieszone."
 	},
 	"external-files.permissions-card.editor.proof-warning.title": {
-		"defaultMessage": "Zespół catálogo może zweryfikować dowody"
+		"defaultMessage": "Zespół Modrinth może zweryfikować dowody"
 	},
 	"external-files.permissions-card.editor.save": {
 		"defaultMessage": "Zapisz atrybucję"
@@ -1320,7 +1320,7 @@
 		"defaultMessage": "Automatyczna atrybucja"
 	},
 	"external-files.permissions-card.reason.globally-allowed.description": {
-		"defaultMessage": "Widzieliśmy jeż ten plik i przygotowaliśmy dla Ciebie gotową atrybucję. Jeżeli coś tu nie pasuje, skontaktuj się z obsługą catálogo przez centrum pomocy"
+		"defaultMessage": "Widzieliśmy jeż ten plik i przygotowaliśmy dla Ciebie gotową atrybucję. Jeżeli coś tu nie pasuje, skontaktuj się z obsługą Modrinth przez centrum pomocy"
 	},
 	"external-files.permissions-card.reason.license": {
 		"defaultMessage": "Licencja"
@@ -2424,7 +2424,7 @@
 		"defaultMessage": "Zewnętrzne"
 	},
 	"instances.managed-content-modal.external-content-description": {
-		"defaultMessage": "Ten plik nie jest opublikowany na catálogo."
+		"defaultMessage": "Ten plik nie jest opublikowany na Modrinth."
 	},
 	"instances.managed-content-modal.header": {
 		"defaultMessage": "Zarządzana zawartość"
@@ -3111,7 +3111,7 @@
 		"defaultMessage": "Moderator"
 	},
 	"omorphia.component.badge.label.modrinth-team": {
-		"defaultMessage": "Zespół catálogo"
+		"defaultMessage": "Zespół Modrinth"
 	},
 	"omorphia.component.badge.label.pending": {
 		"defaultMessage": "Oczekujący"
@@ -3231,10 +3231,10 @@
 		"defaultMessage": "Visa"
 	},
 	"profile.bio.fallback.creator": {
-		"defaultMessage": "Twórca na catálogo."
+		"defaultMessage": "Twórca na Modrinth."
 	},
 	"profile.bio.fallback.user": {
-		"defaultMessage": "Użytkownik catálogo."
+		"defaultMessage": "Użytkownik Modrinth."
 	},
 	"profile.block-user.admonition-body": {
 		"defaultMessage": "Użytkownik {username} nie będzie mógł wysyłać ci zaproszeń do znajomych, zapraszać się do udostępnionych instancji lub zapraszać się do serwerów Hosting."
@@ -3294,7 +3294,7 @@
 		"defaultMessage": "{count, plural, one {# projekt} few {# projekty} other {# projektów}}"
 	},
 	"profile.details.error.github-popup-blocked": {
-		"defaultMessage": "Zezwalaj na wyskakujące okienka dla catálogo, a następnie spróbuj ponownie."
+		"defaultMessage": "Zezwalaj na wyskakujące okienka dla Modrinth, a następnie spróbuj ponownie."
 	},
 	"profile.details.error.github-profile-message": {
 		"defaultMessage": "Profil GitHub nie może zostać odzyskany. Spróbuj ponownie."
@@ -3372,10 +3372,10 @@
 		"defaultMessage": "{count, plural, one {projekt} few {projekty} other {projektów}}"
 	},
 	"profile.official-account": {
-		"defaultMessage": "Oficjalne konto catálogo"
+		"defaultMessage": "Oficjalne konto Modrinth"
 	},
 	"profile.official-account.bio": {
-		"defaultMessage": "Oficjalne konto catálogo. Otrzymaj wsparcie na stronie <support-link></support-link> lub poprzez e-mail <email></email>"
+		"defaultMessage": "Oficjalne konto Modrinth. Otrzymaj wsparcie na stronie <support-link></support-link> lub poprzez e-mail <email></email>"
 	},
 	"profile.unblock-user.error-description": {
 		"defaultMessage": "Wystąpił błąd podczas odblokowywania tego użytkownika. Spróbuj ponownie później."
@@ -3750,7 +3750,7 @@
 		"defaultMessage": "{count} {countPlural, plural, one {grał ostatnio} other {grało ostatnio}}"
 	},
 	"project.recent-plays.tooltip": {
-		"defaultMessage": "{count} {countPlural, plural, one {grał ostatnio} other {grało ostatnio}} poprzez catálogo przez ostatnie 2 tygodnie"
+		"defaultMessage": "{count} {countPlural, plural, one {grał ostatnio} other {grało ostatnio}} poprzez Modrinth przez ostatnie 2 tygodnie"
 	},
 	"project.server.customModpackTooltip": {
 		"defaultMessage": "Ten projekt wykorzystuje niestandardową paczkę modów"
@@ -4083,7 +4083,7 @@
 		"defaultMessage": "Twój projekt ma wiele środowisk"
 	},
 	"project.settings.environment.notice.review-options.description": {
-		"defaultMessage": "Właśnie zmodernizowaliśmy system środowisk w catálogo i są teraz dostępne nowe opcje. Upewnij się, że poniżej wybrano właściwą opcję, a następnie kliknij 'Weryfikuj' gdy skończysz!"
+		"defaultMessage": "Właśnie zmodernizowaliśmy system środowisk w Modrinth i są teraz dostępne nowe opcje. Upewnij się, że poniżej wybrano właściwą opcję, a następnie kliknij 'Weryfikuj' gdy skończysz!"
 	},
 	"project.settings.environment.notice.review-options.title": {
 		"defaultMessage": "Proszę zapoznać się z opcjami poniżej"
@@ -4455,13 +4455,13 @@
 		"defaultMessage": "Loader"
 	},
 	"search.photosensitivity-warning-modal.body.1": {
-		"defaultMessage": "Nie możemy zagwarantować, że cała treść w catálogo została odpowiednio oznaczona."
+		"defaultMessage": "Nie możemy zagwarantować, że cała treść w Modrinth została odpowiednio oznaczona."
 	},
 	"search.photosensitivity-warning-modal.body.2": {
-		"defaultMessage": "Etykiety zawartości wyzwalaczy wrażliwości na światło są przypisane samodzielnie przez twórców, którzy przesyłają swoją zawartość do catálogo. Te projekty nie przeszły żadnych testów bezpieczeństwa."
+		"defaultMessage": "Etykiety zawartości wyzwalaczy wrażliwości na światło są przypisane samodzielnie przez twórców, którzy przesyłają swoją zawartość do Modrinth. Te projekty nie przeszły żadnych testów bezpieczeństwa."
 	},
 	"search.photosensitivity-warning-modal.body.3": {
-		"defaultMessage": "Korzystasz z jakiejkolwiek zawartości na catálogo na własne ryzyko. Dbaj o siebie! 💚"
+		"defaultMessage": "Korzystasz z jakiejkolwiek zawartości na Modrinth na własne ryzyko. Dbaj o siebie! 💚"
 	},
 	"search.photosensitivity-warning-modal.dont-show-again": {
 		"defaultMessage": "Nie pokazuj ponownie"
@@ -5151,7 +5151,7 @@
 		"defaultMessage": "Awatar użytkownika {username}"
 	},
 	"servers.backups.item.creator.support": {
-		"defaultMessage": "Obsługa catálogo"
+		"defaultMessage": "Obsługa Modrinth"
 	},
 	"servers.backups.item.manual-backup": {
 		"defaultMessage": "Ręczne kopie zapasowe"
@@ -5244,13 +5244,13 @@
 		"defaultMessage": "Nie pomylić z nazwą użytkownika Minecraft."
 	},
 	"servers.grant-access-modal.target.label": {
-		"defaultMessage": "Nazwa użytkownika catálogo"
+		"defaultMessage": "Nazwa użytkownika Modrinth"
 	},
 	"servers.grant-access-modal.target.no-suggestions": {
 		"defaultMessage": "Nie znaleziono żadnych użytkowników."
 	},
 	"servers.grant-access-modal.target.placeholder": {
-		"defaultMessage": "Wprowadź nazwę użytkownika catálogo"
+		"defaultMessage": "Wprowadź nazwę użytkownika Modrinth"
 	},
 	"servers.grant-access-modal.target.searching": {
 		"defaultMessage": "Wyszukiwanie..."
@@ -5328,13 +5328,13 @@
 		"defaultMessage": "Instalacja modyfikacji za jednym kliknięciem"
 	},
 	"servers.list-empty.play-with-friends-description": {
-		"defaultMessage": "Zaproś znajomych do grania na swoim serwerze jednym kliknięciem z aplikacji catálogo."
+		"defaultMessage": "Zaproś znajomych do grania na swoim serwerze jednym kliknięciem z aplikacji Modrinth."
 	},
 	"servers.list-empty.play-with-friends-title": {
 		"defaultMessage": "Graj z przyjaciółmi"
 	},
 	"servers.list-empty.sign-in-button": {
-		"defaultMessage": "Zaloguj się na catálogo"
+		"defaultMessage": "Zaloguj się na Modrinth"
 	},
 	"servers.list-empty.simple-setup-description": {
 		"defaultMessage": "Ustaw serwer tak, jak zwykły świat w trybie jednoosobowym."
@@ -5391,7 +5391,7 @@
 		"defaultMessage": "Twoja subskrypcja zostanie anulowana dnia <date>{formattedDate}</date>. "
 	},
 	"servers.listing.notice.suspended": {
-		"defaultMessage": "Twój serwer został zawieszony. Skontaktuj się z obsługą catálogo, by dowiedzieć się więcej."
+		"defaultMessage": "Twój serwer został zawieszony. Skontaktuj się z obsługą Modrinth, by dowiedzieć się więcej."
 	},
 	"servers.listing.notice.upgrading": {
 		"defaultMessage": "Twój serwer jest aktualnie ulepszany i wkrótce zostanie włączony ponownie."
@@ -5409,7 +5409,7 @@
 		"defaultMessage": "Ikona serwera"
 	},
 	"servers.listing.support-label": {
-		"defaultMessage": "Obsługa catálogo"
+		"defaultMessage": "Obsługa Modrinth"
 	},
 	"servers.listing.using-project-label": {
 		"defaultMessage": "Używa {projectTitle}"
@@ -5424,7 +5424,7 @@
 		"defaultMessage": "Przesyłanie w toku"
 	},
 	"servers.manage.contact-support-button": {
-		"defaultMessage": "Skontaktuj się z obsługą catálogo"
+		"defaultMessage": "Skontaktuj się z obsługą Modrinth"
 	},
 	"servers.manage.error.alert-notice": {
 		"defaultMessage": "Nasze systemy automatycznie zawiadamiają nasz zespół, gdy występuje jakakolwiek awaria. Aktualnie przywracamy serwery do działania."
@@ -5439,7 +5439,7 @@
 		"defaultMessage": "Świeżo kupione serwery Hosting są najpierw wstawiane do kolejki i będą pokazane tutaj, gdy będą gotowe. <warning>Nie próbuj kupować od nowa serwera.</warning>"
 	},
 	"servers.manage.error.support-notice": {
-		"defaultMessage": "Jeżeli potrzebujesz spersonalizowanego wsparcia odnośnie do stanu Twojego serwera, skontaktuj się z obsługą catálogo."
+		"defaultMessage": "Jeżeli potrzebujesz spersonalizowanego wsparcia odnośnie do stanu Twojego serwera, skontaktuj się z obsługą Modrinth."
 	},
 	"servers.manage.error.title": {
 		"defaultMessage": "Serwery nie mogły zostać załadowane"
@@ -5472,7 +5472,7 @@
 		"defaultMessage": "Załaduj ponownie"
 	},
 	"servers.manage.resubscribe-error.text": {
-		"defaultMessage": "Wystąpił błąd podczas ponawiania subskrypcji do serwera catálogo."
+		"defaultMessage": "Wystąpił błąd podczas ponawiania subskrypcji do serwera Modrinth."
 	},
 	"servers.manage.resubscribe-error.title": {
 		"defaultMessage": "Błąd resubskrybcji"
@@ -5520,10 +5520,10 @@
 		"defaultMessage": "Okres próbny serwera od Medal zakończył się, więc Twój serwer został zawieszony. Musisz wybrać plan, by dalej móc korzystać z serwera."
 	},
 	"servers.medal-listing.notice.suspended": {
-		"defaultMessage": "Twój serwer został zawieszony. Zaktualizuj swoje dane rozliczeniowe lub skontaktuj się z obsługą catálogo, by dowiedzieć się więcej."
+		"defaultMessage": "Twój serwer został zawieszony. Zaktualizuj swoje dane rozliczeniowe lub skontaktuj się z obsługą Modrinth, by dowiedzieć się więcej."
 	},
 	"servers.medal-listing.notice.suspended-with-reason": {
-		"defaultMessage": "Twój serwer został zawieszony: {reason}. Zaktualizuj swoje dane rozliczeniowe lub skontaktuj się z obsługą catálogo, by dowiedzieć się więcej."
+		"defaultMessage": "Twój serwer został zawieszony: {reason}. Zaktualizuj swoje dane rozliczeniowe lub skontaktuj się z obsługą Modrinth, by dowiedzieć się więcej."
 	},
 	"servers.medal-listing.notice.upgrading": {
 		"defaultMessage": "Twój serwer jest aktualnie ulepszany i wkrótce zostanie włączony ponownie."
@@ -5754,7 +5754,7 @@
 		"defaultMessage": "Ustaw serwer"
 	},
 	"servers.setup.onboarding.step.choose.description": {
-		"defaultMessage": "Wybierz swoją ulubioną paczkę modów z catálogo lub wybierz loader i dodaj mody, które chcesz."
+		"defaultMessage": "Wybierz swoją ulubioną paczkę modów z Modrinth lub wybierz loader i dodaj mody, które chcesz."
 	},
 	"servers.setup.onboarding.step.choose.title": {
 		"defaultMessage": "Wybierz w co grać"
@@ -5859,7 +5859,7 @@
 		"defaultMessage": "Zaawansowane renderowanie"
 	},
 	"settings.display.sidebar.external-links-new-tab.description": {
-		"defaultMessage": "Spraw, aby linki prowadzące poza catálogo otwierały się w nowej karcie. Niezależnie od tego ustawienia linki w tej samej domenie i w opisach Markdown będą otwierane w tej samej karcie, a linki w reklamach i edytowanych stronach będą otwierane w nowej karcie."
+		"defaultMessage": "Spraw, aby linki prowadzące poza Modrinth otwierały się w nowej karcie. Niezależnie od tego ustawienia linki w tej samej domenie i w opisach Markdown będą otwierane w tej samej karcie, a linki w reklamach i edytowanych stronach będą otwierane w nowej karcie."
 	},
 	"settings.display.sidebar.external-links-new-tab.title": {
 		"defaultMessage": "Otwieraj linki zewnętrzne w nowej karcie"
@@ -5904,7 +5904,7 @@
 		"defaultMessage": "Używaj tych ustawień wszędzie, gdzie jesteś zalogowany. Wyłącz, by mieć inne ustawienia na tym urządzeniu."
 	},
 	"settings.display.theme.sync-across-devices.sign-in-tooltip": {
-		"defaultMessage": "Zaloguj się na catálogo, aby synchronizować motyw"
+		"defaultMessage": "Zaloguj się na Modrinth, aby synchronizować motyw"
 	},
 	"settings.display.theme.system": {
 		"defaultMessage": "Synchronizuj z systemem"
@@ -5961,7 +5961,7 @@
 		"defaultMessage": "Klucze dostępu osobistego"
 	},
 	"settings.preferences.update-failed.description": {
-		"defaultMessage": "Twoje ustawienia nie mogły zostać zapisane na Twoim koncie catálogo. Spróbuj ponownie."
+		"defaultMessage": "Twoje ustawienia nie mogły zostać zapisane na Twoim koncie Modrinth. Spróbuj ponownie."
 	},
 	"settings.preferences.update-failed.title": {
 		"defaultMessage": "Nie udało się zsynchronizować ustawień"
@@ -5979,7 +5979,7 @@
 		"defaultMessage": "Zdjęcie profilowe"
 	},
 	"settings.profile.public-information.description": {
-		"defaultMessage": "Twoje informacje profilowe są publicznie <profile-link>dostępne na catálogo</profile-link> i poprzez <docs-link>catálogo API</docs-link>."
+		"defaultMessage": "Twoje informacje profilowe są publicznie <profile-link>dostępne na Modrinth</profile-link> i poprzez <docs-link>Modrinth API</docs-link>."
 	},
 	"settings.profile.save-error": {
 		"defaultMessage": "Nie udało się zaktualizować profilu"
@@ -5988,10 +5988,10 @@
 		"defaultMessage": "Wystąpił błąd podczas aktualizowania profilu. Spróbuj ponownie później."
 	},
 	"settings.profile.sign-in-required.description": {
-		"defaultMessage": "Zaloguj się na konto catálogo, by dostosować swój publiczny profil."
+		"defaultMessage": "Zaloguj się na konto Modrinth, by dostosować swój publiczny profil."
 	},
 	"settings.profile.sign-in-required.title": {
-		"defaultMessage": "Wymagane jest konto catálogo"
+		"defaultMessage": "Wymagane jest konto Modrinth"
 	},
 	"settings.profile.username.description": {
 		"defaultMessage": "Unikatowa bez uwzględniania wielkości liter nazwa identyfikująca Twój profil."
@@ -6006,7 +6006,7 @@
 		"defaultMessage": "Użytkownik"
 	},
 	"settings.social.blocked-users.description": {
-		"defaultMessage": "Lista użytkowników zablokowanych na catálogo. Nie mogą oni:"
+		"defaultMessage": "Lista użytkowników zablokowanych na Modrinth. Nie mogą oni:"
 	},
 	"settings.social.blocked-users.empty": {
 		"defaultMessage": "Brak zablokowanych użytkowników."
@@ -6045,13 +6045,13 @@
 		"defaultMessage": "Awatar użytkownika {username}"
 	},
 	"settings.social.friend-requests.description": {
-		"defaultMessage": "Kontroluj, kto może wysyłać Ci zaproszenia do znajomych na catálogo."
+		"defaultMessage": "Kontroluj, kto może wysyłać Ci zaproszenia do znajomych na Modrinth."
 	},
 	"settings.social.friend-requests.title": {
 		"defaultMessage": "Zaproszenia do znajomych"
 	},
 	"settings.social.hosting-access.description": {
-		"defaultMessage": "Kontroluj, kto może zaprosić Cię do zarządzania serwerem hostingowym catálogo."
+		"defaultMessage": "Kontroluj, kto może zaprosić Cię do zarządzania serwerem hostingowym Modrinth."
 	},
 	"settings.social.hosting-access.title": {
 		"defaultMessage": "Hostowanie zaproszeń dostępu"
@@ -6084,10 +6084,10 @@
 		"defaultMessage": "Współdzielone zaproszenia do instancji"
 	},
 	"settings.social.sign-in-required.description": {
-		"defaultMessage": "Możesz kontrolować, kto może z Tobą pisać i zarządzać zablokowanymi użytkownikami na koncie catálogo"
+		"defaultMessage": "Możesz kontrolować, kto może z Tobą pisać i zarządzać zablokowanymi użytkownikami na koncie Modrinth"
 	},
 	"settings.social.sign-in-required.title": {
-		"defaultMessage": "Wymagane jest konto catálogo"
+		"defaultMessage": "Wymagane jest konto Modrinth"
 	},
 	"settings.social.title": {
 		"defaultMessage": "Społeczne"
@@ -6186,7 +6186,7 @@
 		"defaultMessage": "Zapisz"
 	},
 	"sharing.invite-players-modal.search-placeholder": {
-		"defaultMessage": "Wprowadź nazwę użytkownika catálogo"
+		"defaultMessage": "Wprowadź nazwę użytkownika Modrinth"
 	},
 	"sharing.invite-players-modal.searching": {
 		"defaultMessage": "Wyszukiwanie..."
@@ -6771,34 +6771,34 @@
 		"defaultMessage": "Wirusy są często rozpowszechniane poprzez pliki modów wysyłane na platformach takich jak Discord."
 	},
 	"unknown-file-warning-modal.mod-warning-body": {
-		"defaultMessage": " nie zostało opublikowane na catálogo. Zalecamy instalowanie plików tylko z źródeł, którym ufasz."
+		"defaultMessage": " nie zostało opublikowane na Modrinth. Zalecamy instalowanie plików tylko z źródeł, którym ufasz."
 	},
 	"unknown-file-warning-modal.mod-warning-title": {
 		"defaultMessage": "Ostrzeżenie o nieznanym pliku"
 	},
 	"unknown-file-warning-modal.modpack-warning-body": {
-		"defaultMessage": " zawiera pliki, które nie zostały opublikowane na catálogo. Zalecamy instalowanie plików tylko z źródeł, którym ufasz."
+		"defaultMessage": " zawiera pliki, które nie zostały opublikowane na Modrinth. Zalecamy instalowanie plików tylko z źródeł, którym ufasz."
 	},
 	"unknown-file-warning-modal.modpack-warning-title": {
 		"defaultMessage": "Ostrzeżenie o nieznanych plikach"
 	},
 	"unknown-file-warning-modal.reviewed-files": {
-		"defaultMessage": "Pliki nieopublikowane w catálogo nie są sprawdzane."
+		"defaultMessage": "Pliki nieopublikowane w Modrinth nie są sprawdzane."
 	},
 	"unknown-file-warning-modal.unrecognized-files": {
 		"defaultMessage": "Nieznane plki"
 	},
 	"user.profile.badge.alpha.about.1": {
-		"defaultMessage": "Ten użytkownik utworzył konto za czasów wersji alfa catálogo, trwającej do listopada 2020 r."
+		"defaultMessage": "Ten użytkownik utworzył konto za czasów wersji alfa Modrinth, trwającej do listopada 2020 r."
 	},
 	"user.profile.badge.alpha.name": {
 		"defaultMessage": "Tester wersji alfa"
 	},
 	"user.profile.badge.beta.about.1": {
-		"defaultMessage": "Ten użytkownik utworzył konto za czasów wersji beta catálogo, trwającej do lutego 2022 r."
+		"defaultMessage": "Ten użytkownik utworzył konto za czasów wersji beta Modrinth, trwającej do lutego 2022 r."
 	},
 	"user.profile.badge.beta.link": {
-		"defaultMessage": "Kliknij, aby przeczytać o uruchomieniu wersji beta catálogo."
+		"defaultMessage": "Kliknij, aby przeczytać o uruchomieniu wersji beta Modrinth."
 	},
 	"user.profile.badge.beta.name": {
 		"defaultMessage": "Tester wersji beta"
@@ -6852,22 +6852,22 @@
 		"defaultMessage": "Tester wersji alfa Hosting"
 	},
 	"user.profile.badge.moderator.about.1": {
-		"defaultMessage": "Ten użytkownik pracuje w catálogo jako moderator treści."
+		"defaultMessage": "Ten użytkownik pracuje w Modrinth jako moderator treści."
 	},
 	"user.profile.badge.moderator.about.2": {
-		"defaultMessage": "Moderatorzy treści na catálogo przeglądają projekty, odpowiadają na zgłoszenia i pomagają utrzymać porządek na catálogo."
+		"defaultMessage": "Moderatorzy treści na Modrinth przeglądają projekty, odpowiadają na zgłoszenia i pomagają utrzymać porządek na Modrinth."
 	},
 	"user.profile.badge.moderator.name": {
 		"defaultMessage": "Moderator treści"
 	},
 	"user.profile.badge.plus.about.1": {
-		"defaultMessage": "Ten użytkownik wspiera catálogo i wszystkich twórców na platformie."
+		"defaultMessage": "Ten użytkownik wspiera Modrinth i wszystkich twórców na platformie."
 	},
 	"user.profile.badge.plus.link": {
-		"defaultMessage": "Dowiedz się, jak zostać członkiem Premium del catálogo."
+		"defaultMessage": "Dowiedz się, jak zostać członkiem Modrinth+."
 	},
 	"user.profile.badge.plus.name": {
-		"defaultMessage": "Członek Premium del catálogo"
+		"defaultMessage": "Członek Modrinth+"
 	},
 	"user.profile.badge.pride.about.1": {
 		"defaultMessage": "Ten użytkownik wspierał choć jedną z naszych zbiórek na rzecz osób LGBTQ+."
@@ -6879,16 +6879,16 @@
 		"defaultMessage": "Wsparcie zbiórki na miesiąc dumy"
 	},
 	"user.profile.badge.staff.about.1": {
-		"defaultMessage": "Ten użytkownik pracuje w catálogo."
+		"defaultMessage": "Ten użytkownik pracuje w Modrinth."
 	},
 	"user.profile.badge.staff.name": {
-		"defaultMessage": "Zespół catálogo"
+		"defaultMessage": "Zespół Modrinth"
 	},
 	"user.role.moderator": {
 		"defaultMessage": "Moderator treści"
 	},
 	"user.role.modrinth-team": {
-		"defaultMessage": "Zespół catálogo"
+		"defaultMessage": "Zespół Modrinth"
 	},
 	"version.content.name": {
 		"defaultMessage": "Nazwa"

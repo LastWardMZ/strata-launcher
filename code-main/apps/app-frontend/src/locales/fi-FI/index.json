@@ -450,13 +450,13 @@
 		"message": "MINECON Earth 2017"
 	},
 	"app.skins.section.modrinth": {
-		"message": "catálogo"
+		"message": "Modrinth"
 	},
 	"app.skins.section.modrinth-pride": {
-		"message": "catálogo Pride"
+		"message": "Modrinth Pride"
 	},
 	"app.skins.section.modrinth-pride.tooltip": {
-		"message": "Sait nämä skinit lahjoittamalla catálogoin Pride-keräykseen Pride-kuukauden aikana."
+		"message": "Sait nämä skinit lahjoittamalla Modrinthin Pride-keräykseen Pride-kuukauden aikana."
 	},
 	"app.skins.section.mounts-of-mayhem": {
 		"message": "Sekasorron ratsut"

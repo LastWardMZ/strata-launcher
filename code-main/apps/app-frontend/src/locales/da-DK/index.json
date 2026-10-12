@@ -75,7 +75,7 @@
 		"message": "Opsætning af Minecraft fejlede"
 	},
 	"app.action-bar.install.summary.modrinth-unreachable": {
-		"message": "Kunne ikke få forbindelse til catálogo"
+		"message": "Kunne ikke få forbindelse til Modrinth"
 	},
 	"app.action-bar.install.summary.no-write-permission": {
 		"message": "Ingen tilladelse til at skrive"
@@ -132,7 +132,7 @@
 		"message": "Accepter alle"
 	},
 	"app.ads-consent.body": {
-		"message": "Reklamer gør catálogo muligt og finansiere skaber udbetalinger. Vores partnere må gemme og tilgå cookies i appen for at personliggøre reklamer og måle effektivitet."
+		"message": "Reklamer gør Modrinth muligt og finansiere skaber udbetalinger. Vores partnere må gemme og tilgå cookies i appen for at personliggøre reklamer og måle effektivitet."
 	},
 	"app.ads-consent.manage": {
 		"message": "Administrer præferencer"
@@ -141,7 +141,7 @@
 		"message": "Afvis alle"
 	},
 	"app.ads-consent.title": {
-		"message": "Dit privatliv og hvordan reklamer hjælper catálogo"
+		"message": "Dit privatliv og hvordan reklamer hjælper Modrinth"
 	},
 	"app.appearance-settings.compact-mode.description": {
 		"message": "Vis biblioteksinstanser i et kompakt række-layout."
@@ -186,7 +186,7 @@
 		"message": "Skjul højre sidebar"
 	},
 	"app.appearance-settings.unknown-pack-warning.description": {
-		"message": "Vis en sikkerhedsadvarsel, før du installerer en catálogo Pack (.mrpack), der ikke er hostet på catálogo."
+		"message": "Vis en sikkerhedsadvarsel, før du installerer en Modrinth Pack (.mrpack), der ikke er hostet på Modrinth."
 	},
 	"app.appearance-settings.unknown-pack-warning.title": {
 		"message": "Advar mig før jeg installere en ukendt modpacks"
@@ -210,7 +210,7 @@
 		"message": "Brug disse adfærdsindstillinger overalt du er logget på. Slå dette fra for at holde separate indstillinger på denne enhed."
 	},
 	"app.behavior-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "Log ind på en catálogo-konto for at synkronisere indstillinger."
+		"message": "Log ind på en Modrinth-konto for at synkronisere indstillinger."
 	},
 	"app.behavior-settings.sync-across-devices.title": {
 		"message": "Synkroniser adfærd på tværs af enheder"
@@ -675,13 +675,13 @@
 		"message": "MINECON Earth 2017"
 	},
 	"app.skins.section.modrinth": {
-		"message": "catálogo"
+		"message": "Modrinth"
 	},
 	"app.skins.section.modrinth-pride": {
-		"message": "catálogo Pride"
+		"message": "Modrinth Pride"
 	},
 	"app.skins.section.modrinth-pride.tooltip": {
-		"message": "Du modtog disse skins for at donere til en catálogo Pride indsamling imens der er Pride Month."
+		"message": "Du modtog disse skins for at donere til en Modrinth Pride indsamling imens der er Pride Month."
 	},
 	"app.skins.section.mounts-of-mayhem": {
 		"message": "Mounts of Mayhem"
@@ -1140,10 +1140,10 @@
 		"message": "Åbn browser igen"
 	},
 	"modal.modrinth-account-required.sign-in-button": {
-		"message": "Log ind på catálogo"
+		"message": "Log ind på Modrinth"
 	},
 	"modal.modrinth-account-required.sign-in-heading": {
-		"message": "Log ind med en catálogo konto"
+		"message": "Log ind med en Modrinth konto"
 	},
 	"modal.modrinth-account-required.signing-in-header": {
 		"message": "Logger ind"

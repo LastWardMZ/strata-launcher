@@ -96,7 +96,7 @@
 		"defaultMessage": "Không tìm được thứ bạn đang tìm kiếm!"
 	},
 	"browse.offline": {
-		"defaultMessage": "Bạn đã Mất kết nối. Hãy kết nối mạng để tìm kiếm catálogo!"
+		"defaultMessage": "Bạn đã Mất kết nối. Hãy kết nối mạng để tìm kiếm Modrinth!"
 	},
 	"browse.search.placeholder": {
 		"defaultMessage": "Tìm kiếm {projectType}..."
@@ -2298,7 +2298,7 @@
 		"defaultMessage": "Kiểm duyệt viên"
 	},
 	"omorphia.component.badge.label.modrinth-team": {
-		"defaultMessage": "Đội Ngũ catálogo"
+		"defaultMessage": "Đội Ngũ Modrinth"
 	},
 	"omorphia.component.badge.label.pending": {
 		"defaultMessage": "Đang chờ"
@@ -2718,7 +2718,7 @@
 		"defaultMessage": "{count} {countPlural, plural, one {lượt chơi gần đây} other {lượt chơi gần đây}}"
 	},
 	"project.recent-plays.tooltip": {
-		"defaultMessage": "{count} {countPlural, plural, one {lượt chơi gần đây} other {lượt chơi gần đây}} từ catálogo trong 2 tuần vừa qua"
+		"defaultMessage": "{count} {countPlural, plural, one {lượt chơi gần đây} other {lượt chơi gần đây}} từ Modrinth trong 2 tuần vừa qua"
 	},
 	"project.server.customModpackTooltip": {
 		"defaultMessage": "Dự án này có sử dụng modpack tuỳ chỉnh"
@@ -3030,7 +3030,7 @@
 		"defaultMessage": "Project của bạn có nhiều biến môi trường"
 	},
 	"project.settings.environment.notice.review-options.description": {
-		"defaultMessage": "Chúng tôi vừa nâng cấp hệ thống Môi trường trên catálogo và hiện đã có thêm các tùy chọn mới. Vui lòng đảm bảo bạn đã chọn đúng tùy chọn bên dưới và sau đó nhấp vào 'Xác nhận' khi hoàn tất!"
+		"defaultMessage": "Chúng tôi vừa nâng cấp hệ thống Môi trường trên Modrinth và hiện đã có thêm các tùy chọn mới. Vui lòng đảm bảo bạn đã chọn đúng tùy chọn bên dưới và sau đó nhấp vào 'Xác nhận' khi hoàn tất!"
 	},
 	"project.settings.environment.notice.review-options.title": {
 		"defaultMessage": "Xin hãy xem lại các lựa chọn bên dưới"
@@ -3150,7 +3150,7 @@
 		"defaultMessage": "Không công khai"
 	},
 	"project.visibility.unlisted-by-staff": {
-		"defaultMessage": "Đã bị ẩn bởi đội ngũ catálogo"
+		"defaultMessage": "Đã bị ẩn bởi đội ngũ Modrinth"
 	},
 	"report.item-type.content": {
 		"defaultMessage": "nội dung"
@@ -3882,7 +3882,7 @@
 		"defaultMessage": "Máy chủ mới"
 	},
 	"servers.list-empty.no-servers-description": {
-		"defaultMessage": "Cài mod, mời bạn bè, và chơi cùng nhau mà chỉ cần Ứng dụng catálogo."
+		"defaultMessage": "Cài mod, mời bạn bè, và chơi cùng nhau mà chỉ cần Ứng dụng Modrinth."
 	},
 	"servers.list-empty.one-click-mod-installs-description": {
 		"defaultMessage": "Chọn bản mod mà bạn yêu thích và chúng tôi sẽ làm tất cả phần còn lại."
@@ -3948,7 +3948,7 @@
 		"defaultMessage": "Gói đăng ký của bạn được thiết lập để hủy vào <date>{formattedDate}</date>. "
 	},
 	"servers.listing.notice.suspended": {
-		"defaultMessage": "Máy chủ của bạn đã bị đình chỉ, liên hệ bên hỗ trợ catálogo để biết thêm thông tin."
+		"defaultMessage": "Máy chủ của bạn đã bị đình chỉ, liên hệ bên hỗ trợ Modrinth để biết thêm thông tin."
 	},
 	"servers.listing.notice.upgrading": {
 		"defaultMessage": "Phần cứng máy chủ của bạn hiện đang được nâng cấp và sẽ hoạt động trở lại trong thời gian ngắn."
@@ -3975,7 +3975,7 @@
 		"defaultMessage": "Đang tải lên"
 	},
 	"servers.manage.contact-support-button": {
-		"defaultMessage": "Liên hệ bên hỗ trợ catálogo"
+		"defaultMessage": "Liên hệ bên hỗ trợ Modrinth"
 	},
 	"servers.manage.error.alert-notice": {
 		"defaultMessage": "Hệ thống của chúng tôi tự động báo cáo với đội ngũ khi có vấn đề. Chúng tôi đã cố gắng đưa nó trực tuyến."
@@ -3990,7 +3990,7 @@
 		"defaultMessage": "Nếu bạn đã từng mua máy chủ Hosting, nó đang trong hàng chờ và sẽ xuất hiện ở đây khi đã sẵn sàng. <warning>Tuyệt đối không được mua lại máy chủ mới.</warning>"
 	},
 	"servers.manage.error.support-notice": {
-		"defaultMessage": "Nếu bạn cần trợ giúp cá nhân liên quan đến trạng thái máy chủ, vui lòng liên hệ bên hỗ trợ catálogo."
+		"defaultMessage": "Nếu bạn cần trợ giúp cá nhân liên quan đến trạng thái máy chủ, vui lòng liên hệ bên hỗ trợ Modrinth."
 	},
 	"servers.manage.error.title": {
 		"defaultMessage": "Không tải được máy chủ"
@@ -4014,7 +4014,7 @@
 		"defaultMessage": "Làm mới"
 	},
 	"servers.manage.resubscribe-error.text": {
-		"defaultMessage": "Có lỗi xảy ra trong khi đăng ký lại cho máy chủ catálogo."
+		"defaultMessage": "Có lỗi xảy ra trong khi đăng ký lại cho máy chủ Modrinth."
 	},
 	"servers.manage.resubscribe-error.title": {
 		"defaultMessage": "Lỗi khi đăng ký lại"
@@ -4056,10 +4056,10 @@
 		"defaultMessage": "Thời gian dùng thử máy chủ Medal của bạn đã kết thúc và máy chủ của bạn đã bị đình chỉ. Vui lòng nâng cấp để tiếp tục sử dụng máy chủ."
 	},
 	"servers.medal-listing.notice.suspended": {
-		"defaultMessage": "Máy chủ của bạn đã bị đình chỉ. Vui lòng cập nhật thông tin thanh toán hoặc liên hệ với bên hỗ trợ của catálogo để biết thêm thông tin."
+		"defaultMessage": "Máy chủ của bạn đã bị đình chỉ. Vui lòng cập nhật thông tin thanh toán hoặc liên hệ với bên hỗ trợ của Modrinth để biết thêm thông tin."
 	},
 	"servers.medal-listing.notice.suspended-with-reason": {
-		"defaultMessage": "Máy chủ của bạn đã bị đình chỉ do: {reason}. Vui lòng cập nhật thông tin thanh toán hoặc liên hệ với bên hỗ trợ của catálogo để biết thêm thông tin."
+		"defaultMessage": "Máy chủ của bạn đã bị đình chỉ do: {reason}. Vui lòng cập nhật thông tin thanh toán hoặc liên hệ với bên hỗ trợ của Modrinth để biết thêm thông tin."
 	},
 	"servers.medal-listing.notice.upgrading": {
 		"defaultMessage": "Phần cứng máy chủ của bạn hiện đang được nâng cấp và sẽ hoạt động trở lại trong thời gian ngắn."
@@ -4881,7 +4881,7 @@
 		"defaultMessage": "Người dùng nãy đã có mặt từ thời Beta, kết thúc vào tháng hai năm 2022."
 	},
 	"user.profile.badge.beta.link": {
-		"defaultMessage": "Nhấp để tìm hiểu thêm vào sự ra mắt phiên bản Beta của catálogo."
+		"defaultMessage": "Nhấp để tìm hiểu thêm vào sự ra mắt phiên bản Beta của Modrinth."
 	},
 	"user.profile.badge.beta.name": {
 		"defaultMessage": "Người thử nghiệm Beta"
@@ -4893,37 +4893,37 @@
 		"defaultMessage": "{download_sum} Lượt tải xuống"
 	},
 	"user.profile.badge.early-datapack-adopter.about.1": {
-		"defaultMessage": "Người dùng này đã giúp chúng tôi thử nghiệm với các dự án gói dữ liệu trên catálogo trước khi chúng tôi phát hành chúng vào tháng giêng 2023."
+		"defaultMessage": "Người dùng này đã giúp chúng tôi thử nghiệm với các dự án gói dữ liệu trên Modrinth trước khi chúng tôi phát hành chúng vào tháng giêng 2023."
 	},
 	"user.profile.badge.early-datapack-adopter.name": {
 		"defaultMessage": "Người dùng gói dữ liệu sớm"
 	},
 	"user.profile.badge.early-modpack-adopter.about.1": {
-		"defaultMessage": "Người dùng này đã giúp chúng tôi thử nghiệm với các dự án Modpack trên catálogo trước khi chúng tôi phát hành chúng vào tháng năm, 2022."
+		"defaultMessage": "Người dùng này đã giúp chúng tôi thử nghiệm với các dự án Modpack trên Modrinth trước khi chúng tôi phát hành chúng vào tháng năm, 2022."
 	},
 	"user.profile.badge.early-modpack-adopter.name": {
 		"defaultMessage": "Người dùng Modpack sớm"
 	},
 	"user.profile.badge.early-plugin-adopter.about.1": {
-		"defaultMessage": "Người dùng này đã giúp chúng tôi thử nghiệm với các dự án Plugin trên catálogo trước khi chúng tôi phát hành chúng vào tháng tám 2022."
+		"defaultMessage": "Người dùng này đã giúp chúng tôi thử nghiệm với các dự án Plugin trên Modrinth trước khi chúng tôi phát hành chúng vào tháng tám 2022."
 	},
 	"user.profile.badge.early-plugin-adopter.name": {
 		"defaultMessage": "Người dùng Plugin sớm"
 	},
 	"user.profile.badge.early-resourcepack-adopter.about.1": {
-		"defaultMessage": "Người dùng này đã giúp chúng tôi thử nghiệm với các dự án gói tài nguyên trên catálogo trước khi chúng tôi phát hành chúng vào tháng tám 2022."
+		"defaultMessage": "Người dùng này đã giúp chúng tôi thử nghiệm với các dự án gói tài nguyên trên Modrinth trước khi chúng tôi phát hành chúng vào tháng tám 2022."
 	},
 	"user.profile.badge.early-resourcepack-adopter.name": {
 		"defaultMessage": "Người dùng gói tài nguyên sớm"
 	},
 	"user.profile.badge.early-server-adopter.about.1": {
-		"defaultMessage": "Người dùng này đã giúp chúng tôi thử nghiệm với các dự án máy chủ trên catálogo trước khi chúng tôi phát hành chúng vào tháng ba 2026."
+		"defaultMessage": "Người dùng này đã giúp chúng tôi thử nghiệm với các dự án máy chủ trên Modrinth trước khi chúng tôi phát hành chúng vào tháng ba 2026."
 	},
 	"user.profile.badge.early-server-adopter.name": {
 		"defaultMessage": "Người dùng Máy chủ sớm"
 	},
 	"user.profile.badge.early-shader-adopter.about.1": {
-		"defaultMessage": "Người dùng này đã giúp chúng tôi thử nghiệm với các dự án Shader trên catálogo trước khi chúng tôi phát hành chúng vào tháng giêng 2023."
+		"defaultMessage": "Người dùng này đã giúp chúng tôi thử nghiệm với các dự án Shader trên Modrinth trước khi chúng tôi phát hành chúng vào tháng giêng 2023."
 	},
 	"user.profile.badge.early-shader-adopter.name": {
 		"defaultMessage": "Người dùng Shader sớm"
@@ -4935,25 +4935,25 @@
 		"defaultMessage": "Người thử nghiệm Hosting"
 	},
 	"user.profile.badge.moderator.about.1": {
-		"defaultMessage": "Người dùng này làm cho bên kiểm duyệt nội dung catálogo."
+		"defaultMessage": "Người dùng này làm cho bên kiểm duyệt nội dung Modrinth."
 	},
 	"user.profile.badge.moderator.about.2": {
-		"defaultMessage": "Những người kiểm duyệt nội dung trên catálogo xem xét các dự án, xử lý báo cáo và giúp giữ cho catálogo an toàn."
+		"defaultMessage": "Những người kiểm duyệt nội dung trên Modrinth xem xét các dự án, xử lý báo cáo và giúp giữ cho Modrinth an toàn."
 	},
 	"user.profile.badge.moderator.name": {
 		"defaultMessage": "Thành viên bên kiểm duyệt nội dung"
 	},
 	"user.profile.badge.plus.about.1": {
-		"defaultMessage": "Người dùng này đang đóng góp và hỗ trợ cho catálogo và Nhà sáng tạo trên nên tảng."
+		"defaultMessage": "Người dùng này đang đóng góp và hỗ trợ cho Modrinth và Nhà sáng tạo trên nên tảng."
 	},
 	"user.profile.badge.plus.link": {
 		"defaultMessage": "Nhấp vào để xem cách làm thành viên."
 	},
 	"user.profile.badge.plus.name": {
-		"defaultMessage": "Thành viên Premium del catálogo"
+		"defaultMessage": "Thành viên Modrinth+"
 	},
 	"user.profile.badge.pride.about.1": {
-		"defaultMessage": "Người dùng này đã tham gia ít nhất một trong các hoạt động gây quỹ của catálogo dành cho cộng đồng LGBTQ+."
+		"defaultMessage": "Người dùng này đã tham gia ít nhất một trong các hoạt động gây quỹ của Modrinth dành cho cộng đồng LGBTQ+."
 	},
 	"user.profile.badge.pride.link": {
 		"defaultMessage": "Nhấp vào để ghé qua quỹ LGBT của chúng tôi."
@@ -4962,9 +4962,9 @@
 		"defaultMessage": "Người ủng hộ quỹ LGBT"
 	},
 	"user.profile.badge.staff.about.1": {
-		"defaultMessage": "Người dùng này là cộng tác viên catálogo."
+		"defaultMessage": "Người dùng này là cộng tác viên Modrinth."
 	},
 	"user.profile.badge.staff.name": {
-		"defaultMessage": "Đội ngũ catálogo"
+		"defaultMessage": "Đội ngũ Modrinth"
 	}
 }

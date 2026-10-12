@@ -336,13 +336,13 @@
 		"message": "MINECON Earth 2017"
 	},
 	"app.skins.section.modrinth": {
-		"message": "catálogo"
+		"message": "Modrinth"
 	},
 	"app.skins.section.modrinth-pride": {
-		"message": "catálogo Pride"
+		"message": "Modrinth Pride"
 	},
 	"app.skins.section.modrinth-pride.tooltip": {
-		"message": "Anda mendapat rupa ini karena telah berdonasi ke penggalangan dana catálogo Pride saat Pride Month."
+		"message": "Anda mendapat rupa ini karena telah berdonasi ke penggalangan dana Modrinth Pride saat Pride Month."
 	},
 	"app.skins.section.mounts-of-mayhem": {
 		"message": "Mounts of Mayhem"

@@ -78,7 +78,7 @@
 		"message": "Ustawianie Minecraft nie powiodło się"
 	},
 	"app.action-bar.install.summary.modrinth-unreachable": {
-		"message": "Nie udało się połączyć z serwerami catálogo"
+		"message": "Nie udało się połączyć z serwerami Modrinth"
 	},
 	"app.action-bar.install.summary.no-write-permission": {
 		"message": "Brak permisji, aby zapisać pliki"
@@ -135,7 +135,7 @@
 		"message": "Zaakceptuj wszystko"
 	},
 	"app.ads-consent.body": {
-		"message": "Reklamy pozwalają catálogo oraz fundują wypłaty twórców. Nasi partnerzy mogą zachować lub uzyskać dostęp ciasteczek w aplikacji, żeby spersonalizować reklamy i zmierzyć wydajność."
+		"message": "Reklamy pozwalają Modrinth oraz fundują wypłaty twórców. Nasi partnerzy mogą zachować lub uzyskać dostęp ciasteczek w aplikacji, żeby spersonalizować reklamy i zmierzyć wydajność."
 	},
 	"app.ads-consent.manage": {
 		"message": "Zarządzaj preferencjami"
@@ -144,7 +144,7 @@
 		"message": "Odrzuć wszystkie"
 	},
 	"app.ads-consent.title": {
-		"message": "Twoja prywatność i jak reklamy wspierają catálogo"
+		"message": "Twoja prywatność i jak reklamy wspierają Modrinth"
 	},
 	"app.appearance-settings.compact-mode.description": {
 		"message": "Wyświetlaj instancje biblioteki w kompaktowym układzie wierszy."
@@ -189,7 +189,7 @@
 		"message": "Ukryj prawy pasek boczny"
 	},
 	"app.appearance-settings.unknown-pack-warning.description": {
-		"message": "Pokaż ostrzeżenie o bezpieczeństwie przed zainstalowaniem Pakietu catálogo (.mrpack), które nie jest hostowane na catálogo."
+		"message": "Pokaż ostrzeżenie o bezpieczeństwie przed zainstalowaniem Pakietu Modrinth (.mrpack), które nie jest hostowane na Modrinth."
 	},
 	"app.appearance-settings.unknown-pack-warning.title": {
 		"message": "Ostrzegaj mnie przed instalowaniem nieznanych paczek modów"
@@ -213,7 +213,7 @@
 		"message": "Używaj tych ustawień wszędzie, gdzie jesteś zalogowany. Wyłącz, by mieć inne ustawienia na tym urządzeniu."
 	},
 	"app.behavior-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "Zaloguj się na konto catálogo, aby synchronizować ustawienia."
+		"message": "Zaloguj się na konto Modrinth, aby synchronizować ustawienia."
 	},
 	"app.behavior-settings.sync-across-devices.title": {
 		"message": "Synchronizuj ustawienia między urządzeniami"
@@ -453,7 +453,7 @@
 		"message": "Używaj tych ustawień funkcji na wszystkich urządzeniach, na których się logujesz. Wyłącz tę opcję, aby zachować osobne ustawienia na tym urządzeniu."
 	},
 	"app.features-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "Zaloguj się na konto catálogo, aby synchronizować ustawienia."
+		"message": "Zaloguj się na konto Modrinth, aby synchronizować ustawienia."
 	},
 	"app.features-settings.sync-across-devices.title": {
 		"message": "Synchronizuj funkcje między urządzeniami"
@@ -492,7 +492,7 @@
 		"message": "Pobierz aktualizację"
 	},
 	"app.hosting.update-required.rinthbot-alt": {
-		"message": "Podekscytowany catálogo Bot"
+		"message": "Podekscytowany Modrinth Bot"
 	},
 	"app.hosting.update-required.title": {
 		"message": "Wymagana aktualizacja Strata"
@@ -810,7 +810,7 @@
 		"message": "Zaloguj się jako"
 	},
 	"app.instance.shared-instance-wrong-account.signed-out-header": {
-		"message": "Musisz zalogować się na catálogo"
+		"message": "Musisz zalogować się na Modrinth"
 	},
 	"app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
 		"message": ", by otrzymywać aktualizacje dla tej udostępnionej instancji."
@@ -1242,10 +1242,10 @@
 		"message": "Zainstaluj"
 	},
 	"app.modal.install-to-play.invite-warning": {
-		"message": "To zaproszenie zostało utworzone przez innego użytkownika catálogo, nie przez firmę catálogo. Tylko akceptuj zaproszenia od osób, którym ufasz."
+		"message": "To zaproszenie zostało utworzone przez innego użytkownika Modrinth, nie przez firmę Modrinth. Tylko akceptuj zaproszenia od osób, którym ufasz."
 	},
 	"app.modal.install-to-play.invite-warning-with-creator": {
-		"message": "To zaproszenie zostało utworzone przez <creator>{username}</creator>, nie przez firmę catálogo. Akceptuj zaproszenia tylko od osób, którym ufasz."
+		"message": "To zaproszenie zostało utworzone przez <creator>{username}</creator>, nie przez firmę Modrinth. Akceptuj zaproszenia tylko od osób, którym ufasz."
 	},
 	"app.modal.install-to-play.managed-content.modpack-header": {
 		"message": "Zawartość paczki modów"
@@ -1278,7 +1278,7 @@
 		"message": "W przypadku pytań technicznych prosimy o kontakt z <support-link>Zespołem Obsługi Klienta</support-link>. Aby, zgłosić błąd wejdź na <github-link>GitHub issue</github-link>."
 	},
 	"app.modal.install-to-play.reviewed-files": {
-		"message": "Pliki nieopublikowane w catálogo nie są sprawdzane."
+		"message": "Pliki nieopublikowane w Modrinth nie są sprawdzane."
 	},
 	"app.modal.install-to-play.shared-instance": {
 		"message": "Przesłana Instalacja"
@@ -1287,10 +1287,10 @@
 		"message": "Treści w przesłanej ci instalacji"
 	},
 	"app.modal.install-to-play.shared-instance-unknown-files-description": {
-		"message": "Ta udostępniona instancja zawiera pliki, które nie zostały opublikowane na catálogo. Zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
+		"message": "Ta udostępniona instancja zawiera pliki, które nie zostały opublikowane na Modrinth. Zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
 	},
 	"app.modal.install-to-play.unknown-files-description": {
-		"message": "Ta serwerowa paczka modów zawiera pliki, które nie zostały opublikowane na catálogo. Zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
+		"message": "Ta serwerowa paczka modów zawiera pliki, które nie zostały opublikowane na Modrinth. Zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
 	},
 	"app.modal.install-to-play.unknown-files-warning": {
 		"message": "Ostrzeżenie o nieznanych plikach"
@@ -1311,7 +1311,7 @@
 		"message": "Usunięto"
 	},
 	"app.modal.update-to-play.server-modpack-unknown-files-description": {
-		"message": "Ta serwerowa paczka modów zawiera pliki, które nie zostały opublikowane na catálogo. Zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
+		"message": "Ta serwerowa paczka modów zawiera pliki, które nie zostały opublikowane na Modrinth. Zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
 	},
 	"app.modal.update-to-play.shared-instance-added-label": {
 		"message": "Dodano"
@@ -1320,7 +1320,7 @@
 		"message": "Usunięto"
 	},
 	"app.modal.update-to-play.shared-instance-unknown-files-description": {
-		"message": "Ta aktualizacja udostępnionej instancji zawiera pliki, które nie zostały opublikowane na catálogo. Zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
+		"message": "Ta aktualizacja udostępnionej instancji zawiera pliki, które nie zostały opublikowane na Modrinth. Zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
 	},
 	"app.modal.update-to-play.update-required": {
 		"message": "Wymagana jest aktualizacja"
@@ -1341,7 +1341,7 @@
 		"message": "Ładowanie profilu..."
 	},
 	"app.nav.modrinth-account": {
-		"message": "Konto catálogo"
+		"message": "Konto Modrinth"
 	},
 	"app.nav.modrinth-hosting": {
 		"message": "Hosting"
@@ -1353,13 +1353,13 @@
 		"message": "Zrzuty ekranu"
 	},
 	"app.nav.sign-in-to-modrinth-account": {
-		"message": "Zaloguj się do catálogo"
+		"message": "Zaloguj się do Modrinth"
 	},
 	"app.nav.switch-account": {
 		"message": "Zmień konto"
 	},
 	"app.nav.upgrade-to-modrinth-plus": {
-		"message": "Ulepsz do Premium del catálogo"
+		"message": "Ulepsz do Modrinth+"
 	},
 	"app.nav.view-profile": {
 		"message": "Pokaż profil"
@@ -1575,7 +1575,7 @@
 		"message": "Eksportuj ZIP"
 	},
 	"app.screenshots.selection.global-export-filename": {
-		"message": "Zrzuty ekranu catálogo.zip"
+		"message": "Zrzuty ekranu Strata.zip"
 	},
 	"app.screenshots.selection.instance-export-filename": {
 		"message": "{instance} Zrzuty ekranu.zip"
@@ -1881,7 +1881,7 @@
 		"message": "Niektóre instancje nie obsługują tego ustawienia"
 	},
 	"app.settings.game-options.compatibility.reason.launcher-controlled": {
-		"message": "Tym ustawieniem zarządzają opcje uruchamiania catálogo."
+		"message": "Tym ustawieniem zarządzają opcje uruchamiania Strata."
 	},
 	"app.settings.game-options.custom-value.placeholder": {
 		"message": "Wpisz wartość"
@@ -2715,7 +2715,7 @@
 		"message": "macOS"
 	},
 	"app.settings.privacy.ads-consent.intro": {
-		"message": "Reklamy pozwalają na dalsze działanie catálogo i finansują dochody dla twórców. Nasi partnerzy mogą gromadzić albo uzyskiwać dostęp do plików cookies w celu personalizacji reklam i mierzenia skuteczności."
+		"message": "Reklamy pozwalają na dalsze działanie Modrinth i finansują dochody dla twórców. Nasi partnerzy mogą gromadzić albo uzyskiwać dostęp do plików cookies w celu personalizacji reklam i mierzenia skuteczności."
 	},
 	"app.settings.privacy.discord-rich-presence.description": {
 		"message": "Pokazuj Strata jako aktywność na Discord. Nie wpływa to na Rich Presence dodane do instancji przez mody. Wymaga ponownego uruchomienia aplikacji."
@@ -2724,7 +2724,7 @@
 		"message": "Discord Rich Presence"
 	},
 	"app.settings.privacy.telemetry.description": {
-		"message": "catálogo zbiera anonimowe dane analityczne i użytkowania, aby poprawić komfort naszych użytkowników i dostosować Twoje doświadczenia. Wyłączając tę opcję, rezygnujesz i Twoje dane nie będą już gromadzone."
+		"message": "Strata doesn't collect or send usage data, so this setting has no effect. It's kept for compatibility."
 	},
 	"app.settings.privacy.telemetry.title": {
 		"message": "Telemetria"
@@ -2742,7 +2742,7 @@
 		"message": "Wyczyścić pamięć podręczną aplikacji?"
 	},
 	"app.settings.resource-management.app-cache.description": {
-		"message": "Wyczyść pamięć podręczną danych i pobierz ją ponownie z catálogo. Aplikacja może ładować się wolniej, dopóki pamięć podręczna nie zostanie odbudowana."
+		"message": "Wyczyść pamięć podręczną danych i pobierz ją ponownie z Modrinth. Aplikacja może ładować się wolniej, dopóki pamięć podręczna nie zostanie odbudowana."
 	},
 	"app.settings.resource-management.app-cache.purge": {
 		"message": "Wyczyść pamięć podręczną"
@@ -2763,7 +2763,7 @@
 		"message": "Przeglądaj lokalizację aplikacji"
 	},
 	"app.settings.resource-management.app-directory.description": {
-		"message": "Gdzie aplikacja catálogo przechowuje instancje i inne pliki. Wymaga ponownego uruchomienia aplikacji."
+		"message": "Gdzie aplikacja Modrinth przechowuje instancje i inne pliki. Wymaga ponownego uruchomienia aplikacji."
 	},
 	"app.settings.resource-management.app-directory.select": {
 		"message": "Wybierz nową lokalizację aplikacji"
@@ -2949,7 +2949,7 @@
 		"message": "Te ustawienia zmieniono w innym miejscu"
 	},
 	"app.settings.synced-options.game-settings.custom-empty": {
-		"message": "Ustawienia dodane przez mody pojawią się tutaj, gdy catálogo znajdzie je w jednej z twoich instancji."
+		"message": "Ustawienia dodane przez mody pojawią się tutaj, gdy Strata znajdzie je w jednej z twoich instancji."
 	},
 	"app.settings.synced-options.game-settings.description": {
 		"message": "Używaj tych samych ustawień gry we wszystkich instancjach."
@@ -3231,13 +3231,13 @@
 		"message": "MINECON Earth 2017"
 	},
 	"app.skins.section.modrinth": {
-		"message": "catálogo"
+		"message": "Modrinth"
 	},
 	"app.skins.section.modrinth-pride": {
-		"message": "Duma catálogo"
+		"message": "Duma Modrinth"
 	},
 	"app.skins.section.modrinth-pride.tooltip": {
-		"message": "Zdobyłeś te skórki poprzez dotację na zbiórkę Dumy catálogo w okresie Miesiąca Dumy."
+		"message": "Zdobyłeś te skórki poprzez dotację na zbiórkę Dumy Modrinth w okresie Miesiąca Dumy."
 	},
 	"app.skins.section.mounts-of-mayhem": {
 		"message": "Mounts of Mayhem"
@@ -3270,10 +3270,10 @@
 		"message": "Włącz"
 	},
 	"app.survey.body": {
-		"message": "Czy mógłbyś odpowiedzieć na kilka pytań dotyczących twoich doświadczeń z aplikacją catálogo?"
+		"message": "Czy mógłbyś odpowiedzieć na kilka pytań dotyczących twoich doświadczeń z aplikacją Modrinth?"
 	},
 	"app.survey.footer": {
-		"message": "Ta opinia przejdzie bezpośrednio do zespołu catálogo i pomoże w opracowaniu przyszłych aktualizacji!"
+		"message": "Ta opinia przejdzie bezpośrednio do zespołu Modrinth i pomoże w opracowaniu przyszłych aktualizacji!"
 	},
 	"app.survey.no-thanks": {
 		"message": "Nie, dziękuję"
@@ -3282,7 +3282,7 @@
 		"message": "Weź udział w ankiecie"
 	},
 	"app.survey.title": {
-		"message": "Cześć, użytkowniku catálogo!"
+		"message": "Cześć, użytkowniku Modrinth!"
 	},
 	"app.sync-instances-update.badge": {
 		"message": "Nowość w tej aktualizacji"
@@ -3603,7 +3603,7 @@
 		"message": "Wycofaj udostępnioną instancję"
 	},
 	"installation-settings.shared-instance.unpublish-description": {
-		"message": "Usuń tę udostępnioną instancję z catálogo i przestań wysyłać aktualizacje do użytkowników, którym jest udostępniona. Nie wpłynie to na twoją lokalną instancję."
+		"message": "Usuń tę udostępnioną instancję z Modrinth i przestań wysyłać aktualizacje do użytkowników, którym jest udostępniona. Nie wpłynie to na twoją lokalną instancję."
 	},
 	"installation-settings.shared-instance.unpublishing-button": {
 		"message": "Anulowanie publikacji..."
@@ -3903,7 +3903,7 @@
 		"message": "TNT"
 	},
 	"instance.icon-editor.symbol.wrenth-rinth": {
-		"message": "Klucz catálogo"
+		"message": "Klucz Modrinth"
 	},
 	"instance.icon-editor.symbol.zombie": {
 		"message": "Zombie"
@@ -4326,7 +4326,7 @@
 		"message": "Instancja źródłowa została usunięta. Instancja jest nadal dostępna, ale nie jest już połączona i nie będzie otrzymywać aktualizacji."
 	},
 	"instance.shared-instance.unavailable.locked-text": {
-		"message": "Ta udostępniona instancja została zablokowana przez zespół moderacyjny catálogo. Nie będzie otrzymywać dalszych aktualizacji z instancji źródłowej."
+		"message": "Ta udostępniona instancja została zablokowana przez zespół moderacyjny Modrinth. Nie będzie otrzymywać dalszych aktualizacji z instancji źródłowej."
 	},
 	"instance.shared-instance.unavailable.locked-title": {
 		"message": "Instancja zablokowana"
@@ -4470,7 +4470,7 @@
 		"message": "Utwórz konto"
 	},
 	"modal.modrinth-account-required.description": {
-		"message": "Musisz zalogować się na swoje konto catálogo, zanim będziesz mógł korzystać z tej funkcji."
+		"message": "Musisz zalogować się na swoje konto Modrinth, zanim będziesz mógł korzystać z tej funkcji."
 	},
 	"modal.modrinth-account-required.header": {
 		"message": "Konto wymagane"
@@ -4479,10 +4479,10 @@
 		"message": "Otwórz ponownie przeglądarkę"
 	},
 	"modal.modrinth-account-required.sign-in-button": {
-		"message": "Zaloguj się na catálogo"
+		"message": "Zaloguj się na Modrinth"
 	},
 	"modal.modrinth-account-required.sign-in-heading": {
-		"message": "Zaloguj się na konto catálogo"
+		"message": "Zaloguj się na konto Modrinth"
 	},
 	"modal.modrinth-account-required.signing-in-header": {
 		"message": "Trwa logowanie"
@@ -4500,7 +4500,7 @@
 		"message": "Zaloguj się do Minecraft"
 	},
 	"onboarding-checklist.login-modrinth": {
-		"message": "Zaloguj się na catálogo"
+		"message": "Zaloguj się na Modrinth"
 	},
 	"onboarding-checklist.title": {
 		"message": "Pierwsze kroki"

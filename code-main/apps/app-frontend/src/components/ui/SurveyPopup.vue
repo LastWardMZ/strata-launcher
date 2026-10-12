@@ -34,7 +34,7 @@ const availableSurvey = ref<Survey | null>(null)
 const messages = defineMessages({
 	surveyTitle: {
 		id: 'app.survey.title',
-		defaultMessage: 'Hey there catálogo user!',
+		defaultMessage: 'Hey there Modrinth user!',
 	},
 	surveyBody: {
 		id: 'app.survey.body',
@@ -44,7 +44,7 @@ const messages = defineMessages({
 	surveyFooter: {
 		id: 'app.survey.footer',
 		defaultMessage:
-			'This feedback will go directly to the catálogo team and help guide future updates!',
+			'This feedback will go directly to the Modrinth team and help guide future updates!',
 	},
 	takeSurvey: {
 		id: 'app.survey.take-survey',

@@ -290,12 +290,12 @@ const messages = defineMessages({
 	suspendedWithReasonNotice: {
 		id: 'servers.medal-listing.notice.suspended-with-reason',
 		defaultMessage:
-			'Your server has been suspended: {reason}. Please update your billing information or contact catálogo Support for more information.',
+			'Your server has been suspended: {reason}. Please update your billing information or contact Modrinth Support for more information.',
 	},
 	suspendedNotice: {
 		id: 'servers.medal-listing.notice.suspended',
 		defaultMessage:
-			'Your server has been suspended. Please update your billing information or contact catálogo Support for more information.',
+			'Your server has been suspended. Please update your billing information or contact Modrinth Support for more information.',
 	},
 })
 

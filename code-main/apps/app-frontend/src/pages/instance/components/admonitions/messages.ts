@@ -44,11 +44,11 @@ export const instanceAdmonitionsMessages = defineMessages({
 	},
 	sharedInstanceWrongAccountHeader: {
 		id: 'app.instance.shared-instance-wrong-account.warning-header',
-		defaultMessage: 'You are using the wrong catálogo account',
+		defaultMessage: 'You are using the wrong Modrinth account',
 	},
 	sharedInstanceSignedOutHeader: {
 		id: 'app.instance.shared-instance-wrong-account.signed-out-header',
-		defaultMessage: 'You need to sign in to catálogo',
+		defaultMessage: 'You need to sign in to Modrinth',
 	},
 	sharedInstanceWrongAccountSignInAs: {
 		id: 'app.instance.shared-instance-wrong-account.sign-in-as-label',

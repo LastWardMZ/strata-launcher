@@ -148,7 +148,7 @@ const messages = defineMessages({
 	},
 	officialAccount: {
 		id: 'profile.official-account',
-		defaultMessage: 'Official catálogo account',
+		defaultMessage: 'Official Modrinth account',
 	},
 	profileJoinedLabel: {
 		id: 'profile.label.joined',

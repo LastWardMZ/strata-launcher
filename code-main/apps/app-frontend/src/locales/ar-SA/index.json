@@ -78,7 +78,7 @@
 		"message": "فشل إعداد Minecraft"
 	},
 	"app.action-bar.install.summary.modrinth-unreachable": {
-		"message": "تعذّر الاتصال بـ catálogo"
+		"message": "تعذّر الاتصال بـ Modrinth"
 	},
 	"app.action-bar.install.summary.no-write-permission": {
 		"message": "لا يوجد إذن للكتابة"
@@ -135,7 +135,7 @@
 		"message": "قبول الكل"
 	},
 	"app.ads-consent.body": {
-		"message": "تُتيح الإعلانات استمرارية catálogo وتُمول مدفوعات المنشئين. قد يقوم شركاؤنا بتخزين أو الوصول إلى ملفات تعريف الارتباط (cookies) في التطبيق لتخصيص الإعلانات وقياس الأداء."
+		"message": "تُتيح الإعلانات استمرارية Modrinth وتُمول مدفوعات المنشئين. قد يقوم شركاؤنا بتخزين أو الوصول إلى ملفات تعريف الارتباط (cookies) في التطبيق لتخصيص الإعلانات وقياس الأداء."
 	},
 	"app.ads-consent.manage": {
 		"message": "إدارة التفضيلات"
@@ -144,7 +144,7 @@
 		"message": "رفض الكل"
 	},
 	"app.ads-consent.title": {
-		"message": "خصوصيتك وكيف تساهم الإعلانات في دعم catálogo"
+		"message": "خصوصيتك وكيف تساهم الإعلانات في دعم Modrinth"
 	},
 	"app.appearance-settings.compact-mode.description": {
 		"message": "عرض مثيلات المكتبة بتنسيق صفّي مضغوط."
@@ -165,7 +165,7 @@
 		"message": "إخفاء الاسم"
 	},
 	"app.appearance-settings.minimize-launcher.description": {
-		"message": "تصغير تطبيق catálogo عند تشغيل Minecraft."
+		"message": "تصغير تطبيق Strata عند تشغيل Minecraft."
 	},
 	"app.appearance-settings.minimize-launcher.title": {
 		"message": "تصغير التطبيق"
@@ -189,7 +189,7 @@
 		"message": "قم بإخفاء الشريط الجانبي الأيمن"
 	},
 	"app.appearance-settings.unknown-pack-warning.description": {
-		"message": "إظهار تحذير أمان قبل تثبيت مودباك catálogo (.mrpack) غير المستضاف على catálogo."
+		"message": "إظهار تحذير أمان قبل تثبيت مودباك Modrinth (.mrpack) غير المستضاف على Modrinth."
 	},
 	"app.appearance-settings.unknown-pack-warning.title": {
 		"message": "أخبرني قبل تثبيت المودباكات غير المعروفة"
@@ -390,16 +390,16 @@
 		"message": "عرض النسخة"
 	},
 	"app.hosting.update-required.description": {
-		"message": "يجب عليك التحديث لاستخدام Hosting بواسطة تطبيق catálogo"
+		"message": "يجب عليك التحديث لاستخدام Hosting بواسطة تطبيق Strata"
 	},
 	"app.hosting.update-required.download": {
 		"message": "نزّل للتحديث"
 	},
 	"app.hosting.update-required.rinthbot-alt": {
-		"message": "بوت catálogo المتحمّس"
+		"message": "بوت Modrinth المتحمّس"
 	},
 	"app.hosting.update-required.title": {
-		"message": "يلزم تحديث تطبيق catálogo"
+		"message": "يلزم تحديث تطبيق Modrinth"
 	},
 	"app.install.phase.downloading_content": {
 		"message": "جارٍ تنزيل المحتوى"
@@ -729,7 +729,7 @@
 		"message": "لتلقي التحديثات لهذه النسخة المشتركة."
 	},
 	"app.instance.shared-instance-wrong-account.warning-header": {
-		"message": "أنت تستخدم حساب catálogo الخاطئ"
+		"message": "أنت تستخدم حساب Modrinth الخاطئ"
 	},
 	"app.instance.shortcut.created": {
 		"message": "تم إنشاء الاختصار"
@@ -1143,10 +1143,10 @@
 		"message": "تثبيت"
 	},
 	"app.modal.install-to-play.invite-warning": {
-		"message": "تم إنشاء هذه الدعوة بواسطة مستخدم catálogo آخر، وليس catálogo. لا تقبل الدعوات إلا من الأشخاص الذين تثق بهم فقط."
+		"message": "تم إنشاء هذه الدعوة بواسطة مستخدم Modrinth آخر، وليس Modrinth. لا تقبل الدعوات إلا من الأشخاص الذين تثق بهم فقط."
 	},
 	"app.modal.install-to-play.invite-warning-with-creator": {
-		"message": "تم إنشاء دعوة الانضمام هذه بواسطة <creator>{username}</creator>، وليس بواسطة catálogo. لا تقبل الدعوات إلا من أشخاص تثق بهم."
+		"message": "تم إنشاء دعوة الانضمام هذه بواسطة <creator>{username}</creator>، وليس بواسطة Modrinth. لا تقبل الدعوات إلا من أشخاص تثق بهم."
 	},
 	"app.modal.install-to-play.managed-content.modpack-header": {
 		"message": "محتوى المودباك"
@@ -1179,7 +1179,7 @@
 		"message": "لطلبات الدعم، تواصل مع <support-link>فريق الدعم</support-link>. وللإبلاغ عن الأخطاء، أنشئ <github-link>بلاغًا على GitHub</github-link>."
 	},
 	"app.modal.install-to-play.reviewed-files": {
-		"message": "الملفات التي لم يتم نشرها على catálogo لا يتم مراجعتها."
+		"message": "الملفات التي لم يتم نشرها على Modrinth لا يتم مراجعتها."
 	},
 	"app.modal.install-to-play.shared-instance": {
 		"message": "النماذج المشتركة"
@@ -1188,10 +1188,10 @@
 		"message": "محتوى النسخة المشتركة"
 	},
 	"app.modal.install-to-play.shared-instance-unknown-files-description": {
-		"message": "تحتوي هذه النسخة المُشاركة على ملفات غير منشور على catálogo. نوصي بشدة بعدم تثبيت الملفات إلا من مصادر تثق بها فقط."
+		"message": "تحتوي هذه النسخة المُشاركة على ملفات غير منشور على Modrinth. نوصي بشدة بعدم تثبيت الملفات إلا من مصادر تثق بها فقط."
 	},
 	"app.modal.install-to-play.unknown-files-description": {
-		"message": "تحتوي مودباك السيرفر هذا على ملفات غير منشور على catálogo. نوصي بشدة بعدم تثبيت الملفات إلا من مصادر تثق بها فقط."
+		"message": "تحتوي مودباك السيرفر هذا على ملفات غير منشور على Modrinth. نوصي بشدة بعدم تثبيت الملفات إلا من مصادر تثق بها فقط."
 	},
 	"app.modal.install-to-play.unknown-files-warning": {
 		"message": "تحذير ملفات غير معروفة"
@@ -1212,7 +1212,7 @@
 		"message": "تمت الإزالة"
 	},
 	"app.modal.update-to-play.server-modpack-unknown-files-description": {
-		"message": "يحتوي تحديث مودباك السيرفر هذا على ملفات غير منشور على catálogo. نوصي بشدة بعدم تثبيت الملفات إلا من مصادر تثق بها فقط."
+		"message": "يحتوي تحديث مودباك السيرفر هذا على ملفات غير منشور على Modrinth. نوصي بشدة بعدم تثبيت الملفات إلا من مصادر تثق بها فقط."
 	},
 	"app.modal.update-to-play.shared-instance-added-label": {
 		"message": "تمت الإضافة"
@@ -1221,7 +1221,7 @@
 		"message": "تمت الإزالة"
 	},
 	"app.modal.update-to-play.shared-instance-unknown-files-description": {
-		"message": "يحتوي تحديث هذه النسخة المُشاركة على ملفات غير منشور على catálogo. نوصي بشدة بعدم تثبيت الملفات إلا من مصادر تثق بها فقط."
+		"message": "يحتوي تحديث هذه النسخة المُشاركة على ملفات غير منشور على Modrinth. نوصي بشدة بعدم تثبيت الملفات إلا من مصادر تثق بها فقط."
 	},
 	"app.modal.update-to-play.update-required": {
 		"message": "يلزم التحديث"
@@ -1242,10 +1242,10 @@
 		"message": "جاري تحميل الملف الشخصي..."
 	},
 	"app.nav.modrinth-account": {
-		"message": "حساب catálogo"
+		"message": "حساب Modrinth"
 	},
 	"app.nav.modrinth-hosting": {
-		"message": "استضافة catálogo"
+		"message": "استضافة Modrinth"
 	},
 	"app.nav.remove-account": {
 		"message": "إزالة الحساب"
@@ -1260,7 +1260,7 @@
 		"message": "تبديل الحساب"
 	},
 	"app.nav.upgrade-to-modrinth-plus": {
-		"message": "الترقية إلى Premium del catálogo"
+		"message": "الترقية إلى Modrinth+"
 	},
 	"app.nav.view-profile": {
 		"message": "عرض الملف الشخصي"
@@ -1473,7 +1473,7 @@
 		"message": "تصدير ZIP"
 	},
 	"app.screenshots.selection.global-export-filename": {
-		"message": "catálogo screenshots.zip"
+		"message": "Strata screenshots.zip"
 	},
 	"app.screenshots.selection.instance-export-filename": {
 		"message": "{instance} screenshots.zip"
@@ -1503,7 +1503,7 @@
 		"message": "الاقدم"
 	},
 	"app.settings.app-version": {
-		"message": "تطبيق catálogo {version}"
+		"message": "تطبيق Modrinth {version}"
 	},
 	"app.settings.default-instance-options.environment-variables.description": {
 		"message": "متغيرات البيئة المحددة عند تشغيل النسخة."
@@ -1704,16 +1704,16 @@
 		"message": "macOS"
 	},
 	"app.settings.privacy.ads-consent.intro": {
-		"message": "الإعلانات تجعل catálogo ممكناً وتمول مدفوعات المنشئين. قد يقوم شركاؤنا بتخزين أو الوصول إلى ملفات تعريف الارتباط (cookies) في التطبيق لتخصيص الإعلانات وقياس الأداء. يمكنك إلغاء الاشتراك أو إدارة تفضيلاتك أدناه."
+		"message": "الإعلانات تجعل Modrinth ممكناً وتمول مدفوعات المنشئين. قد يقوم شركاؤنا بتخزين أو الوصول إلى ملفات تعريف الارتباط (cookies) في التطبيق لتخصيص الإعلانات وقياس الأداء. يمكنك إلغاء الاشتراك أو إدارة تفضيلاتك أدناه."
 	},
 	"app.settings.privacy.discord-rich-presence.description": {
-		"message": "إظهار تطبيق catálogo كنشاطك الحالي على Discord. لا يؤثر هذا على الـ Rich Presence المُضاف للنسخ بواسطة المودات. يتطلب إعادة تشغيل التطبيق."
+		"message": "إظهار تطبيق Modrinth كنشاطك الحالي على Discord. لا يؤثر هذا على الـ Rich Presence المُضاف للنسخ بواسطة المودات. يتطلب إعادة تشغيل التطبيق."
 	},
 	"app.settings.privacy.discord-rich-presence.title": {
 		"message": "Discord Rich Presence"
 	},
 	"app.settings.privacy.telemetry.description": {
-		"message": "يجمع catálogo بيانات تحليلات واستخدام مجهولة الهوية لتحسين تجربة المستخدم وتخصيص تجربتك. عند تعطيل هذا الخيار، فإنك تلغي الاشتراك ولن يتم جمع بياناتك بعد الآن."
+		"message": "Strata doesn't collect or send usage data, so this setting has no effect. It's kept for compatibility."
 	},
 	"app.settings.privacy.telemetry.title": {
 		"message": "بيانات قياس الاستخدام"
@@ -1731,7 +1731,7 @@
 		"message": "هل تريد مسح التخزين المؤقت للتطبيق؟"
 	},
 	"app.settings.resource-management.app-cache.description": {
-		"message": "مسح البيانات المخبأة (الذاكرة المؤقتة) وتنزيلها مرة أخرى من catálogo. قد يتم تحميل التطبيق بشكل أبطأ حتى يتم إعادة بناء الذاكرة المؤقتة."
+		"message": "مسح البيانات المخبأة (الذاكرة المؤقتة) وتنزيلها مرة أخرى من Modrinth. قد يتم تحميل التطبيق بشكل أبطأ حتى يتم إعادة بناء الذاكرة المؤقتة."
 	},
 	"app.settings.resource-management.app-cache.purge": {
 		"message": "مسح التخزين المؤقت"
@@ -1752,7 +1752,7 @@
 		"message": "تصفح لاختيار مجلد التطبيق"
 	},
 	"app.settings.resource-management.app-directory.description": {
-		"message": "المكان الذي يخزن فيه تطبيق catálogo النسخ والملفات الأخرى. تسري التغييرات بعد إعادة تشغيل التطبيق."
+		"message": "المكان الذي يخزن فيه تطبيق Modrinth النسخ والملفات الأخرى. تسري التغييرات بعد إعادة تشغيل التطبيق."
 	},
 	"app.settings.resource-management.app-directory.select": {
 		"message": "حدد مجلد تطبيق جديد"
@@ -1965,13 +1965,13 @@
 		"message": "MINECON Earth 2017"
 	},
 	"app.skins.section.modrinth": {
-		"message": "catálogo"
+		"message": "Modrinth"
 	},
 	"app.skins.section.modrinth-pride": {
-		"message": "فخر catálogo"
+		"message": "فخر Modrinth"
 	},
 	"app.skins.section.modrinth-pride.tooltip": {
-		"message": "لقد حصلت على هذه أشكال الشخصيات مقابل تبرعك لحملة جمع التبرعات التي نظمتها catálogo Pride خلال شهر الفخر."
+		"message": "لقد حصلت على هذه أشكال الشخصيات مقابل تبرعك لحملة جمع التبرعات التي نظمتها Modrinth Pride خلال شهر الفخر."
 	},
 	"app.skins.section.mounts-of-mayhem": {
 		"message": "جبال الفوضى"
@@ -2004,10 +2004,10 @@
 		"message": "تشغيل"
 	},
 	"app.survey.body": {
-		"message": "هل تمانع في الإجابة على بضعة أسئلة حول تجربتك مع تطبيق catálogo؟"
+		"message": "هل تمانع في الإجابة على بضعة أسئلة حول تجربتك مع تطبيق Modrinth؟"
 	},
 	"app.survey.footer": {
-		"message": "ستنتقل هذه الملاحظات مباشرة إلى فريق catálogo وتساعد في توجيه التحديثات القادمة!أهلاً بك يا مستخدم catálogo!"
+		"message": "ستنتقل هذه الملاحظات مباشرة إلى فريق Modrinth وتساعد في توجيه التحديثات القادمة!أهلاً بك يا مستخدم Modrinth!"
 	},
 	"app.survey.no-thanks": {
 		"message": "لا شكراً"
@@ -2016,16 +2016,16 @@
 		"message": "شارك في الاستطلاع"
 	},
 	"app.survey.title": {
-		"message": "أهلاً بك يا مستخدم catálogo!"
+		"message": "أهلاً بك يا مستخدم Modrinth!"
 	},
 	"app.update-popup.body.download-complete": {
-		"message": "انتهى تنزيل تطبيق catálogo v{version}. أعد التحميل للتحديث الآن، أو تلقائيًا عند إغلاق تطبيق catálogo."
+		"message": "انتهى تنزيل تطبيق Modrinth v{version}. أعد التحميل للتحديث الآن، أو تلقائيًا عند إغلاق تطبيق Modrinth."
 	},
 	"app.update-popup.body.linux": {
 		"message": "يتوفر الآن Strata v{version}. استخدم مدير الحزم لتحديث التطبيق والحصول على أحدث الميزات والإصلاحات!"
 	},
 	"app.update-popup.body.metered": {
-		"message": "تطبيق catálogo v{version} متاح الآن! وبما أنك متصل بشبكة مقيّدة، لم نقم بتنزيله تلقائيًا."
+		"message": "تطبيق Modrinth v{version} متاح الآن! وبما أنك متصل بشبكة مقيّدة، لم نقم بتنزيله تلقائيًا."
 	},
 	"app.update-popup.changelog": {
 		"message": "سجل التغيير"
@@ -2208,7 +2208,7 @@
 		"message": "إلغاء نشر النسخة المُشاركة"
 	},
 	"installation-settings.shared-instance.unpublish-description": {
-		"message": "إزالة هذه النسخة المُشاركة من catálogo والتوقف عن إرسال التحديثات لأي شخص يستخدمها. لن تتأثر نسختك المحلية."
+		"message": "إزالة هذه النسخة المُشاركة من Modrinth والتوقف عن إرسال التحديثات لأي شخص يستخدمها. لن تتأثر نسختك المحلية."
 	},
 	"installation-settings.shared-instance.unpublishing-button": {
 		"message": "جاري إلغاء النشر..."
@@ -2223,7 +2223,7 @@
 		"message": "إلغاء ربط النسخة المُشاركة"
 	},
 	"installation-settings.unpublish-shared-instance.modal.admonition-body": {
-		"message": "سيؤدي هذا إلى حذف النسخة المُشاركة من خوادم catálogo. سيتوقف الأشخاص الذين يستخدمونها على تطبيق catálogo عن تلقي التحديثات، ولكن ستظل نسختك المحلية ومحتواها على هذا الجهاز."
+		"message": "سيؤدي هذا إلى حذف النسخة المُشاركة من خوادم Modrinth. سيتوقف الأشخاص الذين يستخدمونها على تطبيق Strata عن تلقي التحديثات، ولكن ستظل نسختك المحلية ومحتواها على هذا الجهاز."
 	},
 	"installation-settings.unpublish-shared-instance.modal.admonition-header": {
 		"message": "جاري إلغاء نشر النسخة المُشاركة"
@@ -2505,7 +2505,7 @@
 		"message": "متفجراة"
 	},
 	"instance.icon-editor.symbol.wrenth-rinth": {
-		"message": "مفتاح catálogo"
+		"message": "مفتاح Modrinth"
 	},
 	"instance.icon-editor.symbol.zombie": {
 		"message": "زومبي"
@@ -3042,10 +3042,10 @@
 		"message": "افتح المتصفح مرة أخرى"
 	},
 	"modal.modrinth-account-required.sign-in-button": {
-		"message": "تسجيل الدخول إلى catálogo"
+		"message": "تسجيل الدخول إلى Modrinth"
 	},
 	"modal.modrinth-account-required.sign-in-heading": {
-		"message": "تسجيل الدخول إلى حساب catálogo"
+		"message": "تسجيل الدخول إلى حساب Modrinth"
 	},
 	"modal.modrinth-account-required.signing-in-header": {
 		"message": "جار تسجيل الدخول"
@@ -3063,7 +3063,7 @@
 		"message": "تسجيل الدخول إلى ماين كرافت"
 	},
 	"onboarding-checklist.login-modrinth": {
-		"message": "تسجيل الدخول إلى catálogo"
+		"message": "تسجيل الدخول إلى Modrinth"
 	},
 	"onboarding-checklist.title": {
 		"message": "ابدأ ألان"

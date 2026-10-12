@@ -60,7 +60,7 @@ import { appMessages } from '@/utils/app-messages'
 useRootBreadcrumb({
 	slot: 'root',
 	id: 'skins',
-	label: 'Skin selector',
+	label: useVIntl().formatMessage(appMessages.skinSelectorLabel),
 	to: '/skins',
 	visual: { type: 'icon', component: ShirtIcon },
 })
@@ -76,16 +76,16 @@ const EARS_NOTICE_PLACEHOLDER = '__EARS_MOD_NAME__'
 const messages = defineMessages({
 	modrinthPrideSection: {
 		id: 'app.skins.section.modrinth-pride',
-		defaultMessage: 'catálogo Pride',
+		defaultMessage: 'Modrinth Pride',
 	},
 	modrinthPrideTooltip: {
 		id: 'app.skins.section.modrinth-pride.tooltip',
 		defaultMessage:
-			'You received these skins for donating to a catálogo Pride fundraiser during Pride Month.',
+			'You received these skins for donating to a Modrinth Pride fundraiser during Pride Month.',
 	},
 	modrinthSection: {
 		id: 'app.skins.section.modrinth',
-		defaultMessage: 'catálogo',
+		defaultMessage: 'Modrinth',
 	},
 	defaultSkinsSection: {
 		id: 'app.skins.section.default-skins',

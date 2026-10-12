@@ -78,7 +78,7 @@
 		"message": "無法設定 Minecraft"
 	},
 	"app.action-bar.install.summary.modrinth-unreachable": {
-		"message": "無法連線到 catálogo"
+		"message": "無法連線到 Modrinth"
 	},
 	"app.action-bar.install.summary.no-write-permission": {
 		"message": "沒有寫入權限"
@@ -135,7 +135,7 @@
 		"message": "全部接受"
 	},
 	"app.ads-consent.body": {
-		"message": "廣告使 catálogo 得以營運，並為創作者提供收益。我們的合作夥伴可能會在應用程式中儲存或存取 Cookie，以實現個人化廣告並衡量廣告成效。"
+		"message": "廣告使 Modrinth 得以營運，並為創作者提供收益。我們的合作夥伴可能會在應用程式中儲存或存取 Cookie，以實現個人化廣告並衡量廣告成效。"
 	},
 	"app.ads-consent.manage": {
 		"message": "管理偏好設定"
@@ -144,7 +144,7 @@
 		"message": "全部拒絕"
 	},
 	"app.ads-consent.title": {
-		"message": "關於你的隱私，以及廣告如何幫助 catálogo"
+		"message": "關於你的隱私，以及廣告如何幫助 Modrinth"
 	},
 	"app.appearance-settings.compact-mode.description": {
 		"message": "以密集的橫列版面顯示遊戲庫實例。"
@@ -189,7 +189,7 @@
 		"message": "隱藏右側邊欄"
 	},
 	"app.appearance-settings.unknown-pack-warning.description": {
-		"message": "在安裝非託管於 catálogo 的 catálogo Pack（.mrpack）之前，顯示安全警告。"
+		"message": "在安裝非託管於 Modrinth 的 Modrinth Pack（.mrpack）之前，顯示安全警告。"
 	},
 	"app.appearance-settings.unknown-pack-warning.title": {
 		"message": "在安裝未知模組包前發出警告"
@@ -213,7 +213,7 @@
 		"message": "在你登入的所有裝置套用這些行為設定。如果要在這個裝置上單獨設定，請關閉這個選項。"
 	},
 	"app.behavior-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "登入 catálogo 帳號即可同步設定。"
+		"message": "登入 Modrinth 帳號即可同步設定。"
 	},
 	"app.behavior-settings.sync-across-devices.title": {
 		"message": "同步所有裝置的行為"
@@ -453,7 +453,7 @@
 		"message": "在你登入的所有裝置套用這些功能設定。如果要在這個裝置上單獨設定，請關閉這個選項。"
 	},
 	"app.features-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "登入 catálogo 帳號即可同步設定。"
+		"message": "登入 Modrinth 帳號即可同步設定。"
 	},
 	"app.features-settings.sync-across-devices.title": {
 		"message": "同步所有裝置的功能"
@@ -492,7 +492,7 @@
 		"message": "下載即可更新"
 	},
 	"app.hosting.update-required.rinthbot-alt": {
-		"message": "興奮的 catálogo Bot"
+		"message": "興奮的 Modrinth Bot"
 	},
 	"app.hosting.update-required.title": {
 		"message": "需要更新 Strata"
@@ -822,13 +822,13 @@
 		"message": "你需要以"
 	},
 	"app.instance.shared-instance-wrong-account.signed-out-header": {
-		"message": "你需要登入 catálogo"
+		"message": "你需要登入 Modrinth"
 	},
 	"app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
 		"message": "登入才能收到這個共用實例的更新。"
 	},
 	"app.instance.shared-instance-wrong-account.warning-header": {
-		"message": "你目前使用的 catálogo 帳號不正確"
+		"message": "你目前使用的 Modrinth 帳號不正確"
 	},
 	"app.instance.shortcut.created": {
 		"message": "已建立捷徑"
@@ -1254,10 +1254,10 @@
 		"message": "安裝"
 	},
 	"app.modal.install-to-play.invite-warning": {
-		"message": "這份邀請是由另一位 catálogo 使用者建立，並非由 catálogo 官方建立。請僅接受來自你信任的人的邀請。"
+		"message": "這份邀請是由另一位 Modrinth 使用者建立，並非由 Modrinth 官方建立。請僅接受來自你信任的人的邀請。"
 	},
 	"app.modal.install-to-play.invite-warning-with-creator": {
-		"message": "這份邀請是由 <creator>{username}</creator> 建立，並非由 catálogo 官方建立。請僅接受來自你信任的人的邀請。"
+		"message": "這份邀請是由 <creator>{username}</creator> 建立，並非由 Modrinth 官方建立。請僅接受來自你信任的人的邀請。"
 	},
 	"app.modal.install-to-play.managed-content.modpack-header": {
 		"message": "模組包內容"
@@ -1290,7 +1290,7 @@
 		"message": "如需客服支援，請聯絡我們的<support-link>客服團隊</support-link>。如需回報錯誤，請<github-link>在 GitHub 上提交 issue</github-link>。"
 	},
 	"app.modal.install-to-play.reviewed-files": {
-		"message": "未在 catálogo 上發布的檔案未經過審查。"
+		"message": "未在 Modrinth 上發布的檔案未經過審查。"
 	},
 	"app.modal.install-to-play.shared-instance": {
 		"message": "共用實例"
@@ -1299,10 +1299,10 @@
 		"message": "共用實例的內容"
 	},
 	"app.modal.install-to-play.shared-instance-unknown-files-description": {
-		"message": "這個共用實例包含未在 catálogo 上發布的檔案。強烈建議你僅安裝來自信任來源的檔案。"
+		"message": "這個共用實例包含未在 Modrinth 上發布的檔案。強烈建議你僅安裝來自信任來源的檔案。"
 	},
 	"app.modal.install-to-play.unknown-files-description": {
-		"message": "這個伺服器模組包中包含未在 catálogo 上發布的檔案。強烈建議你僅安裝來自信任來源的檔案。"
+		"message": "這個伺服器模組包中包含未在 Modrinth 上發布的檔案。強烈建議你僅安裝來自信任來源的檔案。"
 	},
 	"app.modal.install-to-play.unknown-files-warning": {
 		"message": "未知檔案警告"
@@ -1323,7 +1323,7 @@
 		"message": "已移除"
 	},
 	"app.modal.update-to-play.server-modpack-unknown-files-description": {
-		"message": "這個伺服器模組包更新包含未在 catálogo 上發布的檔案。強烈建議你僅安裝來自信任來源的檔案。"
+		"message": "這個伺服器模組包更新包含未在 Modrinth 上發布的檔案。強烈建議你僅安裝來自信任來源的檔案。"
 	},
 	"app.modal.update-to-play.shared-instance-added-label": {
 		"message": "已新增"
@@ -1332,7 +1332,7 @@
 		"message": "已移除"
 	},
 	"app.modal.update-to-play.shared-instance-unknown-files-description": {
-		"message": "這個共用實例更新包含未在 catálogo 上發布的檔案。強烈建議你僅安裝來自信任來源的檔案。"
+		"message": "這個共用實例更新包含未在 Modrinth 上發布的檔案。強烈建議你僅安裝來自信任來源的檔案。"
 	},
 	"app.modal.update-to-play.update-required": {
 		"message": "需要更新"
@@ -1353,7 +1353,7 @@
 		"message": "正在載入個人檔案..."
 	},
 	"app.nav.modrinth-account": {
-		"message": "catálogo 帳號"
+		"message": "Modrinth 帳號"
 	},
 	"app.nav.modrinth-hosting": {
 		"message": "Hosting"
@@ -1365,13 +1365,13 @@
 		"message": "螢幕擷取畫面"
 	},
 	"app.nav.sign-in-to-modrinth-account": {
-		"message": "登入 catálogo"
+		"message": "登入 Modrinth"
 	},
 	"app.nav.switch-account": {
 		"message": "切換帳號"
 	},
 	"app.nav.upgrade-to-modrinth-plus": {
-		"message": "升級至 Premium del catálogo"
+		"message": "升級至 Modrinth+"
 	},
 	"app.nav.view-profile": {
 		"message": "查看個人檔案"
@@ -1587,7 +1587,7 @@
 		"message": "匯出 ZIP"
 	},
 	"app.screenshots.selection.global-export-filename": {
-		"message": "catálogo screenshots.zip"
+		"message": "Strata screenshots.zip"
 	},
 	"app.screenshots.selection.instance-export-filename": {
 		"message": "{instance} screenshots.zip"
@@ -1893,7 +1893,7 @@
 		"message": "你的部分實例無法使用這項設定"
 	},
 	"app.settings.game-options.compatibility.reason.launcher-controlled": {
-		"message": "這項設定由 catálogo 的啟動設定管理。"
+		"message": "這項設定由 Strata 的啟動設定管理。"
 	},
 	"app.settings.game-options.custom-value.placeholder": {
 		"message": "輸入一個值"
@@ -2727,7 +2727,7 @@
 		"message": "macOS"
 	},
 	"app.settings.privacy.ads-consent.intro": {
-		"message": "廣告使 catálogo 得以營運，並為創作者提供收益。我們的合作夥伴可能會在應用程式中儲存或存取 Cookie，以實現個人化廣告並衡量廣告成效。你可以在下方選擇退出或管理偏好設定。"
+		"message": "廣告使 Modrinth 得以營運，並為創作者提供收益。我們的合作夥伴可能會在應用程式中儲存或存取 Cookie，以實現個人化廣告並衡量廣告成效。你可以在下方選擇退出或管理偏好設定。"
 	},
 	"app.settings.privacy.discord-rich-presence.description": {
 		"message": "在 Discord 上將 Strata 顯示為目前活動。這不會影響模組為實例新增的豐富狀態。需要重新啟動應用程式。"
@@ -2736,7 +2736,7 @@
 		"message": "Discord 豐富狀態"
 	},
 	"app.settings.privacy.telemetry.description": {
-		"message": "catálogo 會收集匿名化的分析與使用資料，以提升使用者體驗並提供客製化服務。若停用此選項，即表示你選擇退出，你的資料將不再被收集。"
+		"message": "Strata doesn't collect or send usage data, so this setting has no effect. It's kept for compatibility."
 	},
 	"app.settings.privacy.telemetry.title": {
 		"message": "遙測"
@@ -2754,7 +2754,7 @@
 		"message": "要清除應用程式快取嗎？"
 	},
 	"app.settings.resource-management.app-cache.description": {
-		"message": "清除快取資料，並從 catálogo 重新下載。在快取完成重建前，應用程式的載入速度可能會比較慢。"
+		"message": "清除快取資料，並從 Modrinth 重新下載。在快取完成重建前，應用程式的載入速度可能會比較慢。"
 	},
 	"app.settings.resource-management.app-cache.purge": {
 		"message": "清除快取"
@@ -2961,7 +2961,7 @@
 		"message": "這些設定已在其他地方變更"
 	},
 	"app.settings.synced-options.game-settings.custom-empty": {
-		"message": "當 catálogo 在你的實例中找到模組新增的設定後，便會顯示在這裡。"
+		"message": "當 Strata 在你的實例中找到模組新增的設定後，便會顯示在這裡。"
 	},
 	"app.settings.synced-options.game-settings.description": {
 		"message": "在所有實例中使用相同的遊戲選項。"
@@ -3243,13 +3243,13 @@
 		"message": "MINECON Earth 2017"
 	},
 	"app.skins.section.modrinth": {
-		"message": "catálogo"
+		"message": "Modrinth"
 	},
 	"app.skins.section.modrinth-pride": {
-		"message": "catálogo 驕傲"
+		"message": "Modrinth 驕傲"
 	},
 	"app.skins.section.modrinth-pride.tooltip": {
-		"message": "這些外觀是你在驕傲月期間捐款給 catálogo 驕傲月籌款活動所獲得的。"
+		"message": "這些外觀是你在驕傲月期間捐款給 Modrinth 驕傲月籌款活動所獲得的。"
 	},
 	"app.skins.section.mounts-of-mayhem": {
 		"message": "群騎紛爭"
@@ -3285,7 +3285,7 @@
 		"message": "你方便回答幾個關於 Strata 使用體驗的問題嗎？"
 	},
 	"app.survey.footer": {
-		"message": "你的回覆將直接傳送給 catálogo 團隊，作為未來更新方向的指引！"
+		"message": "你的回覆將直接傳送給 Modrinth 團隊，作為未來更新方向的指引！"
 	},
 	"app.survey.no-thanks": {
 		"message": "不用了，謝謝"
@@ -3294,7 +3294,7 @@
 		"message": "填寫問卷調查"
 	},
 	"app.survey.title": {
-		"message": "你好啊，catálogo 使用者！"
+		"message": "你好啊，Modrinth 使用者！"
 	},
 	"app.sync-instances-update.badge": {
 		"message": "更新內容"
@@ -3615,7 +3615,7 @@
 		"message": "取消發布共用實例"
 	},
 	"installation-settings.shared-instance.unpublish-description": {
-		"message": "在 catálogo 上移除這個共用實例，並停止向任何使用者推送更新。你的本機實例不會受到影響。"
+		"message": "在 Modrinth 上移除這個共用實例，並停止向任何使用者推送更新。你的本機實例不會受到影響。"
 	},
 	"installation-settings.shared-instance.unpublishing-button": {
 		"message": "正在取消發布..."
@@ -3630,7 +3630,7 @@
 		"message": "取消連結共用實例"
 	},
 	"installation-settings.unpublish-shared-instance.modal.admonition-body": {
-		"message": "這會從 catálogo 的伺服器刪除共用實例。在 Strata 使用該實例的使用者將不再收到更新，但本機實例及其內容仍會保留在此裝置上。"
+		"message": "這會從 Modrinth 的伺服器刪除共用實例。在 Strata 使用該實例的使用者將不再收到更新，但本機實例及其內容仍會保留在此裝置上。"
 	},
 	"installation-settings.unpublish-shared-instance.modal.admonition-header": {
 		"message": "即將取消發布共用實例"
@@ -3915,7 +3915,7 @@
 		"message": "TNT"
 	},
 	"instance.icon-editor.symbol.wrenth-rinth": {
-		"message": "catálogo 扳手"
+		"message": "Modrinth 扳手"
 	},
 	"instance.icon-editor.symbol.zombie": {
 		"message": "殭屍"
@@ -4482,7 +4482,7 @@
 		"message": "建立帳號"
 	},
 	"modal.modrinth-account-required.description": {
-		"message": "你必須登入 catálogo 帳號才能使用這個功能。"
+		"message": "你必須登入 Modrinth 帳號才能使用這個功能。"
 	},
 	"modal.modrinth-account-required.header": {
 		"message": "需要帳號"
@@ -4491,10 +4491,10 @@
 		"message": "再次開啟瀏覽器"
 	},
 	"modal.modrinth-account-required.sign-in-button": {
-		"message": "登入 catálogo"
+		"message": "登入 Modrinth"
 	},
 	"modal.modrinth-account-required.sign-in-heading": {
-		"message": "登入 catálogo 帳號"
+		"message": "登入 Modrinth 帳號"
 	},
 	"modal.modrinth-account-required.signing-in-header": {
 		"message": "登入"
@@ -4512,7 +4512,7 @@
 		"message": "登入 Minecraft"
 	},
 	"onboarding-checklist.login-modrinth": {
-		"message": "登入 catálogo"
+		"message": "登入 Modrinth"
 	},
 	"onboarding-checklist.title": {
 		"message": "開始使用"

@@ -78,7 +78,7 @@
 		"message": "Не удалось установить Minecraft"
 	},
 	"app.action-bar.install.summary.modrinth-unreachable": {
-		"message": "Не удалось подключиться к catálogo"
+		"message": "Не удалось подключиться к Modrinth"
 	},
 	"app.action-bar.install.summary.no-write-permission": {
 		"message": "Нет разрешения на запись"
@@ -135,7 +135,7 @@
 		"message": "Принять всё"
 	},
 	"app.ads-consent.body": {
-		"message": "Реклама обеспечивает работу catálogo и выплаты авторам. Для персонализации и анализа рекламы наши партнёры могут использовать куки."
+		"message": "Реклама обеспечивает работу Modrinth и выплаты авторам. Для персонализации и анализа рекламы наши партнёры могут использовать куки."
 	},
 	"app.ads-consent.manage": {
 		"message": "Настроить"
@@ -144,7 +144,7 @@
 		"message": "Отклонить всё"
 	},
 	"app.ads-consent.title": {
-		"message": "Конфиденциальность и реклама на catálogo"
+		"message": "Конфиденциальность и реклама на Modrinth"
 	},
 	"app.appearance-settings.compact-mode.description": {
 		"message": "Отображать сборки в библиотеке компактным списком."
@@ -165,7 +165,7 @@
 		"message": "Без имени над скином"
 	},
 	"app.appearance-settings.minimize-launcher.description": {
-		"message": "Сворачивать catálogo App при запуске Minecraft."
+		"message": "Сворачивать Strata App при запуске Minecraft."
 	},
 	"app.appearance-settings.minimize-launcher.title": {
 		"message": "Сворачивание приложения"
@@ -189,7 +189,7 @@
 		"message": "Скрытие панели справа"
 	},
 	"app.appearance-settings.unknown-pack-warning.description": {
-		"message": "Предупреждать о рисках перед установкой файлов .mrpack, не размещённых на catálogo."
+		"message": "Предупреждать о рисках перед установкой файлов .mrpack, не размещённых на Modrinth."
 	},
 	"app.appearance-settings.unknown-pack-warning.title": {
 		"message": "Предупреждение о сторонних сборках"
@@ -213,7 +213,7 @@
 		"message": "Применять текущие настройки везде, где вы вошли. Отключите, чтобы настроить это устройство отдельно."
 	},
 	"app.behavior-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "Войдите в аккаунт catálogo для синхронизации настроек."
+		"message": "Войдите в аккаунт Modrinth для синхронизации настроек."
 	},
 	"app.behavior-settings.sync-across-devices.title": {
 		"message": "Синхронизация поведения между устройствами"
@@ -453,7 +453,7 @@
 		"message": "Используйте эти настройки везде, где вы вошли в систему. Отключите эту опцию, чтобы сохранить отдельные настройки на этом устройстве."
 	},
 	"app.features-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "Войдите в аккаунт catálogo для синхронизации настроек."
+		"message": "Войдите в аккаунт Modrinth для синхронизации настроек."
 	},
 	"app.features-settings.sync-across-devices.title": {
 		"message": "Синхронизировать настройки между устройствами"
@@ -492,7 +492,7 @@
 		"message": "Скачать и обновить"
 	},
 	"app.hosting.update-required.rinthbot-alt": {
-		"message": "Восторженный catálogo Bot"
+		"message": "Восторженный Modrinth Bot"
 	},
 	"app.hosting.update-required.title": {
 		"message": "Обновите Strata"
@@ -810,13 +810,13 @@
 		"message": "Войдите как"
 	},
 	"app.instance.shared-instance-wrong-account.signed-out-header": {
-		"message": "Необходимо войти в catálogo"
+		"message": "Необходимо войти в Modrinth"
 	},
 	"app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
 		"message": "для получения обновлений совместной сборки."
 	},
 	"app.instance.shared-instance-wrong-account.warning-header": {
-		"message": "Используется неверный аккаунт catálogo"
+		"message": "Используется неверный аккаунт Modrinth"
 	},
 	"app.instance.shortcut.created": {
 		"message": "Ярлык создан"
@@ -1236,10 +1236,10 @@
 		"message": "Установить"
 	},
 	"app.modal.install-to-play.invite-warning": {
-		"message": "Приглашение создано другим пользователем, а не catálogo. Принимайте приглашения только от тех, кому доверяете."
+		"message": "Приглашение создано другим пользователем, а не Modrinth. Принимайте приглашения только от тех, кому доверяете."
 	},
 	"app.modal.install-to-play.invite-warning-with-creator": {
-		"message": "Приглашение создано <creator>{username}</creator>, а не catálogo. Принимайте приглашения только от тех, кому доверяете."
+		"message": "Приглашение создано <creator>{username}</creator>, а не Modrinth. Принимайте приглашения только от тех, кому доверяете."
 	},
 	"app.modal.install-to-play.managed-content.modpack-header": {
 		"message": "Контент сборки"
@@ -1272,7 +1272,7 @@
 		"message": "Для запросов в поддержку обращайтесь в нашу <support-link>службу поддержки</support-link>. Для сообщений об ошибках открывайте запросы в <github-link>GitHub </github-link>."
 	},
 	"app.modal.install-to-play.reviewed-files": {
-		"message": "Файлы не c catálogo не проверяются."
+		"message": "Файлы не c Modrinth не проверяются."
 	},
 	"app.modal.install-to-play.shared-instance": {
 		"message": "Сборка"
@@ -1281,10 +1281,10 @@
 		"message": "Контент совместной сборки"
 	},
 	"app.modal.install-to-play.shared-instance-unknown-files-description": {
-		"message": "Совместная сборка содержит файлы не с catálogo. Устанавливайте только проверенные файлы."
+		"message": "Совместная сборка содержит файлы не с Modrinth. Устанавливайте только проверенные файлы."
 	},
 	"app.modal.install-to-play.unknown-files-description": {
-		"message": "Серверная сборка содержит файлы не с catálogo. Устанавливайте только проверенные файлы."
+		"message": "Серверная сборка содержит файлы не с Modrinth. Устанавливайте только проверенные файлы."
 	},
 	"app.modal.install-to-play.unknown-files-warning": {
 		"message": "Предупреждение о неизвестных файлах"
@@ -1305,7 +1305,7 @@
 		"message": "Удалён"
 	},
 	"app.modal.update-to-play.server-modpack-unknown-files-description": {
-		"message": "Обновление серверной сборки содержит файлы не с catálogo. Устанавливайте только проверенные файлы."
+		"message": "Обновление серверной сборки содержит файлы не с Modrinth. Устанавливайте только проверенные файлы."
 	},
 	"app.modal.update-to-play.shared-instance-added-label": {
 		"message": "Добавлен"
@@ -1314,7 +1314,7 @@
 		"message": "Удалён"
 	},
 	"app.modal.update-to-play.shared-instance-unknown-files-description": {
-		"message": "Обновление совместной сборки содержит файлы не с catálogo. Устанавливайте только проверенные файлы."
+		"message": "Обновление совместной сборки содержит файлы не с Modrinth. Устанавливайте только проверенные файлы."
 	},
 	"app.modal.update-to-play.update-required": {
 		"message": "Требуется обновление"
@@ -1335,7 +1335,7 @@
 		"message": "Загрузка профиля..."
 	},
 	"app.nav.modrinth-account": {
-		"message": "Аккаунт catálogo"
+		"message": "Аккаунт Modrinth"
 	},
 	"app.nav.modrinth-hosting": {
 		"message": "Hosting"
@@ -1347,13 +1347,13 @@
 		"message": "Скриншоты"
 	},
 	"app.nav.sign-in-to-modrinth-account": {
-		"message": "Вход в catálogo"
+		"message": "Вход в Modrinth"
 	},
 	"app.nav.switch-account": {
 		"message": "Сменить аккаунт"
 	},
 	"app.nav.upgrade-to-modrinth-plus": {
-		"message": "Перейти на Premium del catálogo"
+		"message": "Перейти на Modrinth+"
 	},
 	"app.nav.view-profile": {
 		"message": "Посмотреть профиль"
@@ -1569,7 +1569,7 @@
 		"message": "Сохранить архив"
 	},
 	"app.screenshots.selection.global-export-filename": {
-		"message": "Скриншоты catálogo.zip"
+		"message": "Скриншоты Strata.zip"
 	},
 	"app.screenshots.selection.instance-export-filename": {
 		"message": "Скриншоты {instance}.zip"
@@ -1872,7 +1872,7 @@
 		"message": "Некоторые из ваших сборок не могут использовать эту настройку"
 	},
 	"app.settings.game-options.compatibility.reason.launcher-controlled": {
-		"message": "Данный параметр может быть изменен настройками запуска catálogo."
+		"message": "Данный параметр может быть изменен настройками запуска Strata."
 	},
 	"app.settings.game-options.custom-value.placeholder": {
 		"message": "Введите значение"
@@ -2706,16 +2706,16 @@
 		"message": "macOS"
 	},
 	"app.settings.privacy.ads-consent.intro": {
-		"message": "Реклама обеспечивает работу catálogo и выплаты авторам. Для персонализации и анализа рекламы наши партнёры могут использовать куки. Отказаться и настроить куки можно ниже."
+		"message": "Реклама обеспечивает работу Modrinth и выплаты авторам. Для персонализации и анализа рекламы наши партнёры могут использовать куки. Отказаться и настроить куки можно ниже."
 	},
 	"app.settings.privacy.discord-rich-presence.description": {
-		"message": "Показывать catálogo App в текущей активности Discord. Не влияет на Rich Presence модов. Требуется перезапуск."
+		"message": "Показывать Modrinth App в текущей активности Discord. Не влияет на Rich Presence модов. Требуется перезапуск."
 	},
 	"app.settings.privacy.discord-rich-presence.title": {
 		"message": "Discord Rich Presence"
 	},
 	"app.settings.privacy.telemetry.description": {
-		"message": "catálogo собирает анонимные данные об использовании для персонализации и улучшения сервиса. Отключите этот параметр, чтобы отказаться от сбора данных."
+		"message": "Strata doesn't collect or send usage data, so this setting has no effect. It's kept for compatibility."
 	},
 	"app.settings.privacy.telemetry.title": {
 		"message": "Телеметрия"
@@ -2733,7 +2733,7 @@
 		"message": "Очистить кеш приложения?"
 	},
 	"app.settings.resource-management.app-cache.description": {
-		"message": "Удаляет кешированные данные и повторно скачивает их с catálogo. Приложение может замедлиться, пока кеш не восстановится."
+		"message": "Удаляет кешированные данные и повторно скачивает их с Modrinth. Приложение может замедлиться, пока кеш не восстановится."
 	},
 	"app.settings.resource-management.app-cache.purge": {
 		"message": "Очистить кеш"
@@ -2754,7 +2754,7 @@
 		"message": "Выбрать каталог приложения"
 	},
 	"app.settings.resource-management.app-directory.description": {
-		"message": "Здесь catálogo App хранит сборки и другие файлы. Изменения вступят в силу после перезапуска."
+		"message": "Здесь Modrinth App хранит сборки и другие файлы. Изменения вступят в силу после перезапуска."
 	},
 	"app.settings.resource-management.app-directory.select": {
 		"message": "Выбор нового каталога приложения"
@@ -2940,7 +2940,7 @@
 		"message": "Настройки изменились где-то ещё"
 	},
 	"app.settings.synced-options.game-settings.custom-empty": {
-		"message": "Настройки, добавленные модами, появятся здесь после того, как catálogo найдёт их в одной из сборок."
+		"message": "Настройки, добавленные модами, появятся здесь после того, как Strata найдёт их в одной из сборок."
 	},
 	"app.settings.synced-options.game-settings.description": {
 		"message": "Использовать одинаковые настройки игры в сборках."
@@ -3222,13 +3222,13 @@
 		"message": "MINECON Earth 2017"
 	},
 	"app.skins.section.modrinth": {
-		"message": "catálogo"
+		"message": "Modrinth"
 	},
 	"app.skins.section.modrinth-pride": {
-		"message": "catálogo Pride"
+		"message": "Modrinth Pride"
 	},
 	"app.skins.section.modrinth-pride.tooltip": {
-		"message": "Эти скины получены за участие в сборе средств catálogo Pride в месяц гордости."
+		"message": "Эти скины получены за участие в сборе средств Modrinth Pride в месяц гордости."
 	},
 	"app.skins.section.mounts-of-mayhem": {
 		"message": "Mounts of Mayhem"
@@ -3264,7 +3264,7 @@
 		"message": "Не хотите ответить на несколько вопросов о вашем опыте с Strata?"
 	},
 	"app.survey.footer": {
-		"message": "Этот отзыв будет доставлен напрямую команде catálogo и поможет разрабатывать будущие обновления!"
+		"message": "Этот отзыв будет доставлен напрямую команде Modrinth и поможет разрабатывать будущие обновления!"
 	},
 	"app.survey.no-thanks": {
 		"message": "Нет, спасибо"
@@ -3273,7 +3273,7 @@
 		"message": "Пройти опрос"
 	},
 	"app.survey.title": {
-		"message": "Привет, пользователь catálogo!"
+		"message": "Привет, пользователь Modrinth!"
 	},
 	"app.sync-instances-update.badge": {
 		"message": "Новинка"
@@ -3405,13 +3405,13 @@
 		"message": "Синхронизированные наборы ресурсов"
 	},
 	"app.update-popup.body.download-complete": {
-		"message": "Скачивание версии catálogo App {version} завершено. Перезапустите приложение, чтобы обновить его, или оно обновится автоматически после закрытия."
+		"message": "Скачивание версии Modrinth App {version} завершено. Перезапустите приложение, чтобы обновить его, или оно обновится автоматически после закрытия."
 	},
 	"app.update-popup.body.linux": {
-		"message": "Доступна версия catálogo App {version}. Обновите приложение через менеджер пакетов, чтобы получить последние улучшения и исправления!"
+		"message": "Доступна версия Modrinth App {version}. Обновите приложение через менеджер пакетов, чтобы получить последние улучшения и исправления!"
 	},
 	"app.update-popup.body.metered": {
-		"message": "Версия catálogo App {version} доступна для скачивания! Используется сеть с лимитным тарифным планом, поэтому скачивание не началось автоматически."
+		"message": "Версия Modrinth App {version} доступна для скачивания! Используется сеть с лимитным тарифным планом, поэтому скачивание не началось автоматически."
 	},
 	"app.update-popup.changelog": {
 		"message": "Список изменений"
@@ -3594,7 +3594,7 @@
 		"message": "Закрыть доступ к сборке"
 	},
 	"installation-settings.shared-instance.unpublish-description": {
-		"message": "Удаляет сборку с серверов catálogo и прекращает отправку обновлений. Локальная сборка останется нетронутой."
+		"message": "Удаляет сборку с серверов Modrinth и прекращает отправку обновлений. Локальная сборка останется нетронутой."
 	},
 	"installation-settings.shared-instance.unpublishing-button": {
 		"message": "Закрытие доступа..."
@@ -3609,7 +3609,7 @@
 		"message": "Отвязка совместной сборки"
 	},
 	"installation-settings.unpublish-shared-instance.modal.admonition-body": {
-		"message": "Сборка будет удалена с серверов catálogo. Локальная копия и её контент останутся на устройстве, а другие участники перестанут получать обновления."
+		"message": "Сборка будет удалена с серверов Modrinth. Локальная копия и её контент останутся на устройстве, а другие участники перестанут получать обновления."
 	},
 	"installation-settings.unpublish-shared-instance.modal.admonition-header": {
 		"message": "Закрытие доступа к сборке"
@@ -3891,7 +3891,7 @@
 		"message": "Динамит"
 	},
 	"instance.icon-editor.symbol.wrenth-rinth": {
-		"message": "Гаечный ключ catálogo"
+		"message": "Гаечный ключ Modrinth"
 	},
 	"instance.icon-editor.symbol.zombie": {
 		"message": "Зомби"
@@ -4458,7 +4458,7 @@
 		"message": "Создать аккаунт"
 	},
 	"modal.modrinth-account-required.description": {
-		"message": "Войдите в аккаунт catálogo, чтобы использовать эту функцию."
+		"message": "Войдите в аккаунт Modrinth, чтобы использовать эту функцию."
 	},
 	"modal.modrinth-account-required.header": {
 		"message": "Требуется аккаунт"
@@ -4467,10 +4467,10 @@
 		"message": "Открыть браузер снова"
 	},
 	"modal.modrinth-account-required.sign-in-button": {
-		"message": "Войти в catálogo"
+		"message": "Войти в Modrinth"
 	},
 	"modal.modrinth-account-required.sign-in-heading": {
-		"message": "Войдите в аккаунт catálogo"
+		"message": "Войдите в аккаунт Modrinth"
 	},
 	"modal.modrinth-account-required.signing-in-header": {
 		"message": "Вход"
@@ -4488,7 +4488,7 @@
 		"message": "Войдите в Minecraft"
 	},
 	"onboarding-checklist.login-modrinth": {
-		"message": "Войдите в catálogo"
+		"message": "Войдите в Modrinth"
 	},
 	"onboarding-checklist.title": {
 		"message": "Начало работы"

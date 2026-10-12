@@ -75,7 +75,7 @@
 		"message": "Nastavení Minecraftu se nezdařilo"
 	},
 	"app.action-bar.install.summary.modrinth-unreachable": {
-		"message": "Nepodařilo se připojit k catálogo"
+		"message": "Nepodařilo se připojit k Modrinth"
 	},
 	"app.action-bar.install.summary.no-write-permission": {
 		"message": "Nemáte oprávnění k zápisu"
@@ -141,7 +141,7 @@
 		"message": "Odmítnout vše"
 	},
 	"app.ads-consent.title": {
-		"message": "Vaše soukromí a způsob, jakým reklamy podporují catálogo"
+		"message": "Vaše soukromí a způsob, jakým reklamy podporují Modrinth"
 	},
 	"app.appearance-settings.compact-mode.description": {
 		"message": "Zobrazit instanční knihovny v kompaktních řádcích."
@@ -162,7 +162,7 @@
 		"message": "Skrýt jmenovku"
 	},
 	"app.appearance-settings.minimize-launcher.description": {
-		"message": "Minimalizovat catálogo aplikaci při spuštění Minecraftu."
+		"message": "Minimalizovat Strata aplikaci při spuštění Minecraftu."
 	},
 	"app.appearance-settings.minimize-launcher.title": {
 		"message": "Minimalizovat aplikaci"
@@ -186,7 +186,7 @@
 		"message": "Skrýt pravý postranní panel"
 	},
 	"app.appearance-settings.unknown-pack-warning.description": {
-		"message": "Zobrazit bezpečnostní varování před instalací catálogo Pack (.mrpack), který není hostován v catálogo."
+		"message": "Zobrazit bezpečnostní varování před instalací Modrinth Pack (.mrpack), který není hostován v Modrinth."
 	},
 	"app.appearance-settings.unknown-pack-warning.title": {
 		"message": "Upozorni mě před instalací neznámých modpacků"
@@ -210,7 +210,7 @@
 		"message": "Používejte toto nastavení všude, kde jste přihlášeni. Vypněte ho, pokud chcete různé nastavení na různých zařízeních."
 	},
 	"app.behavior-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "Přihlašte se do vašeho catálogo účtu aby jste si mohli synchronizovat nastavení."
+		"message": "Přihlašte se do vašeho Modrinth účtu aby jste si mohli synchronizovat nastavení."
 	},
 	"app.behavior-settings.sync-across-devices.title": {
 		"message": "Synchronizovat nastavení mezi různými zařízeními"
@@ -375,7 +375,7 @@
 		"message": "Stáhnout novou aktualizaci"
 	},
 	"app.hosting.update-required.rinthbot-alt": {
-		"message": "Nadšený catálogo Bot"
+		"message": "Nadšený Modrinth Bot"
 	},
 	"app.hosting.update-required.title": {
 		"message": "Strata potřebuje být aktualizovaná"
@@ -702,13 +702,13 @@
 		"message": "Přihlásit se jako"
 	},
 	"app.instance.shared-instance-wrong-account.signed-out-header": {
-		"message": "Musíte se přihlásit do catálogou"
+		"message": "Musíte se přihlásit do Modrinthu"
 	},
 	"app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
 		"message": "dostávat aktualizace pro tuto sdílenou instanci."
 	},
 	"app.instance.shared-instance-wrong-account.warning-header": {
-		"message": "Používate nesprávný catálogo účet"
+		"message": "Používate nesprávný Modrinth účet"
 	},
 	"app.instance.shortcut.created": {
 		"message": "Zkratka vytvořena"
@@ -1125,10 +1125,10 @@
 		"message": "Společný obsah instance"
 	},
 	"app.modal.install-to-play.shared-instance-unknown-files-description": {
-		"message": "Tato sdílená instance obsahuje soubory, které nejsou publikované na catálogou. Silně doporučujeme instalovat pouze soubory ze zdroje, kterému důveřujete."
+		"message": "Tato sdílená instance obsahuje soubory, které nejsou publikované na Modrinthu. Silně doporučujeme instalovat pouze soubory ze zdroje, kterému důveřujete."
 	},
 	"app.modal.install-to-play.unknown-files-description": {
-		"message": "Tento serverový modpack obsahuje soubory, které nejsou publikované na catálogou. Silně doporučujeme instalovat pouze soubory ze zdroje, kterému důveřujete."
+		"message": "Tento serverový modpack obsahuje soubory, které nejsou publikované na Modrinthu. Silně doporučujeme instalovat pouze soubory ze zdroje, kterému důveřujete."
 	},
 	"app.modal.install-to-play.unknown-files-warning": {
 		"message": "Upozornění na neznámý soubor"
@@ -1149,7 +1149,7 @@
 		"message": "Odstraněno"
 	},
 	"app.modal.update-to-play.server-modpack-unknown-files-description": {
-		"message": "Tato aktualizace serverového modpacku obsahuje soubory, které nejsou publikované na catálogou. Silně doporučujeme instalovat pouze soubory ze zdroje, kterému důveřujete."
+		"message": "Tato aktualizace serverového modpacku obsahuje soubory, které nejsou publikované na Modrinthu. Silně doporučujeme instalovat pouze soubory ze zdroje, kterému důveřujete."
 	},
 	"app.modal.update-to-play.shared-instance-added-label": {
 		"message": "Přidáno"
@@ -1158,7 +1158,7 @@
 		"message": "Odstraněno"
 	},
 	"app.modal.update-to-play.shared-instance-unknown-files-description": {
-		"message": "Tato aktualizace sdílené instance obsahuje soubory, které nejsou publikované na catálogou. Silně doporučujeme instalovat pouze soubory ze zdroje, kterému důveřujete."
+		"message": "Tato aktualizace sdílené instance obsahuje soubory, které nejsou publikované na Modrinthu. Silně doporučujeme instalovat pouze soubory ze zdroje, kterému důveřujete."
 	},
 	"app.modal.update-to-play.update-required": {
 		"message": "Je vyžadována aktualizace"
@@ -1179,7 +1179,7 @@
 		"message": "Načítání profilu..."
 	},
 	"app.nav.modrinth-account": {
-		"message": "catálogo účet"
+		"message": "Modrinth účet"
 	},
 	"app.nav.modrinth-hosting": {
 		"message": "Hosting"
@@ -1191,13 +1191,13 @@
 		"message": "Screenshoty"
 	},
 	"app.nav.sign-in-to-modrinth-account": {
-		"message": "Přihlásit se do catálogo"
+		"message": "Přihlásit se do Modrinth"
 	},
 	"app.nav.switch-account": {
 		"message": "Změnit účet"
 	},
 	"app.nav.upgrade-to-modrinth-plus": {
-		"message": "Upgradovat na Premium del catálogo"
+		"message": "Upgradovat na Modrinth+"
 	},
 	"app.nav.view-profile": {
 		"message": "Zobrazit profil"
@@ -1398,7 +1398,7 @@
 		"message": "Exportovat ZIP"
 	},
 	"app.screenshots.selection.global-export-filename": {
-		"message": "catálogo screenshots.zip"
+		"message": "Strata screenshots.zip"
 	},
 	"app.screenshots.selection.instance-export-filename": {
 		"message": "{instance} screenshots.zip"
@@ -1704,13 +1704,13 @@
 		"message": "MINECON Earth 2017"
 	},
 	"app.skins.section.modrinth": {
-		"message": "catálogo"
+		"message": "Modrinth"
 	},
 	"app.skins.section.modrinth-pride": {
-		"message": "catálogo Pride"
+		"message": "Modrinth Pride"
 	},
 	"app.skins.section.modrinth-pride.tooltip": {
-		"message": "Tyto skiny jsi obdržel za přispění do sbírky catálogo Pride behěm Pride měsíce."
+		"message": "Tyto skiny jsi obdržel za přispění do sbírky Modrinth Pride behěm Pride měsíce."
 	},
 	"app.skins.section.mounts-of-mayhem": {
 		"message": "Mounts of Mayhem"
@@ -1740,7 +1740,7 @@
 		"message": "Mohli byste prosím odpovědět na pár otázek ohledně vašich zkušeností s Strata?"
 	},
 	"app.survey.footer": {
-		"message": "Tato zpětná vazba půjde přímo k týmu catálogou a pomůže při budoucích aktualizacích!"
+		"message": "Tato zpětná vazba půjde přímo k týmu Modrinthu a pomůže při budoucích aktualizacích!"
 	},
 	"app.survey.no-thanks": {
 		"message": "Ne, děkuji"
@@ -1749,7 +1749,7 @@
 		"message": "Zapoj se do ankety"
 	},
 	"app.survey.title": {
-		"message": "Ahoj catálogo uživateli!"
+		"message": "Ahoj Modrinth uživateli!"
 	},
 	"app.update-popup.body.download-complete": {
 		"message": "Stahování Strata v{version} bylo dokončeno. Aktualizujte ji znovunačtením nebo se automaticky aktualizuje po zavření."
@@ -2166,7 +2166,7 @@
 		"message": "Dynamit (TNT)"
 	},
 	"instance.icon-editor.symbol.wrenth-rinth": {
-		"message": "catálogo klíč"
+		"message": "Modrinth klíč"
 	},
 	"instance.icon-editor.symbol.zombie": {
 		"message": "Zombie"
@@ -2490,10 +2490,10 @@
 		"message": "Znovu otevřít prohlížeč"
 	},
 	"modal.modrinth-account-required.sign-in-button": {
-		"message": "Přihlásit se do catálogo"
+		"message": "Přihlásit se do Modrinth"
 	},
 	"modal.modrinth-account-required.sign-in-heading": {
-		"message": "Přihlaste se k catálogo účtu"
+		"message": "Přihlaste se k Modrinth účtu"
 	},
 	"modal.modrinth-account-required.signing-in-header": {
 		"message": "Přihlášení"

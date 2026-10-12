@@ -375,13 +375,13 @@
 		"message": "MINECON Earth 2017"
 	},
 	"app.skins.section.modrinth": {
-		"message": "catálogo"
+		"message": "Modrinth"
 	},
 	"app.skins.section.modrinth-pride": {
-		"message": "catálogo Pride"
+		"message": "Modrinth Pride"
 	},
 	"app.skins.section.modrinth-pride.tooltip": {
-		"message": "คุณได้รับสกินเหล่านี้จากการร่วมบริจาคให้กับกิจกรรมระดมทุน catálogo Pride ในช่วงเดือน Pride Month"
+		"message": "คุณได้รับสกินเหล่านี้จากการร่วมบริจาคให้กับกิจกรรมระดมทุน Modrinth Pride ในช่วงเดือน Pride Month"
 	},
 	"app.skins.section.mounts-of-mayhem": {
 		"message": "Mounts of Mayhem"
@@ -402,13 +402,13 @@
 		"message": "Tiny Takeover"
 	},
 	"app.update-popup.body.download-complete": {
-		"message": "ดาวน์โหลด catálogo v{version} สำเร็จแล้ว เปิดโปรแกรมใหม่อีกครั้งเพื่ออัปเดตตอนนี้ หรือจะรออัปเดตอัตโนมัติ ซึ่งจะเกิดขึ้นเมื่อคุณกดปิดโปรแกรม catálogo"
+		"message": "ดาวน์โหลด Modrinth v{version} สำเร็จแล้ว เปิดโปรแกรมใหม่อีกครั้งเพื่ออัปเดตตอนนี้ หรือจะรออัปเดตอัตโนมัติ ซึ่งจะเกิดขึ้นเมื่อคุณกดปิดโปรแกรม Modrinth"
 	},
 	"app.update-popup.body.linux": {
-		"message": "catálogo v{version} พร้อมให้อัปเดตแล้ว โปรดไปที่การจัดการแพ็กเกจของคุณสำหรับการอัปเดตคุณสมบัติใหม่และการแก้ไขต่าง ๆ"
+		"message": "Modrinth v{version} พร้อมให้อัปเดตแล้ว โปรดไปที่การจัดการแพ็กเกจของคุณสำหรับการอัปเดตคุณสมบัติใหม่และการแก้ไขต่าง ๆ"
 	},
 	"app.update-popup.body.metered": {
-		"message": "catálogo v{version} พร้อมให้บริการแล้ว! แต่เนื่องจากคุณเปิดโหมดจำกัดปริมาณการใช้ข้อมูลเครือข่าย เราจึงไม่ได้อัปเดตเนื้อหาโดยอัตโนมัติ"
+		"message": "Modrinth v{version} พร้อมให้บริการแล้ว! แต่เนื่องจากคุณเปิดโหมดจำกัดปริมาณการใช้ข้อมูลเครือข่าย เราจึงไม่ได้อัปเดตเนื้อหาโดยอัตโนมัติ"
 	},
 	"app.update-popup.changelog": {
 		"message": "บันทึกการเปลี่ยนแปลง"

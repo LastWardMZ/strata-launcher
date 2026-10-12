@@ -29,7 +29,7 @@ import ConfirmPurchase from './ServersPurchase3Review.vue'
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
-const debug = useDebugLogger('catálogoServersPurchaseModal')
+const debug = useDebugLogger('ModrinthServersPurchaseModal')
 
 export type RegionPing = {
 	region: string

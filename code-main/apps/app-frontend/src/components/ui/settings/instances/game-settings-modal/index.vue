@@ -93,7 +93,7 @@ const messages = defineMessages({
 	customEmpty: {
 		id: 'app.settings.synced-options.game-settings.custom-empty',
 		defaultMessage:
-			'Settings added by mods will appear here after catálogo finds them in one of your instances.',
+			'Settings added by mods will appear here after Strata finds them in one of your instances.',
 	},
 	empty: {
 		id: 'app.settings.synced-options.game-settings.empty',

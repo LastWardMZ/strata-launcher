@@ -322,7 +322,7 @@ const messages = defineMessages({
 	description: {
 		id: 'settings.profile.public-information.description',
 		defaultMessage:
-			'Your profile information is publicly <profile-link>viewable on catálogo</profile-link> and through the <docs-link>catálogo API</docs-link>.',
+			'Your profile information is publicly <profile-link>viewable on Modrinth</profile-link> and through the <docs-link>Modrinth API</docs-link>.',
 	},
 	profilePicture: {
 		id: 'settings.profile.profile-picture.title',
@@ -342,11 +342,11 @@ const messages = defineMessages({
 	},
 	signInRequiredTitle: {
 		id: 'settings.profile.sign-in-required.title',
-		defaultMessage: 'catálogo account required',
+		defaultMessage: 'Modrinth account required',
 	},
 	signInRequiredDescription: {
 		id: 'settings.profile.sign-in-required.description',
-		defaultMessage: 'Sign in with a catálogo account to customize your public profile.',
+		defaultMessage: 'Sign in with a Modrinth account to customize your public profile.',
 	},
 	saveError: {
 		id: 'settings.profile.save-error',

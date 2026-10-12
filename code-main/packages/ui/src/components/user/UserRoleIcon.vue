@@ -28,7 +28,7 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	modrinthTeamLabel: {
 		id: 'user.role.modrinth-team',
-		defaultMessage: 'catálogo Team',
+		defaultMessage: 'Modrinth Team',
 	},
 	moderatorLabel: {
 		id: 'user.role.moderator',

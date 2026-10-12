@@ -75,7 +75,7 @@
 		"message": "Oppsett av Minecraft mislyktes"
 	},
 	"app.action-bar.install.summary.modrinth-unreachable": {
-		"message": "Kunne ikke nå catálogo"
+		"message": "Kunne ikke nå Modrinth"
 	},
 	"app.action-bar.install.summary.no-write-permission": {
 		"message": "Ikke tillatelse til å skrive"
@@ -132,7 +132,7 @@
 		"message": "Godta alt"
 	},
 	"app.ads-consent.body": {
-		"message": "Annonser gjør catálogo mulig og finansierer betalinger til skapere. Partnerne våre kan lagre eller få tilgang til informasjonskapsler i appen for å tilpasse annonser og måle ytelse."
+		"message": "Annonser gjør Modrinth mulig og finansierer betalinger til skapere. Partnerne våre kan lagre eller få tilgang til informasjonskapsler i appen for å tilpasse annonser og måle ytelse."
 	},
 	"app.ads-consent.manage": {
 		"message": "Administrer preferanser"
@@ -141,7 +141,7 @@
 		"message": "Avslå alle"
 	},
 	"app.ads-consent.title": {
-		"message": "Ditt personvern og hvordan annonser støtter catálogo"
+		"message": "Ditt personvern og hvordan annonser støtter Modrinth"
 	},
 	"app.appearance-settings.compact-mode.description": {
 		"message": "Vis instanser i biblioteket i et kompakt radoppsett."

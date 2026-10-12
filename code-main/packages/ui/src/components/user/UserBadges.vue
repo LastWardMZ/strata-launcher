@@ -86,7 +86,7 @@ const BADGES = [
 		icon: StaffBadge,
 		name: defineMessage({
 			id: 'user.profile.badge.staff.name',
-			defaultMessage: 'catálogo Team',
+			defaultMessage: 'Modrinth Team',
 		}),
 		about: [
 			defineMessage({
@@ -181,7 +181,7 @@ const BADGES = [
 		icon: PlusBadge,
 		name: defineMessage({
 			id: 'user.profile.badge.plus.name',
-			defaultMessage: 'Premium del catálogo Member',
+			defaultMessage: 'Modrinth+ Member',
 		}),
 		about: [
 			defineMessage({

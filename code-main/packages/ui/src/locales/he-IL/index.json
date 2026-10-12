@@ -192,7 +192,7 @@
 		"defaultMessage": "פתח בתקייה"
 	},
 	"button.open-in-modrinth": {
-		"defaultMessage": "פתח בcatálogo"
+		"defaultMessage": "פתח בModrinth"
 	},
 	"button.play": {
 		"defaultMessage": "שחק"
@@ -684,7 +684,7 @@
 		"defaultMessage": "מפקח"
 	},
 	"omorphia.component.badge.label.modrinth-team": {
-		"defaultMessage": "צוות catálogo"
+		"defaultMessage": "צוות Modrinth"
 	},
 	"omorphia.component.badge.label.pending": {
 		"defaultMessage": "בהמתנה"

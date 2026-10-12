@@ -533,7 +533,7 @@ function modpackEntityFromMetadata(
 
 		return {
 			id: projectId || versionId || 'modrinth',
-			label: label || 'catálogo modpack',
+			label: label || 'Modrinth modpack',
 			secondaryLabel: versionLabel,
 			icon: PackageIcon,
 			iconUrl: project?.icon_url || undefined,

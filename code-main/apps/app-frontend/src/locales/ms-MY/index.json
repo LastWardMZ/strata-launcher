@@ -582,7 +582,7 @@
 		"message": "Beberapa pemasangan anda tidak boleh menggunakan tetapan ini"
 	},
 	"app.settings.game-options.compatibility.reason.launcher-controlled": {
-		"message": "Tetapan ini diuruskan oleh tetapan pelancaran catálogo."
+		"message": "Tetapan ini diuruskan oleh tetapan pelancaran Strata."
 	},
 	"app.settings.game-options.custom-value.placeholder": {
 		"message": "Masukkan nilai"
@@ -1497,13 +1497,13 @@
 		"message": "Perlahanlah sikit!"
 	},
 	"app.skins.section.modrinth": {
-		"message": "catálogo"
+		"message": "Modrinth"
 	},
 	"app.skins.section.modrinth-pride": {
-		"message": "catálogo Pride"
+		"message": "Modrinth Pride"
 	},
 	"app.skins.section.modrinth-pride.tooltip": {
-		"message": "Anda menerima kekulit ini kerana menderma kepada acara pengumpulan dana catálogo Pride semasa Pride Month."
+		"message": "Anda menerima kekulit ini kerana menderma kepada acara pengumpulan dana Modrinth Pride semasa Pride Month."
 	},
 	"app.skins.section.mounts-of-mayhem": {
 		"message": "Mounts of Mayhem"

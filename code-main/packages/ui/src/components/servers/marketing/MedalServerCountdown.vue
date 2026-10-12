@@ -19,7 +19,7 @@
 				>
 					<ClockIcon class="clock-glow text-medal-orange size-5 shrink-0" />
 					<span class="w-full text-wrap text-lg">
-						Your <span class="text-medal-orange">Medal</span>-powered catálogo Server will expire in
+						Your <span class="text-medal-orange">Medal</span>-powered Modrinth Server will expire in
 						<span class="text-medal-orange font-bold">{{ timeLeftCountdown.days }}</span> days
 						<span class="text-medal-orange font-bold">{{ timeLeftCountdown.hours }}</span> hours
 						<span class="text-medal-orange font-bold">{{ timeLeftCountdown.minutes }}</span> minutes

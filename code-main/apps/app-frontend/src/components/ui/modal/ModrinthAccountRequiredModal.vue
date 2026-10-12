@@ -226,12 +226,12 @@ const messages = defineMessages({
 	},
 	signInHeading: {
 		id: 'modal.modrinth-account-required.sign-in-heading',
-		defaultMessage: 'Sign in to a catálogo account',
+		defaultMessage: 'Sign in to a Modrinth account',
 	},
 	description: {
 		id: 'modal.modrinth-account-required.description',
 		defaultMessage:
-			"You'll need to sign into your catálogo account before you can use this feature.",
+			"You'll need to sign into your Modrinth account before you can use this feature.",
 	},
 	createAccountButton: {
 		id: 'modal.modrinth-account-required.create-account-button',
@@ -239,7 +239,7 @@ const messages = defineMessages({
 	},
 	signInButton: {
 		id: 'modal.modrinth-account-required.sign-in-button',
-		defaultMessage: 'Sign in to catálogo',
+		defaultMessage: 'Sign in to Modrinth',
 	},
 	continueInBrowserHeading: {
 		id: 'modal.modrinth-account-required.continue-in-browser-heading',

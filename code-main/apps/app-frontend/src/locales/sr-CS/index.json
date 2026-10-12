@@ -72,7 +72,7 @@
 		"message": "Podešavanje Minecrafta nije uspelo"
 	},
 	"app.action-bar.install.summary.modrinth-unreachable": {
-		"message": "Nije bilo moguće povezati se sa catálogo-om"
+		"message": "Nije bilo moguće povezati se sa Modrinth-om"
 	},
 	"app.action-bar.install.summary.no-write-permission": {
 		"message": "Nema dozvole za pisanje"
@@ -126,7 +126,7 @@
 		"message": "Prihvati sve"
 	},
 	"app.ads-consent.body": {
-		"message": "Reklame omogućavaju da catálogo radi i finansiraju isplate kreatorima. Naši partneri mogu da čuvaju i koriste kolačiće u aplikaciji da bi personalizovali reklame i merili performanse."
+		"message": "Reklame omogućavaju da Modrinth radi i finansiraju isplate kreatorima. Naši partneri mogu da čuvaju i koriste kolačiće u aplikaciji da bi personalizovali reklame i merili performanse."
 	},
 	"app.ads-consent.manage": {
 		"message": "Upravljaj podešavanjima"
@@ -135,7 +135,7 @@
 		"message": "Odbij sve"
 	},
 	"app.ads-consent.title": {
-		"message": "Tvoja bezbednost i kako reklame pomažu catálogo-u"
+		"message": "Tvoja bezbednost i kako reklame pomažu Modrinth-u"
 	},
 	"app.appearance-settings.default-landing-page.home": {
 		"message": "Početna stranica"
@@ -399,7 +399,7 @@
 		"message": "Instaliraj"
 	},
 	"app.modal.install-to-play.invite-warning": {
-		"message": "Ovu pozivnicu je kreirao drugi korisnik catálogoa, a ne sam catálogo. Prihvataj pozivnice samo od osoba kojima veruješ."
+		"message": "Ovu pozivnicu je kreirao drugi korisnik Modrintha, a ne sam Modrinth. Prihvataj pozivnice samo od osoba kojima veruješ."
 	},
 	"app.modal.install-to-play.mod-count": {
 		"message": "{count, plural, one {# mod} other {# modova}}"
@@ -408,7 +408,7 @@
 		"message": "Deljena instanca"
 	},
 	"app.modal.install-to-play.unknown-files-description": {
-		"message": "Ovaj modpack servera sadrži datoteke koje nisu postavljene na catálogo-u. Preporučujemo da instaliraš datoteke samo iz izvora kojima veruješ."
+		"message": "Ovaj modpack servera sadrži datoteke koje nisu postavljene na Modrinth-u. Preporučujemo da instaliraš datoteke samo iz izvora kojima veruješ."
 	},
 	"app.modal.install-to-play.unknown-files-warning": {
 		"message": "Upozorenje nepoznatih datoteka"
@@ -576,13 +576,13 @@
 		"message": "MINECON Earth 2017"
 	},
 	"app.skins.section.modrinth": {
-		"message": "catálogo"
+		"message": "Modrinth"
 	},
 	"app.skins.section.modrinth-pride": {
-		"message": "catálogo Ponos"
+		"message": "Modrinth Ponos"
 	},
 	"app.skins.section.modrinth-pride.tooltip": {
-		"message": "Dobio si ove skinove za donaciju za prikupljanje sredstava catálogo Ponos tokom Meseca ponosa."
+		"message": "Dobio si ove skinove za donaciju za prikupljanje sredstava Modrinth Ponos tokom Meseca ponosa."
 	},
 	"app.skins.section.mounts-of-mayhem": {
 		"message": "Mounts of Mayhem"
@@ -606,13 +606,13 @@
 		"message": "Selektor skina"
 	},
 	"app.update-popup.body.download-complete": {
-		"message": "Preuzimanje catálogo aplikacije v{version} je završeno. Ponovo učitaj da bi ažurirao sada ili automatski kada zatvoriš catálogo aplikaciju."
+		"message": "Preuzimanje Modrinth aplikacije v{version} je završeno. Ponovo učitaj da bi ažurirao sada ili automatski kada zatvoriš Modrinth aplikaciju."
 	},
 	"app.update-popup.body.linux": {
-		"message": "Dostupna je catálogo aplikacija v{version}. Koristi menadžer paketa da bi ažurirao za najnovije funkcije i ispravke!"
+		"message": "Dostupna je Modrinth aplikacija v{version}. Koristi menadžer paketa da bi ažurirao za najnovije funkcije i ispravke!"
 	},
 	"app.update-popup.body.metered": {
-		"message": "catálogo aplikacija v{version} je sada dostupna! Pošto si na mreži sa ograničenjem interneta, nismo je automatski preuzeli."
+		"message": "Modrinth aplikacija v{version} je sada dostupna! Pošto si na mreži sa ograničenjem interneta, nismo je automatski preuzeli."
 	},
 	"app.update-popup.changelog": {
 		"message": "Spisak promena"

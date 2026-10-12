@@ -52,7 +52,7 @@ export const Default: StoryObj = {
 
 			const showActions = () => {
 				notificationManager.addNotification({
-					title: 'Your privacy and how ads support catálogo',
+					title: 'Your privacy and how ads support Modrinth',
 					text: 'Choose how our advertising partners may use your data.',
 					type: 'neutral',
 					autoCloseMs: null,

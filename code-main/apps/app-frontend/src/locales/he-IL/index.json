@@ -132,7 +132,7 @@
 		"message": "קבל הכל"
 	},
 	"app.ads-consent.body": {
-		"message": "פרסומות מאפשרות את הפעילות של catálogo ואת הון התשלום ליוצרים. ייתכן כי השותפים שלנו ישמרו או יגשו לעוגיות באפליקציה על מנת להגיש פרסומות אישיות ולמדוד ביצועים."
+		"message": "פרסומות מאפשרות את הפעילות של Modrinth ואת הון התשלום ליוצרים. ייתכן כי השותפים שלנו ישמרו או יגשו לעוגיות באפליקציה על מנת להגיש פרסומות אישיות ולמדוד ביצועים."
 	},
 	"app.ads-consent.manage": {
 		"message": "ניהול העדפות"
@@ -141,7 +141,7 @@
 		"message": "דחה הכל"
 	},
 	"app.ads-consent.title": {
-		"message": "הפרטיות שלך ואיך פרסומות תומכות בcatálogo"
+		"message": "הפרטיות שלך ואיך פרסומות תומכות בModrinth"
 	},
 	"app.appearance-settings.compact-mode.description": {
 		"message": "הצכ התקנות בפריסת שורות קומפקטית."
@@ -162,7 +162,7 @@
 		"message": "הסתר שם משתמש"
 	},
 	"app.appearance-settings.minimize-launcher.description": {
-		"message": "מזער את אפליקציית catálogo בעת הפעלת Minecraft."
+		"message": "מזער את אפליקציית Strata בעת הפעלת Minecraft."
 	},
 	"app.appearance-settings.minimize-launcher.title": {
 		"message": "הקטן אפליקציה"
@@ -186,7 +186,7 @@
 		"message": "הסתר את סרגל הצד הימני"
 	},
 	"app.appearance-settings.unknown-pack-warning.description": {
-		"message": "הצג אזהרת בטיחות לפני התקנת חבילת catálogo (.mrpack) שאינה מאורחת ב-catálogo."
+		"message": "הצג אזהרת בטיחות לפני התקנת חבילת Modrinth (.mrpack) שאינה מאורחת ב-Modrinth."
 	},
 	"app.appearance-settings.unknown-pack-warning.title": {
 		"message": "הזהר אותי לפני התקנת חבילות תוכן לא מוכרות"
@@ -210,7 +210,7 @@
 		"message": "שתמש בהגדרות התנהגות אלו בכל מקום שבו אתה מחובר. כבה אפשרות זו כדי לשמור על הגדרות נפרדות במכשיר זה."
 	},
 	"app.behavior-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "התחבר לחשבון catálogo כדי לסנכרן הגדרות."
+		"message": "התחבר לחשבון Modrinth כדי לסנכרן הגדרות."
 	},
 	"app.behavior-settings.sync-across-devices.title": {
 		"message": "סנכרן התנהגות בין מכשירים"
@@ -369,7 +369,7 @@
 		"message": "שמור הגדרות הפיצ'רים האלה בכל מקום שאתה מחובר. כבה הגדרה זאת כדי להשאיר הגדרות שונות במכשיר זה."
 	},
 	"app.features-settings.sync-across-devices.signed-out-tooltip": {
-		"message": "התחבר לחשבון catálogo כדי לסנכרן הגדרות."
+		"message": "התחבר לחשבון Modrinth כדי לסנכרן הגדרות."
 	},
 	"app.features-settings.sync-across-devices.title": {
 		"message": "סנכרן פיצ'רים בין מכשירים"
@@ -402,16 +402,16 @@
 		"message": "הצג התקנה"
 	},
 	"app.hosting.update-required.description": {
-		"message": "עליך לעדכן בכדי להשתמש ב- Hosting דרך אפליקציית ה catálogo"
+		"message": "עליך לעדכן בכדי להשתמש ב- Hosting דרך אפליקציית ה Strata"
 	},
 	"app.hosting.update-required.download": {
 		"message": "הורד על מנת לעדכן"
 	},
 	"app.hosting.update-required.rinthbot-alt": {
-		"message": "רובוט catálogo מתרגש"
+		"message": "רובוט Modrinth מתרגש"
 	},
 	"app.hosting.update-required.title": {
-		"message": "אפליקציית ה- catálogo דורשת עדכון"
+		"message": "אפליקציית ה- Modrinth דורשת עדכון"
 	},
 	"app.install.phase.downloading_content": {
 		"message": "מוריד תוכן"
@@ -738,13 +738,13 @@
 		"message": "התחברו בתור"
 	},
 	"app.instance.shared-instance-wrong-account.signed-out-header": {
-		"message": "צריך להתחבר ל-catálogo"
+		"message": "צריך להתחבר ל-Modrinth"
 	},
 	"app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
 		"message": "כדי לקבל עדכונים עבור ההתקנה המשותפת הזו."
 	},
 	"app.instance.shared-instance-wrong-account.warning-header": {
-		"message": "אתם משתמשים בחשבון catálogo הלא נכון"
+		"message": "אתם משתמשים בחשבון Modrinth הלא נכון"
 	},
 	"app.instance.shortcut.created": {
 		"message": "קיצור הדרך נוצר"
@@ -1170,10 +1170,10 @@
 		"message": "התקנה"
 	},
 	"app.modal.install-to-play.invite-warning": {
-		"message": "הזמנה זאת נוצרה על ידי משתמש \"catálogo\" לא \"catálogo\" עצמו. תאשר\\י הזמנות רק מאנשים שאפשר לסמוך עליהם."
+		"message": "הזמנה זאת נוצרה על ידי משתמש \"Modrinth\" לא \"Modrinth\" עצמו. תאשר\\י הזמנות רק מאנשים שאפשר לסמוך עליהם."
 	},
 	"app.modal.install-to-play.invite-warning-with-creator": {
-		"message": "הזמנה זאת נוצרה על ידי <creator>{username}</creator> לא \"catálogo\". תאשר\\י הזמנות רק מאנשים שאפשר לסמוך עליהם."
+		"message": "הזמנה זאת נוצרה על ידי <creator>{username}</creator> לא \"Modrinth\". תאשר\\י הזמנות רק מאנשים שאפשר לסמוך עליהם."
 	},
 	"app.modal.install-to-play.managed-content.modpack-header": {
 		"message": "תוכן החבילת מודים"
@@ -1206,7 +1206,7 @@
 		"message": "לפניות בנושא תמיכה, צרו קשר עם <support-link>צוות התמיכה</support-link> שלנו. לדיווח על באגים, פתחו <github-link>בעיית Github</github-link>."
 	},
 	"app.modal.install-to-play.reviewed-files": {
-		"message": "קבצים שלא עלו בcatálogo לא מקבלים בדיקה."
+		"message": "קבצים שלא עלו בModrinth לא מקבלים בדיקה."
 	},
 	"app.modal.install-to-play.shared-instance": {
 		"message": "התקנה משותפת"
@@ -1215,10 +1215,10 @@
 		"message": "שתף תוכן ההתקן"
 	},
 	"app.modal.install-to-play.shared-instance-unknown-files-description": {
-		"message": "התקן משותף זה מכיל קבצים שאינם מפורסמים ב-catálogo. אנו ממליצים בחום להתקין קבצים אך ורק ממקורות שאתם סומכים עליהם."
+		"message": "התקן משותף זה מכיל קבצים שאינם מפורסמים ב-Modrinth. אנו ממליצים בחום להתקין קבצים אך ורק ממקורות שאתם סומכים עליהם."
 	},
 	"app.modal.install-to-play.unknown-files-description": {
-		"message": "שרת חבילת מודים זה מכיל קבצים שאינם מפורסמים ב-catálogo. אנו ממליצים בחום להתקין קבצים אך ורק ממקורות שאתם סומכים עליהם."
+		"message": "שרת חבילת מודים זה מכיל קבצים שאינם מפורסמים ב-Modrinth. אנו ממליצים בחום להתקין קבצים אך ורק ממקורות שאתם סומכים עליהם."
 	},
 	"app.modal.install-to-play.unknown-files-warning": {
 		"message": "הזהרת קבצים לא ידועים"
@@ -1239,7 +1239,7 @@
 		"message": "נמחק"
 	},
 	"app.modal.update-to-play.server-modpack-unknown-files-description": {
-		"message": "עדכון שרת חבילת מודים זה מכיל קבצים שאינם מפורסמים ב-catálogo. אנו ממליצים בחום להתקין קבצים אך ורק ממקורות שאתם סומכים עליהם."
+		"message": "עדכון שרת חבילת מודים זה מכיל קבצים שאינם מפורסמים ב-Modrinth. אנו ממליצים בחום להתקין קבצים אך ורק ממקורות שאתם סומכים עליהם."
 	},
 	"app.modal.update-to-play.shared-instance-added-label": {
 		"message": "נוסף"
@@ -1248,7 +1248,7 @@
 		"message": "נמחק"
 	},
 	"app.modal.update-to-play.shared-instance-unknown-files-description": {
-		"message": "עדכון התקן משותף זה מכיל קבצים שאינם מפורסמים ב-catálogo. אנו ממליצים בחום להתקין קבצים אך ורק ממקורות שאתם סומכים עליהם."
+		"message": "עדכון התקן משותף זה מכיל קבצים שאינם מפורסמים ב-Modrinth. אנו ממליצים בחום להתקין קבצים אך ורק ממקורות שאתם סומכים עליהם."
 	},
 	"app.modal.update-to-play.update-required": {
 		"message": "נדרש עדכון"
@@ -1269,10 +1269,10 @@
 		"message": "טוען פרופיל..."
 	},
 	"app.nav.modrinth-account": {
-		"message": "משתמש catálogo"
+		"message": "משתמש Modrinth"
 	},
 	"app.nav.modrinth-hosting": {
-		"message": "שרתי catálogo"
+		"message": "שרתי Modrinth"
 	},
 	"app.nav.remove-account": {
 		"message": "מחק חשבון"
@@ -1281,13 +1281,13 @@
 		"message": "צילומי מסך"
 	},
 	"app.nav.sign-in-to-modrinth-account": {
-		"message": "התחבר לcatálogo"
+		"message": "התחבר לModrinth"
 	},
 	"app.nav.switch-account": {
 		"message": "החלף חשבון"
 	},
 	"app.nav.upgrade-to-modrinth-plus": {
-		"message": "שדרג לPremium del catálogo"
+		"message": "שדרג לModrinth+"
 	},
 	"app.nav.view-profile": {
 		"message": "ראה פרופיל"

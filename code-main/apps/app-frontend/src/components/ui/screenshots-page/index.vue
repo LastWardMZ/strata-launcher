@@ -298,7 +298,7 @@ const messages = defineMessages({
 	zipArchive: { id: 'app.screenshots.selection.zip-archive', defaultMessage: 'ZIP archive' },
 	globalExportFilename: {
 		id: 'app.screenshots.selection.global-export-filename',
-		defaultMessage: 'catálogo screenshots.zip',
+		defaultMessage: 'Strata screenshots.zip',
 	},
 	instanceExportFilename: {
 		id: 'app.screenshots.selection.instance-export-filename',
