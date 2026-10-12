@@ -37,6 +37,10 @@ const MAX_MESSAGES: usize = 1000;
 const MAX_TUNNELS_PER_FRIEND: usize = 16;
 const MAX_INCOMING_PENDING: usize = 50;
 const MAX_SHARES: usize = 16;
+/// Los identificadores de mensaje y de recurso compartido son UUID: nada más largo es legítimo.
+const MAX_ID: usize = 64;
+/// Mensajes (chat o invitaciones) que se aceptan de un mismo amigo por minuto.
+const MAX_INCOMING_PER_MINUTE: u32 = 60;
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(12);
 
 #[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Debug)]
@@ -180,6 +184,8 @@ pub struct Core {
     shares: Mutex<HashMap<String, Share>>,
     joins: Mutex<HashMap<String, (u16, AbortHandle)>>,
     tunnels: Mutex<HashMap<String, usize>>,
+    /// Mensajes recibidos por amigo en el minuto en curso: (inicio de la ventana en segundos, cuántos).
+    incoming_rate: Mutex<HashMap<String, (u64, u32)>>,
     conns: tokio::sync::Mutex<HashMap<String, Connection>>,
     hints: Mutex<HashMap<String, EndpointAddr>>,
     /// Códigos de los amigos de la cuenta de Strata: se aceptan sin pedir confirmación.
@@ -202,6 +208,11 @@ fn clean_name(name: &str) -> String {
 /// Identificadores de Modrinth, versiones y cargadores: solo caracteres inofensivos.
 fn clean_token(value: &str, max: usize) -> String {
     value.chars().filter(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '-' | '_' | '+')).take(max).collect()
+}
+
+/// Un id de mensaje o de recurso válido: corto y solo con letras, números y guiones (los launchers envían UUID v4).
+fn valid_id(id: &str) -> bool {
+    !id.is_empty() && id.len() <= MAX_ID && id.chars().all(|c| c.is_ascii_alphanumeric() || c == '-')
 }
 
 fn clean_recipe(recipe: InstanceRecipe) -> Result<InstanceRecipe, String> {
@@ -314,6 +325,7 @@ impl Core {
             shares: Mutex::new(HashMap::new()),
             joins: Mutex::new(HashMap::new()),
             tunnels: Mutex::new(HashMap::new()),
+            incoming_rate: Mutex::new(HashMap::new()),
             conns: tokio::sync::Mutex::new(HashMap::new()),
             hints: Mutex::new(HashMap::new()),
             trusted: Mutex::new(HashSet::new()),
@@ -515,9 +527,12 @@ impl Core {
             Request::Chat { id, text, ts } => {
                 self.require_friend(remote)?;
                 let text = text.trim().to_string();
-                if text.is_empty() || text.chars().count() > MAX_TEXT {
+                if text.is_empty() || text.chars().count() > MAX_TEXT || !valid_id(&id) {
                     return Err("Mensaje no válido".into());
                 }
+                self.allow_incoming(remote)?;
+                // La hora la pone quien envía: nunca en el futuro (desordenaría la conversación).
+                let ts = ts.min(now() + 300);
                 self.store_incoming(remote, ChatMessage { id, from_me: false, text, ts, delivered: true, invite: None });
                 Ok(Response::Ok { accepted: true, name: String::new() })
             }
@@ -526,9 +541,15 @@ impl Core {
                 if self.invites_none.load(Ordering::Relaxed) {
                     return Err("Este usuario no acepta invitaciones".into());
                 }
-                if !["world", "server", "instance"].contains(&info.kind.as_str()) {
+                if !["world", "server", "instance"].contains(&info.kind.as_str()) || !valid_id(&id) {
                     return Err("Invitación no válida".into());
                 }
+                // El id del recurso se guarda y se devuelve al unirse: acotado como cualquier otro id (vacío en instancias).
+                if info.kind != "instance" && !valid_id(&info.share_id) {
+                    return Err("Invitación no válida".into());
+                }
+                self.allow_incoming(remote)?;
+                let ts = ts.min(now() + 300);
                 let instance = match info.instance.clone() {
                     Some(recipe) => Some(clean_recipe(recipe)?),
                     None => None,
@@ -559,6 +580,21 @@ impl Core {
             }
             Request::Tunnel { .. } => Err("No autorizado".into()),
         }
+    }
+
+    /// Límite de mensajes por minuto de cada amigo. Lo que se rechaza aquí queda pendiente en el origen y se reintenta.
+    fn allow_incoming(&self, friend: &str) -> Result<(), String> {
+        let now = now();
+        let mut rates = self.incoming_rate.lock().unwrap();
+        let entry = rates.entry(friend.to_string()).or_insert((now, 0));
+        if now.saturating_sub(entry.0) >= 60 {
+            *entry = (now, 0);
+        }
+        entry.1 += 1;
+        if entry.1 > MAX_INCOMING_PER_MINUTE {
+            return Err("Demasiados mensajes seguidos".into());
+        }
+        Ok(())
     }
 
     fn store_incoming(&self, friend: &str, message: ChatMessage) {
@@ -1807,6 +1843,43 @@ mod tests {
         }
     }
 
+
+    /// SEC-05: un amigo no puede inflar el disco con ids enormes ni saturar con mensajes.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn incoming_messages_have_bounded_ids_times_and_rate() {
+        let (a, b) = pair().await;
+        befriend(&a, &b).await;
+        let b_id = b.info().id;
+        let chat = |id: String, ts: u64| Request::Chat { id, text: "hola".into(), ts };
+
+        assert!(a.handle_request(&b_id, chat("x".repeat(65_000), now())).is_err(), "id de 65 KB");
+        assert!(a.handle_request(&b_id, chat(String::new(), now())).is_err(), "id vacío");
+        assert!(a.handle_request(&b_id, chat("../../etc/passwd".into(), now())).is_err(), "caracteres no permitidos");
+        assert!(a.messages(&b_id).is_empty(), "no se guardó nada");
+
+        // Un UUID normal pasa, y una hora en el futuro se acota.
+        assert!(a.handle_request(&b_id, chat(uuid::Uuid::new_v4().to_string(), u64::MAX)).is_ok());
+        assert!(a.messages(&b_id)[0].ts <= now() + 300, "la hora no puede ir en el futuro");
+
+        // Invitaciones: el id del recurso también se acota.
+        let invite = |share_id: String| Request::Invite {
+            id: uuid::Uuid::new_v4().to_string(),
+            info: InviteInfo { share_id, kind: "world".into(), title: "Mundo".into(), game_version: "1.21".into(), instance: None },
+            ts: now(),
+        };
+        assert!(a.handle_request(&b_id, invite("y".repeat(60_000))).is_err());
+        assert!(a.handle_request(&b_id, invite(uuid::Uuid::new_v4().to_string())).is_ok());
+
+        // Límite por minuto (ya se han aceptado 2 en esta ventana).
+        let mut accepted = 2;
+        while a.handle_request(&b_id, chat(uuid::Uuid::new_v4().to_string(), now())).is_ok() {
+            accepted += 1;
+            assert!(accepted <= 200, "el límite no actúa");
+        }
+        assert_eq!(accepted, MAX_INCOMING_PER_MINUTE as usize);
+        a.shutdown().await;
+        b.shutdown().await;
+    }
 
     /// SEC-02: un usuario bloqueado en la cuenta no puede mandar solicitudes P2P directas, y el bloqueo se levanta
     /// cuando la cuenta lo levanta (salvo los bloqueos hechos a mano).
