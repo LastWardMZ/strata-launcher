@@ -596,6 +596,16 @@ async function add() {
 	if (creating.value) return
 	creating.value = true
 	try {
+		// Si el Java elegido no existe o es más antiguo que el que pide esta versión de Minecraft, se instala solo.
+		if (launchMode.value === 'jar' && recommendedJava.value) {
+			const check = await call<{ available: boolean; major_version: number | null }>('local_servers_java_check', { java: java.value })
+			if (!check.available || (check.major_version !== null && check.major_version < recommendedJava.value)) {
+				error.value = ''
+				downloadProgress.value = `Instalando Java ${recommendedJava.value}…`
+				await installCreateJava()
+				if (error.value) throw new Error(error.value)
+			}
+		}
 		const server = await call<Server>('local_servers_create', {
 			name: name.value,
 			directory: directory.value,
@@ -1104,7 +1114,7 @@ onUnmounted(() => {
 						<Button @click="pickExecutable">Elegir ejecutable</Button>
 						<label class="field full">Argumentos de lanzamiento<input v-model="launchArgs" placeholder="--world mundo" /></label>
 						<label v-if="launchMode === 'jar'" class="field full">Java<input v-model="java" placeholder="java o ruta a java.exe" @blur="checkJava" /></label>
-						<p v-if="recommendedJava" class="subtle">Esta versión de Minecraft recomienda Java {{ recommendedJava }}.</p>
+						<p v-if="recommendedJava" class="subtle">Esta versión de Minecraft recomienda Java {{ recommendedJava }}. Si no lo tienes, Strata lo instala al crear el servidor.</p>
 						<Button v-if="recommendedJava" :disabled="installingCreateJava" @click="installCreateJava">{{ installingCreateJava ? 'Instalando Java…' : `Instalar Java ${recommendedJava}` }}</Button>
 						<p v-if="launchMode === 'jar' && javaCheck" class="subtle">{{ javaCheck.available ? (javaCheck.raw || 'Java disponible') : 'Java no disponible en esta ruta' }}</p>
 					</div>
