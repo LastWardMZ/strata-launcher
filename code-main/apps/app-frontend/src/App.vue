@@ -2440,7 +2440,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					</div>
 					<div class="flex flex-col gap-3 p-4">
 						<suspense>
-							<StrataFriendsPanel ref="friendsList" @sign-in="appSettingsModal?.showProfile()" />
+							<StrataFriendsPanel
+								ref="friendsList"
+								@sign-in="appSettingsModal?.showProfile()"
+								@edit-profile="appSettingsModal?.showProfile()"
+							/>
 						</suspense>
 					</div>
 				</div>

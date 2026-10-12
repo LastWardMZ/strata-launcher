@@ -1,16 +1,34 @@
 <script setup lang="ts">
-import { BanIcon, CheckIcon, SearchIcon, UserPlusIcon, UsersIcon, XIcon } from '@modrinth/assets'
-import { Button, IconButton, Input } from '@modrinth/ui'
-import { onBeforeUnmount, ref, watch } from 'vue'
+import {
+	BanIcon,
+	CheckIcon,
+	MoreVerticalIcon,
+	SearchIcon,
+	UserPlusIcon,
+	UsersIcon,
+	XIcon,
+} from '@modrinth/assets'
+import { Button, IconButton, Input, TeleportOverflowMenu } from '@modrinth/ui'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import UserAvatar from '@/components/ui/friends/UserAvatar.vue'
+import { useFriendPresence } from '@/composables/use-friend-presence'
+import { useProfileAvatar } from '@/composables/use-profile-avatar'
 import { type Relation, type SearchHit, useStrataAccount } from '@/composables/use-strata-account'
 
-const emit = defineEmits<{ signIn: [] }>()
+const emit = defineEmits<{ signIn: []; editProfile: [] }>()
 const router = useRouter()
 const account = useStrataAccount()
-const { loggedIn, social, busy, error, status } = account
+const { loggedIn, social, busy, error, status, profile } = account
+const { avatar } = useProfileAvatar()
+const { online } = useFriendPresence(computed(() => social.value.friends.map((friend) => friend.id)))
+// Quien tiene Strata abierto va primero; dentro de cada grupo, por orden alfabético.
+const byName = (a: { username: string }, b: { username: string }) =>
+	a.username.localeCompare(b.username, undefined, { sensitivity: 'base' })
+const onlineFriends = computed(() => social.value.friends.filter((f) => online.value[f.id]).sort(byName))
+const offlineFriends = computed(() => social.value.friends.filter((f) => !online.value[f.id]).sort(byName))
 
 const addModal = ref<InstanceType<typeof ModalWrapper> | null>(null)
 const query = ref('')
@@ -74,7 +92,6 @@ async function requestExact() {
 		addModal.value?.hide()
 	}
 }
-const initial = (name: string) => (name.trim()[0] ?? '?').toUpperCase()
 const exactInResults = () =>
 	results.value.some((hit) => hit.username.toLowerCase() === query.value.trim().toLowerCase())
 </script>
@@ -106,11 +123,7 @@ const exactInResults = () =>
 					:key="hit.id"
 					class="flex items-center gap-3 rounded-xl bg-surface-4 p-2 pl-3"
 				>
-					<div
-						class="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-5 font-bold text-contrast"
-					>
-						{{ initial(hit.username) }}
-					</div>
+					<UserAvatar :name="hit.username" :size="36" />
 					<span class="min-w-0 flex-1 truncate font-semibold text-contrast">{{
 						hit.username
 					}}</span>
@@ -162,6 +175,21 @@ const exactInResults = () =>
 	</div>
 
 	<div v-else class="flex flex-col gap-3">
+		<button
+			v-if="profile"
+			type="button"
+			class="flex w-full cursor-pointer items-center gap-3 rounded-xl border border-solid border-surface-5 bg-surface-3 p-2.5 text-left transition-colors hover:bg-surface-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+			aria-label="Editar tu perfil"
+			@click="emit('editProfile')"
+		>
+			<UserAvatar :name="profile.username" :src="avatar" :size="44" :status="status?.offline ? 'offline' : 'online'" />
+			<span class="min-w-0 flex-1">
+				<span class="block truncate font-bold leading-tight text-contrast">{{ profile.username }}</span>
+				<span class="block truncate text-xs leading-tight text-secondary">
+					{{ status?.offline ? 'Sin conexión con el servidor' : 'En línea · Editar perfil' }}
+				</span>
+			</span>
+		</button>
 		<div class="flex items-center gap-1 -ml-1">
 			<h3 class="m-0 flex-1 pl-1 text-base font-medium text-primary">
 				Amigos · {{ social.friends.length }}
@@ -185,11 +213,7 @@ const exactInResults = () =>
 				:key="user.id"
 				class="flex items-center gap-2 rounded-xl bg-surface-3 p-2"
 			>
-				<div
-					class="flex size-8 shrink-0 items-center justify-center rounded-full bg-surface-5 text-sm font-bold text-contrast"
-				>
-					{{ initial(user.username) }}
-				</div>
+				<UserAvatar :name="user.username" :size="32" />
 				<span class="min-w-0 flex-1 truncate font-semibold text-contrast">{{ user.username }}</span>
 				<IconButton
 					v-tooltip="'Aceptar'"
@@ -229,42 +253,47 @@ const exactInResults = () =>
 			>
 			para jugar juntos.
 		</p>
-		<div
-			v-for="user in social.friends"
-			:key="user.id"
-			class="group flex items-center gap-2 rounded-xl p-1 hover:bg-surface-3"
-		>
-			<div
-				class="flex size-8 shrink-0 items-center justify-center rounded-full bg-surface-5 text-sm font-bold text-contrast"
-			>
-				{{ initial(user.username) }}
+		<template v-for="group in [
+			{ key: 'online', label: 'En línea', users: onlineFriends },
+			{ key: 'offline', label: 'Desconectados', users: offlineFriends },
+		]" :key="group.key">
+			<div v-if="group.users.length" class="flex flex-col gap-0.5">
+				<div class="px-1 pb-1 text-xs font-semibold uppercase tracking-wide text-secondary">
+					{{ group.label }} · {{ group.users.length }}
+				</div>
+				<div
+					v-for="user in group.users"
+					:key="user.id"
+					class="group flex items-center gap-2.5 rounded-xl p-1.5 hover:bg-surface-3 focus-within:bg-surface-3"
+				>
+					<UserAvatar :name="user.username" :size="36" :status="group.key === 'online' ? 'online' : 'offline'" />
+					<div class="min-w-0 flex-1" :title="user.bio || undefined">
+						<div
+							class="truncate font-semibold leading-tight"
+							:class="group.key === 'online' ? 'text-contrast' : 'text-secondary'"
+						>
+							{{ user.username }}
+						</div>
+						<div class="truncate text-xs leading-tight text-secondary">
+							{{ group.key === 'online' ? 'En línea' : 'Desconectado' }}
+						</div>
+					</div>
+					<TeleportOverflowMenu
+						type="quiet"
+						:label="`Más acciones para ${user.username}`"
+						class="shrink-0 opacity-0 transition-opacity focus-visible:opacity-100 group-hover:opacity-100 group-focus-within:opacity-100"
+						:options="[
+							{ id: 'remove', label: 'Eliminar amigo', action: () => account.friendAction('remove', user.username) },
+							{ id: 'block', label: 'Bloquear', action: () => account.friendAction('block', user.username), tone: 'red' },
+						]"
+					>
+						<MoreVerticalIcon />
+						<template #remove><XIcon /> Eliminar amigo</template>
+						<template #block><BanIcon /> Bloquear</template>
+					</TeleportOverflowMenu>
+				</div>
 			</div>
-			<span
-				class="min-w-0 flex-1 truncate font-semibold text-contrast"
-				:title="user.bio || undefined"
-				>{{ user.username }}</span
-			>
-			<span class="hidden gap-1 group-hover:flex">
-				<IconButton
-					v-tooltip="'Eliminar amigo'"
-					type="quiet"
-					label="Eliminar amigo"
-					:disabled="busy"
-					@click="account.friendAction('remove', user.username)"
-				>
-					<XIcon />
-				</IconButton>
-				<IconButton
-					v-tooltip="'Bloquear'"
-					type="quiet"
-					label="Bloquear"
-					:disabled="busy"
-					@click="account.friendAction('block', user.username)"
-				>
-					<BanIcon />
-				</IconButton>
-			</span>
-		</div>
+		</template>
 
 		<template v-if="social.outgoing.length">
 			<div class="text-sm font-semibold text-contrast">

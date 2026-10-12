@@ -26,6 +26,7 @@ import {
 	recipeOf,
 	recipeSummary,
 } from '@/composables/use-instance-sharing'
+import UserAvatar from '@/components/ui/friends/UserAvatar.vue'
 import { useStrataAccount } from '@/composables/use-strata-account'
 import { getErrorMessage } from '@/helpers/install'
 
@@ -125,9 +126,6 @@ function say(text: string) {
 }
 function time(ts: number) {
 	return new Date(ts * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-}
-function initial(name: string) {
-	return (name.trim()[0] ?? '?').toUpperCase()
 }
 
 async function loadFriends() {
@@ -511,11 +509,7 @@ onUnmounted(() => {
 						:key="f.id"
 						class="flex items-center gap-2 rounded-xl bg-surface-4 p-2"
 					>
-						<div
-							class="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-5 font-bold text-contrast"
-						>
-							{{ initial(f.name) }}
-						</div>
+						<UserAvatar :name="f.name" :size="36" />
 						<span class="min-w-0 flex-1 truncate font-semibold text-contrast">{{ f.name }}</span>
 						<Button type="colored" color="brand" size="sm" @click="accept(f)"><CheckIcon /></Button>
 						<Button type="outlined" size="sm" @click="remove(f)"><XIcon /></Button>
@@ -539,17 +533,7 @@ onUnmounted(() => {
 					:class="f.id === selectedId ? 'bg-surface-4' : 'bg-transparent'"
 					@click="select(f)"
 				>
-					<div class="relative">
-						<div
-							class="flex size-9 items-center justify-center rounded-full bg-surface-5 font-bold text-contrast"
-						>
-							{{ initial(f.name) }}
-						</div>
-						<span
-							class="absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-solid border-surface-3"
-							:class="online[f.id] ? 'bg-green' : 'bg-surface-5'"
-						/>
-					</div>
+					<UserAvatar :name="f.name" :size="36" :status="online[f.id] ? 'online' : 'offline'" />
 					<div class="min-w-0 flex-1">
 						<div class="truncate font-semibold text-contrast">{{ f.name }}</div>
 						<div class="text-xs text-secondary">
@@ -588,11 +572,7 @@ onUnmounted(() => {
 						class="flex items-center justify-between gap-2 border-0 border-b border-solid border-surface-5 pb-3"
 					>
 						<div class="flex min-w-0 items-center gap-2">
-							<div
-								class="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-5 font-bold text-contrast"
-							>
-								{{ initial(selected.name) }}
-							</div>
+							<UserAvatar :name="selected.name" :size="36" :status="online[selected.id] ? 'online' : 'offline'" />
 							<strong class="truncate text-lg text-contrast">{{ selected.name }}</strong>
 						</div>
 						<div class="flex gap-2">

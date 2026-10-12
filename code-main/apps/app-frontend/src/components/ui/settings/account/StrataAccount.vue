@@ -11,6 +11,8 @@ import { Admonition, Button, Input, Textarea } from '@modrinth/ui'
 import { confirm, open, save } from '@tauri-apps/plugin-dialog'
 import { computed, ref, watch } from 'vue'
 
+import UserAvatar from '@/components/ui/friends/UserAvatar.vue'
+import { useProfileAvatar } from '@/composables/use-profile-avatar'
 import { useStrataAccount } from '@/composables/use-strata-account'
 import { restartApp } from '@/helpers/utils'
 
@@ -26,6 +28,23 @@ const showServer = ref(false)
 const showRename = ref(false)
 const serverUrl = ref('')
 const notice = ref('')
+const { avatar, setFromFile, clear: clearAvatar } = useProfileAvatar()
+const photoInput = ref<HTMLInputElement | null>(null)
+const photoError = ref('')
+
+async function pickPhoto(event: Event) {
+	const input = event.target as HTMLInputElement
+	const file = input.files?.[0]
+	input.value = ''
+	if (!file) return
+	photoError.value = ''
+	try {
+		await setFromFile(file)
+		notice.value = 'Foto actualizada.'
+	} catch (cause) {
+		photoError.value = cause instanceof Error ? cause.message : 'No se pudo usar esa imagen.'
+	}
+}
 
 watch(profile, (value) => {
 	bio.value = value?.bio ?? ''
@@ -175,15 +194,26 @@ async function saveServer() {
 			<div
 				class="flex flex-wrap items-center gap-3 rounded-2xl bg-surface-3 p-4 ring-1 ring-inset ring-surface-5"
 			>
-				<div
-					class="flex size-12 shrink-0 items-center justify-center rounded-full bg-surface-5 text-xl font-bold text-contrast"
-				>
-					{{ profile.username[0]?.toUpperCase() }}
-				</div>
+				<UserAvatar :name="profile.username" :src="avatar" :size="72" />
 				<div class="min-w-0 flex-1">
 					<div class="truncate text-lg font-bold text-contrast">{{ profile.username }}</div>
 					<div class="text-sm text-secondary">
 						Tu nombre de usuario es único y no se puede repetir.
+					</div>
+					<div class="mt-2 flex flex-wrap gap-2">
+						<input
+							ref="photoInput"
+							type="file"
+							accept="image/png,image/jpeg,image/webp,image/gif"
+							class="hidden"
+							@change="pickPhoto"
+						/>
+						<Button size="sm" @click="photoInput?.click()"><UploadIcon /> {{ avatar ? 'Cambiar foto' : 'Subir foto' }}</Button>
+						<Button v-if="avatar" size="sm" type="outlined" @click="clearAvatar"><TrashIcon /> Quitar foto</Button>
+					</div>
+					<div v-if="photoError" class="mt-1 text-sm text-red" role="alert">{{ photoError }}</div>
+					<div v-else class="mt-1 text-sm text-secondary">
+						La foto se recorta a un cuadrado y se guarda en este equipo; todavía no se comparte con tus amigos.
 					</div>
 				</div>
 				<Button type="outlined" @click="showRename = !showRename">Cambiar nombre</Button>
