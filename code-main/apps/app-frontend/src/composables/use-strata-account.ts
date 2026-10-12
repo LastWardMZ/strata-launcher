@@ -18,9 +18,11 @@ export type Profile = {
 	id: string
 	username: string
 	bio: string
+	/** Versión de la foto de perfil; 0 si no tiene. */
+	avatar_v?: number
 	settings: AccountSettings
 }
-export type Member = { id: string; username: string; bio?: string }
+export type Member = { id: string; username: string; bio?: string; avatar_v?: number }
 export type Social = {
 	friends: Member[]
 	incoming: Member[]
@@ -118,6 +120,17 @@ export function useStrataAccount() {
 		update: (changes: { bio?: string; settings?: Partial<AccountSettings> }) =>
 			run(async () => {
 				await invoke('accounts_update', { changes })
+				await reload()
+			}),
+		/** Sube la foto (WebP en base64, sin el prefijo `data:`). */
+		setAvatar: (image: string) =>
+			run(async () => {
+				await invoke('accounts_set_avatar', { image })
+				await reload()
+			}),
+		removeAvatar: () =>
+			run(async () => {
+				await invoke('accounts_remove_avatar')
 				await reload()
 			}),
 		friendAction: (action: FriendAction, username: string) =>

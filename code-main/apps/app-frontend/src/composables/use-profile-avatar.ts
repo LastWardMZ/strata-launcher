@@ -40,8 +40,8 @@ const toDataUrl = (blob: Blob) =>
 	})
 
 export function useProfileAvatar() {
-	/** Procesa la imagen elegida; lanza un `Error` con un mensaje legible si no sirve. */
-	async function setFromFile(file: File) {
+	/** Procesa la imagen elegida y devuelve el WebP en base64 (sin prefijo); lanza un `Error` legible si no sirve. */
+	async function setFromFile(file: File): Promise<string> {
 		if (!file.type.startsWith('image/')) throw new Error('Elige un archivo de imagen (PNG, JPG o WebP).')
 		if (file.size > MAX_SOURCE_BYTES) throw new Error('La imagen pesa más de 10 MB.')
 		let bitmap: ImageBitmap
@@ -71,8 +71,9 @@ export function useProfileAvatar() {
 		for (const quality of [0.9, 0.8, 0.7, 0.55, 0.4]) {
 			const blob = await toBlob(canvas, quality)
 			if (blob && blob.size <= MAX_BYTES) {
-				persist(await toDataUrl(blob))
-				return
+				const dataUrl = await toDataUrl(blob)
+				persist(dataUrl)
+				return dataUrl.slice(dataUrl.indexOf(',') + 1)
 			}
 		}
 		throw new Error('No se pudo reducir la imagen lo suficiente. Prueba con otra.')

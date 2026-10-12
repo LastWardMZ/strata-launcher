@@ -38,12 +38,20 @@ async function pickPhoto(event: Event) {
 	input.value = ''
 	if (!file) return
 	photoError.value = ''
+	let image: string
 	try {
-		await setFromFile(file)
-		notice.value = 'Foto actualizada.'
+		image = await setFromFile(file)
 	} catch (cause) {
 		photoError.value = cause instanceof Error ? cause.message : 'No se pudo usar esa imagen.'
+		return
 	}
+	if (await account.setAvatar(image)) notice.value = 'Foto actualizada: ya la ven tus amigos.'
+	else photoError.value = 'La foto se guardó en este equipo, pero no se pudo compartir con tus amigos. Inténtalo de nuevo.'
+}
+async function removePhoto() {
+	clearAvatar()
+	photoError.value = ''
+	if (await account.removeAvatar()) notice.value = 'Foto quitada.'
 }
 
 watch(profile, (value) => {
@@ -209,11 +217,11 @@ async function saveServer() {
 							@change="pickPhoto"
 						/>
 						<Button size="sm" @click="photoInput?.click()"><UploadIcon /> {{ avatar ? 'Cambiar foto' : 'Subir foto' }}</Button>
-						<Button v-if="avatar" size="sm" type="outlined" @click="clearAvatar"><TrashIcon /> Quitar foto</Button>
+						<Button v-if="avatar" size="sm" type="outlined" @click="removePhoto"><TrashIcon /> Quitar foto</Button>
 					</div>
 					<div v-if="photoError" class="mt-1 text-sm text-red" role="alert">{{ photoError }}</div>
 					<div v-else class="mt-1 text-sm text-secondary">
-						La foto se recorta a un cuadrado y se guarda en este equipo; todavía no se comparte con tus amigos.
+						La foto se recorta a un cuadrado y la ven tus amigos y quienes te envían una solicitud.
 					</div>
 				</div>
 				<Button type="outlined" @click="showRename = !showRename">Cambiar nombre</Button>

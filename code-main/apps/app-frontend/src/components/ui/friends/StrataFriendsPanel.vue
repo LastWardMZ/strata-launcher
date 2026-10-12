@@ -14,6 +14,7 @@ import { useRouter } from 'vue-router'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import UserAvatar from '@/components/ui/friends/UserAvatar.vue'
+import { useFriendAvatars } from '@/composables/use-friend-avatars'
 import { useFriendPresence } from '@/composables/use-friend-presence'
 import { useProfileAvatar } from '@/composables/use-profile-avatar'
 import { type Relation, type SearchHit, useStrataAccount } from '@/composables/use-strata-account'
@@ -23,6 +24,7 @@ const router = useRouter()
 const account = useStrataAccount()
 const { loggedIn, social, busy, error, status, profile } = account
 const { avatar } = useProfileAvatar()
+const { avatarOf } = useFriendAvatars()
 const { online } = useFriendPresence(computed(() => social.value.friends.map((friend) => friend.id)))
 // Quien tiene Strata abierto va primero; dentro de cada grupo, por orden alfabético.
 const byName = (a: { username: string }, b: { username: string }) =>
@@ -213,7 +215,7 @@ const exactInResults = () =>
 				:key="user.id"
 				class="flex items-center gap-2 rounded-xl bg-surface-3 p-2"
 			>
-				<UserAvatar :name="user.username" :size="32" />
+				<UserAvatar :name="user.username" :src="avatarOf(user)" :size="32" />
 				<span class="min-w-0 flex-1 truncate font-semibold text-contrast">{{ user.username }}</span>
 				<IconButton
 					v-tooltip="'Aceptar'"
@@ -266,7 +268,7 @@ const exactInResults = () =>
 					:key="user.id"
 					class="group flex items-center gap-2.5 rounded-xl p-1.5 hover:bg-surface-3 focus-within:bg-surface-3"
 				>
-					<UserAvatar :name="user.username" :size="36" :status="group.key === 'online' ? 'online' : 'offline'" />
+					<UserAvatar :name="user.username" :src="avatarOf(user)" :size="36" :status="group.key === 'online' ? 'online' : 'offline'" />
 					<div class="min-w-0 flex-1" :title="user.bio || undefined">
 						<div
 							class="truncate font-semibold leading-tight"

@@ -27,6 +27,7 @@ import {
 	recipeSummary,
 } from '@/composables/use-instance-sharing'
 import UserAvatar from '@/components/ui/friends/UserAvatar.vue'
+import { useFriendAvatars } from '@/composables/use-friend-avatars'
 import { useStrataAccount } from '@/composables/use-strata-account'
 import { getErrorMessage } from '@/helpers/install'
 
@@ -62,6 +63,10 @@ const call = <T,>(cmd: string, args: Record<string, unknown> = {}) => invoke<T>(
 
 const me = ref<{ id: string; name: string }>({ id: '', name: '' })
 const account = useStrataAccount()
+const { avatarOf } = useFriendAvatars()
+/** Foto de un amigo del P2P: el código de partidas es el id de su cuenta. */
+const photoOf = (id: string) =>
+	avatarOf({ id, avatar_v: account.social.value.friends.find((member) => member.id === id)?.avatar_v })
 const friends = ref<Friend[]>([])
 const online = ref<Record<string, boolean>>({})
 const selectedId = ref('')
@@ -509,7 +514,7 @@ onUnmounted(() => {
 						:key="f.id"
 						class="flex items-center gap-2 rounded-xl bg-surface-4 p-2"
 					>
-						<UserAvatar :name="f.name" :size="36" />
+						<UserAvatar :name="f.name" :src="photoOf(f.id)" :size="36" />
 						<span class="min-w-0 flex-1 truncate font-semibold text-contrast">{{ f.name }}</span>
 						<Button type="colored" color="brand" size="sm" @click="accept(f)"><CheckIcon /></Button>
 						<Button type="outlined" size="sm" @click="remove(f)"><XIcon /></Button>
@@ -533,7 +538,7 @@ onUnmounted(() => {
 					:class="f.id === selectedId ? 'bg-surface-4' : 'bg-transparent'"
 					@click="select(f)"
 				>
-					<UserAvatar :name="f.name" :size="36" :status="online[f.id] ? 'online' : 'offline'" />
+					<UserAvatar :name="f.name" :src="photoOf(f.id)" :size="36" :status="online[f.id] ? 'online' : 'offline'" />
 					<div class="min-w-0 flex-1">
 						<div class="truncate font-semibold text-contrast">{{ f.name }}</div>
 						<div class="text-xs text-secondary">
@@ -572,7 +577,7 @@ onUnmounted(() => {
 						class="flex items-center justify-between gap-2 border-0 border-b border-solid border-surface-5 pb-3"
 					>
 						<div class="flex min-w-0 items-center gap-2">
-							<UserAvatar :name="selected.name" :size="36" :status="online[selected.id] ? 'online' : 'offline'" />
+							<UserAvatar :name="selected.name" :src="photoOf(selected.id)" :size="36" :status="online[selected.id] ? 'online' : 'offline'" />
 							<strong class="truncate text-lg text-contrast">{{ selected.name }}</strong>
 						</div>
 						<div class="flex gap-2">

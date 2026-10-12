@@ -270,6 +270,34 @@ pub async fn accounts_update<R: tauri::Runtime>(app: tauri::AppHandle<R>, state:
     Ok(profile)
 }
 
+/// Sube la foto de perfil: WebP de 128×128 en base64 (el servicio la valida y limita a 24 KB).
+#[tauri::command]
+pub async fn accounts_set_avatar<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, p2p_state: tauri::State<'_, P2pState>, image: String) -> Result<Value, String> {
+    if image.len() > 40_000 {
+        return Err("La foto pesa demasiado".into());
+    }
+    let profile = state.request(&app, &p2p_state, Method::PUT, "/me/avatar", Some(json!({"image": image}))).await.map_err(|e| e.message)?;
+    let _ = sync_account(&app, &state, &p2p_state).await;
+    Ok(profile)
+}
+
+#[tauri::command]
+pub async fn accounts_remove_avatar<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, p2p_state: tauri::State<'_, P2pState>) -> Result<Value, String> {
+    let profile = state.request(&app, &p2p_state, Method::POST, "/me/avatar/delete", Some(json!({}))).await.map_err(|e| e.message)?;
+    let _ = sync_account(&app, &state, &p2p_state).await;
+    Ok(profile)
+}
+
+/// Foto de una cuenta (`{id, v, image}`); solo la entrega el servicio si es la tuya o de un amigo o solicitud.
+#[tauri::command]
+pub async fn accounts_avatar<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, p2p_state: tauri::State<'_, P2pState>, id: String) -> Result<Value, String> {
+    // Solo un código válido: así la ruta firmada es idéntica a la que llega al servicio.
+    if id.len() != 64 || !id.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)) {
+        return Err("Código no válido".into());
+    }
+    state.request(&app, &p2p_state, Method::GET, &format!("/avatar?user={id}"), None).await.map_err(|e| e.message)
+}
+
 #[tauri::command]
 pub async fn accounts_rename<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, p2p_state: tauri::State<'_, P2pState>, username: String) -> Result<Value, String> {
     let profile = state.request(&app, &p2p_state, Method::POST, "/me/rename", Some(json!({"username": username}))).await.map_err(|e| e.message)?;
