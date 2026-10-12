@@ -732,6 +732,37 @@ fn maven_versions(xml: &str) -> Vec<String> {
     versions
 }
 
+/// Hash en hexadecimal (minúsculas) de `bytes` con `sha512`, `sha256` o `sha1`.
+fn digest_hex(algorithm: &str, bytes: &[u8]) -> String {
+    use sha1::Digest as _;
+    match algorithm {
+        "sha512" => format!("{:x}", sha2::Sha512::digest(bytes)),
+        "sha256" => format!("{:x}", sha2::Sha256::digest(bytes)),
+        _ => format!("{:x}", sha1::Sha1::digest(bytes)),
+    }
+}
+
+/// Extrae el hash de un archivo `.sha1`/`.sha256`/`.sha512` de Maven (a veces seguido del nombre del archivo).
+fn parse_published_checksum(text: &str, hex_length: usize) -> Option<String> {
+    let token = text.split_whitespace().next()?.to_ascii_lowercase();
+    (token.len() == hex_length && token.chars().all(|c| c.is_ascii_hexdigit())).then_some(token)
+}
+
+/// El hash que el repositorio Maven publica junto a un archivo (`<url>.sha512`, `.sha256` o `.sha1`, en ese orden).
+async fn maven_checksum(client: &reqwest::Client, url: &str) -> Result<(&'static str, String), String> {
+    for (algorithm, hex_length) in [("sha512", 128), ("sha256", 64), ("sha1", 40)] {
+        let Ok(response) = client.get(format!("{url}.{algorithm}")).send().await else { continue };
+        if !response.status().is_success() || response.content_length().is_some_and(|n| n > 1024) {
+            continue;
+        }
+        let Ok(text) = response.text().await else { continue };
+        if let Some(hash) = parse_published_checksum(&text[..text.len().min(1024)], hex_length) {
+            return Ok((algorithm, hash));
+        }
+    }
+    Err("No se pudo obtener el hash que publica el repositorio para este instalador, así que no se descarga".into())
+}
+
 async fn catalog_json(client: &reqwest::Client, url: &str) -> Result<serde_json::Value, String> {
     client.get(url).send().await.map_err(|e| e.to_string())?
         .error_for_status().map_err(|e| e.to_string())?
@@ -1005,6 +1036,12 @@ pub async fn local_servers_download<R: tauri::Runtime>(
             );
         }
     };
+    // Los instaladores de Forge y NeoForge se ejecutan con Java: el repositorio Maven publica su hash junto al archivo.
+    let published = if matches!(server.kind.to_ascii_lowercase().as_str(), "forge" | "neoforge") {
+        Some(maven_checksum(&client, &url).await?)
+    } else {
+        None
+    };
     let mut response = client
         .get(url)
         .send()
@@ -1026,6 +1063,11 @@ pub async fn local_servers_download<R: tauri::Runtime>(
         }
         bytes.extend_from_slice(&chunk);
         let _ = app.emit("local-server-download-progress", serde_json::json!({"id":id,"downloadedBytes":bytes.len(),"totalBytes":total_bytes}));
+    }
+    if let Some((algorithm, expected)) = published {
+        if digest_hex(algorithm, &bytes) != expected {
+            return Err(format!("El {} del instalador no coincide con el que publica el repositorio", algorithm.to_ascii_uppercase()));
+        }
     }
     if let Some(expected) = expected_sha256 {
         use sha2::Digest as _;
@@ -1800,5 +1842,34 @@ mod lifecycle_tests {
         shutdown_all(&state, Duration::from_secs(1));
         assert!(state.children.lock().unwrap().is_empty());
         assert!(started.elapsed() < Duration::from_secs(10));
+    }
+}
+
+#[cfg(test)]
+mod checksum_tests {
+    use super::*;
+
+    #[test]
+    fn digests_match_known_vectors() {
+        assert_eq!(digest_hex("sha1", b"abc"), "a9993e364706816aba3e25717850c26c9cd0d89d");
+        assert_eq!(digest_hex("sha256", b"abc"), "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
+        assert!(digest_hex("sha512", b"abc").starts_with("ddaf35a193617aba"));
+        assert_eq!(digest_hex("sha512", b"abc").len(), 128);
+    }
+
+    /// SEC-04: un archivo alterado no puede dar el hash publicado.
+    #[test]
+    fn a_tampered_installer_does_not_match_the_published_hash() {
+        let published = parse_published_checksum("A9993E364706816ABA3E25717850C26C9CD0D89D  forge-installer.jar\n", 40).unwrap();
+        assert_eq!(digest_hex("sha1", b"abc"), published, "el original coincide (se normaliza a minúsculas)");
+        assert_ne!(digest_hex("sha1", b"abd"), published, "un byte distinto no coincide");
+    }
+
+    #[test]
+    fn published_checksums_must_be_plain_hex_of_the_expected_length() {
+        assert!(parse_published_checksum("", 40).is_none());
+        assert!(parse_published_checksum("<html>404</html>", 40).is_none());
+        assert!(parse_published_checksum("a9993e364706816aba3e25717850c26c9cd0d89", 40).is_none(), "39 caracteres");
+        assert!(parse_published_checksum("zz993e364706816aba3e25717850c26c9cd0d89d", 40).is_none(), "no hexadecimal");
     }
 }
