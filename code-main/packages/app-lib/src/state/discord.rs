@@ -2,11 +2,17 @@ use std::sync::{Arc, atomic::AtomicBool};
 
 use discord_rich_presence::{
     DiscordIpc, DiscordIpcClient,
-    activity::{Activity, Assets},
+    activity::{Activity, Assets, Timestamps},
 };
 use tokio::sync::RwLock;
 
 use crate::State;
+
+/// Aplicación «Strata Minecraft» registrada en el Developer Portal de Discord. El nombre que Discord
+/// muestra («Jugando a …») sale de esta aplicación, no del código.
+const DISCORD_APPLICATION_ID: &str = "1559276683973107873";
+/// Clave de la imagen grande, subida en Rich Presence → Art Assets de esa aplicación.
+const DISCORD_LARGE_IMAGE: &str = "strata";
 
 pub struct DiscordGuard {
     client: Arc<RwLock<DiscordIpcClient>>,
@@ -17,7 +23,7 @@ impl DiscordGuard {
     /// Initialize discord IPC client, and attempt to connect to it
     /// If it fails, it will still return a DiscordGuard, but the client will be unconnected
     pub fn init() -> crate::Result<DiscordGuard> {
-        let dipc = DiscordIpcClient::new("1123683254248148992");
+        let dipc = DiscordIpcClient::new(DISCORD_APPLICATION_ID);
 
         Ok(DiscordGuard {
             client: Arc::new(RwLock::new(dipc)),
@@ -45,7 +51,8 @@ impl DiscordGuard {
     /// First checks if discord is disabled, and if so, clear the activity instead
     pub async fn set_activity(
         &self,
-        msg: &str,
+        details: &str,
+        status: Option<&str>,
         reconnect_if_fail: bool,
     ) -> crate::Result<()> {
         // Check if discord is disabled, and if so, clear the activity instead
@@ -54,7 +61,7 @@ impl DiscordGuard {
         if !settings.discord_rpc {
             Ok(self.clear_activity(true).await?)
         } else {
-            Ok(self.force_set_activity(msg, reconnect_if_fail).await?)
+            Ok(self.force_set_activity(details, status, reconnect_if_fail).await?)
         }
     }
 
@@ -62,7 +69,8 @@ impl DiscordGuard {
     /// Should not be used except for in the above method, or if it is already known that discord is enabled (specifically for state initialization) and we are connected to the internet
     pub async fn force_set_activity(
         &self,
-        msg: &str,
+        details: &str,
+        status: Option<&str>,
         reconnect_if_fail: bool,
     ) -> crate::Result<()> {
         // Attempt to connect if not connected. Do not continue if it fails, as the client.set_activity can panic if it never was connected
@@ -70,11 +78,17 @@ impl DiscordGuard {
             return Ok(());
         }
 
-        let activity = Activity::new().state(msg).assets(
-            Assets::new()
-                .large_image("modrinth_simple")
-                .large_text("Modrinth Logo"),
-        );
+        let mut activity = Activity::new()
+            .details(details)
+            .timestamps(Timestamps::new().start(chrono::Utc::now().timestamp()))
+            .assets(
+                Assets::new()
+                    .large_image(DISCORD_LARGE_IMAGE)
+                    .large_text("Strata Minecraft"),
+            );
+        if let Some(status) = status {
+            activity = activity.state(status);
+        }
 
         // Attempt to set the activity
         // If the existing connection fails, attempt to reconnect and try again
@@ -136,12 +150,14 @@ impl DiscordGuard {
         let running_instances = state.process_manager.get_all();
         if let Some(existing_child) = running_instances.first() {
             self.set_activity(
-                &format!("Playing {}", existing_child.instance_name),
+                &format!("Jugando a {}", existing_child.instance_name),
+                None,
                 reconnect_if_fail,
             )
             .await?;
         } else {
-            self.set_activity("Idling...", reconnect_if_fail).await?;
+            self.set_activity("En Strata", Some("Explorando"), reconnect_if_fail)
+                .await?;
         }
         Ok(())
     }

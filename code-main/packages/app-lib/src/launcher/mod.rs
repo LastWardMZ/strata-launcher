@@ -1231,7 +1231,15 @@ pub async fn launch_minecraft(
 
     let _ = state
         .discord_rpc
-        .set_activity(&format!("Playing {}", instance.name), true)
+        .set_activity(
+            &format!("Jugando a {}", instance.name),
+            Some(&format!(
+                "Minecraft {} · {}",
+                content_set.game_version,
+                content_set.loader.as_str()
+            )),
+            true,
+        )
         .await;
 
     let _ = state
