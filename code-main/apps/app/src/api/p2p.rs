@@ -962,7 +962,8 @@ impl Core {
                 }
             }
             store.friends.retain(|f| {
-                let keep = !(f.via_account && !trusted.contains(&f.id));
+                // Los bloqueos que vienen de la cuenta se gestionan en `sync_account_blocks`, no aquí.
+                let keep = !(f.via_account && f.status != FriendStatus::Blocked && !trusted.contains(&f.id));
                 if !keep {
                     removed.push(f.id.clone());
                 }
@@ -982,6 +983,47 @@ impl Core {
             tokio::spawn(async move {
                 let _ = core.sync_once().await;
             });
+        }
+        Ok(())
+    }
+
+    /// Lleva al P2P los bloqueos de la cuenta. El P2P es directo entre launchers y el servidor no puede impedirlo, así que
+    /// sin esto un usuario bloqueado en la cuenta seguiría pudiendo mandar solicitudes P2P (su código es público para
+    /// cualquier cuenta). Un bloqueo manual no se toca; los que vienen de la cuenta se quitan cuando la cuenta los quita.
+    pub async fn sync_account_blocks(self: &Arc<Self>, blocked: Vec<String>) -> Result<(), String> {
+        let me = self.endpoint.id().to_string();
+        let wanted: HashSet<String> = blocked.iter().filter_map(|code| parse_id(code).ok()).map(|id| id.to_string()).filter(|id| *id != me).collect();
+        let mut newly_blocked = Vec::new();
+        let mut changed = false;
+        {
+            let mut store = self.store.lock().unwrap();
+            for id in &wanted {
+                match store.friends.iter_mut().find(|f| &f.id == id) {
+                    Some(friend) if friend.status == FriendStatus::Blocked => {}
+                    Some(friend) => {
+                        friend.status = FriendStatus::Blocked;
+                        friend.via_account = true;
+                        friend.synced = true;
+                        newly_blocked.push(id.clone());
+                        changed = true;
+                    }
+                    None => {
+                        store.friends.push(Friend { id: id.clone(), name: format!("Strata-{}", &id[..6.min(id.len())]), status: FriendStatus::Blocked, synced: true, via_account: true });
+                        newly_blocked.push(id.clone());
+                        changed = true;
+                    }
+                }
+            }
+            let before = store.friends.len();
+            store.friends.retain(|f| !(f.status == FriendStatus::Blocked && f.via_account && !wanted.contains(&f.id)));
+            changed |= store.friends.len() != before;
+        }
+        for id in &newly_blocked {
+            self.drop_friend_access(id).await;
+        }
+        if changed {
+            self.save_store()?;
+            self.emit(serde_json::json!({"type": "friends"}));
         }
         Ok(())
     }
@@ -1765,6 +1807,41 @@ mod tests {
         }
     }
 
+
+    /// SEC-02: un usuario bloqueado en la cuenta no puede mandar solicitudes P2P directas, y el bloqueo se levanta
+    /// cuando la cuenta lo levanta (salvo los bloqueos hechos a mano).
+    #[tokio::test(flavor = "multi_thread")]
+    async fn account_blocks_apply_to_p2p_requests_and_lift_with_the_account() {
+        let (a, b) = pair().await;
+        let (a_id, b_id) = (a.info().id, b.info().id);
+
+        a.sync_account_blocks(vec![b_id.clone(), "no-es-un-codigo".into(), a_id.clone()]).await.unwrap();
+        assert_eq!(a.friends().len(), 1, "solo el código válido y ajeno");
+        assert_eq!(a.friends()[0].status, FriendStatus::Blocked);
+
+        // B manda una solicitud P2P directa: A la rechaza y no la registra como entrante.
+        let _ = b.add_friend(&a_id).await;
+        tokio::time::sleep(Duration::from_millis(500)).await;
+        assert_eq!(a.friends().len(), 1);
+        assert_eq!(a.friends()[0].status, FriendStatus::Blocked, "sigue bloqueado, no pasa a entrante");
+
+        // Un bloqueo de la cuenta no se puede levantar con la lista de amigos de la cuenta.
+        a.sync_account_friends(vec![]).await.unwrap();
+        assert_eq!(a.friends()[0].status, FriendStatus::Blocked);
+
+        // La cuenta lo desbloquea: el P2P también.
+        a.sync_account_blocks(vec![]).await.unwrap();
+        assert!(a.friends().is_empty());
+
+        // Un bloqueo manual sobrevive a que la cuenta lo desbloquee.
+        a.set_blocked(&b_id, true).await.unwrap();
+        a.sync_account_blocks(vec![b_id.clone()]).await.unwrap();
+        a.sync_account_blocks(vec![]).await.unwrap();
+        assert_eq!(a.friends().len(), 1);
+        assert_eq!(a.friends()[0].status, FriendStatus::Blocked);
+        a.shutdown().await;
+        b.shutdown().await;
+    }
 
     #[tokio::test(flavor = "multi_thread")]
     async fn privacy_settings_are_enforced_by_the_receiving_launcher() {

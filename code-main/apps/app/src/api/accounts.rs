@@ -157,6 +157,13 @@ impl AccountsState {
     }
 }
 
+/// Con «solo amigos de amigos» (`mutual`) o «nadie» el P2P no acepta solicitudes de desconocidos: el servidor no puede
+/// comprobar «amigos de amigos» en una conexión directa, así que solo valen las de amigos de la cuenta (que llegan por
+/// el servidor, con sus reglas aplicadas).
+fn closes_requests(friend_privacy: Option<&str>) -> bool {
+    matches!(friend_privacy, Some("none" | "mutual"))
+}
+
 /// Lleva a este launcher los datos de la cuenta (nombre P2P, privacidad y amigos) y devuelve el
 /// perfil y las listas sociales. Es idempotente y se repite cada pocos minutos.
 async fn sync_account<R: tauri::Runtime>(
@@ -171,7 +178,13 @@ async fn sync_account<R: tauri::Runtime>(
         core.set_name(username)?;
     }
     let settings = &data["profile"]["settings"];
-    core.set_privacy(settings["friend_privacy"].as_str() == Some("none"), settings["invite_privacy"].as_str() == Some("none"));
+    core.set_privacy(closes_requests(settings["friend_privacy"].as_str()), settings["invite_privacy"].as_str() == Some("none"));
+    // Los bloqueos de la cuenta también valen en el P2P (si no, un bloqueado seguiría mandando solicitudes directas).
+    let blocked: Vec<String> = data["social"]["blocked"]
+        .as_array()
+        .map(|users| users.iter().filter_map(|u| u["id"].as_str().map(str::to_string)).collect())
+        .unwrap_or_default();
+    core.sync_account_blocks(blocked).await?;
     // Cada amigo trae su clave pública, que es su código de partidas.
     let peers: Vec<(String, String)> = data["social"]["friends"]
         .as_array()
@@ -190,6 +203,7 @@ async fn sync_account<R: tauri::Runtime>(
 async fn clear_account_links<R: tauri::Runtime>(app: &tauri::AppHandle<R>, p2p_state: &P2pState) {
     if let Ok(core) = p2p::core(app, p2p_state).await {
         let _ = core.sync_account_friends(Vec::new()).await;
+        let _ = core.sync_account_blocks(Vec::new()).await;
         core.set_privacy(false, false);
     }
 }
@@ -309,7 +323,13 @@ pub async fn accounts_set_server<R: tauri::Runtime>(app: tauri::AppHandle<R>, st
 
 #[cfg(test)]
 mod tests {
-    use super::{normalize_server_url, request_message};
+    use super::{closes_requests, normalize_server_url, request_message};
+
+    #[test]
+    fn mutual_and_none_close_p2p_requests_from_strangers() {
+        assert!(closes_requests(Some("none")) && closes_requests(Some("mutual")));
+        assert!(!closes_requests(Some("everyone")) && !closes_requests(None), "sin ajuste no se cierra nada");
+    }
 
     #[test]
     fn server_url_must_be_https_or_local() {
