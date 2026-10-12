@@ -317,6 +317,8 @@ fn main() {
             api::local_servers::local_servers_schedule_backup,
             api::local_servers::local_servers_backup_schedules,
             api::local_servers::local_servers_import_nyx,
+            api::discord::discord_detail_get,
+            api::discord::discord_detail_set,
             api::accounts::accounts_status,
             api::accounts::accounts_register,
             api::accounts::accounts_update,

@@ -2,12 +2,14 @@
 import { Settings2Icon } from '@modrinth/assets'
 import {
 	Button,
+	Chips,
 	defineMessages,
 	injectNotificationManager,
 	injectPageContext,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
+import { invoke } from '@tauri-apps/api/core'
 import { ref, watch } from 'vue'
 
 import { open_ads_consent_preferences } from '@/helpers/ads.js'
@@ -18,6 +20,21 @@ const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
 const { adConsentAvailable } = injectPageContext()
 const settings = ref(await get())
+
+// Nivel de detalle de Discord (completo o básico); es un ajuste local, aparte de los demás.
+const discordDetail = ref<'full' | 'basic'>('full')
+invoke<string>('discord_detail_get')
+	.then((level) => (discordDetail.value = level === 'basic' ? 'basic' : 'full'))
+	.catch(() => {})
+async function setDiscordDetail(level: string | null | undefined) {
+	if (level !== 'full' && level !== 'basic') return
+	try {
+		await invoke('discord_detail_set', { level })
+		discordDetail.value = level
+	} catch (error) {
+		handleError(error as Error)
+	}
+}
 
 const messages = defineMessages({
 	adsConsentTitle: {
@@ -110,5 +127,24 @@ watch(
 			</p>
 		</div>
 		<Toggle id="disable-discord-rpc" v-model="settings.discord_rpc" />
+	</div>
+
+	<div v-if="settings.discord_rpc" class="mt-3 flex flex-col gap-2">
+		<h3 class="m-0 text-base font-semibold text-contrast">Detalle en Discord</h3>
+		<Chips
+			:model-value="discordDetail"
+			:items="['full', 'basic']"
+			:format-label="(value: string) => (value === 'full' ? 'Completo' : 'Básico')"
+			:capitalize="false"
+			aria-label="Detalle en Discord"
+			@update:model-value="setDiscordDetail"
+		/>
+		<p class="m-0 text-secondary">
+			{{
+				discordDetail === 'full'
+					? 'Muestra el nombre de la instancia, la versión de Minecraft y el cargador.'
+					: 'Solo muestra «Jugando a Minecraft»: sin nombre de instancia ni versión.'
+			}}
+		</p>
 	</div>
 </template>

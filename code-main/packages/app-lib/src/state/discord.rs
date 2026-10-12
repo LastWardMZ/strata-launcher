@@ -14,6 +14,49 @@ const DISCORD_APPLICATION_ID: &str = "1559276683973107873";
 /// Clave de la imagen grande, subida en Rich Presence → Art Assets de esa aplicación.
 const DISCORD_LARGE_IMAGE: &str = "strata";
 
+/// Cuánto muestra Discord de lo que se juega. Se guarda en un archivo de la carpeta de ajustes (no en la base de datos).
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum DiscordDetail {
+    /// «Jugando a {instancia}» y «Minecraft {versión} · {cargador}».
+    Full,
+    /// Solo «Jugando a Minecraft»: sin nombre de instancia ni versiones.
+    Basic,
+}
+
+impl DiscordDetail {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Full => "full",
+            Self::Basic => "basic",
+        }
+    }
+
+    pub fn parse(text: &str) -> Option<Self> {
+        match text.trim() {
+            "full" => Some(Self::Full),
+            "basic" => Some(Self::Basic),
+            _ => None,
+        }
+    }
+}
+
+const DETAIL_FILE: &str = "discord-detail.txt";
+
+/// Nivel guardado (por defecto, completo).
+pub async fn discord_detail() -> crate::Result<DiscordDetail> {
+    let state = State::get().await?;
+    let path = state.directories.settings_dir.join(DETAIL_FILE);
+    Ok(std::fs::read_to_string(path).ok().and_then(|text| DiscordDetail::parse(&text)).unwrap_or(DiscordDetail::Full))
+}
+
+/// Guarda el nivel y actualiza la presencia ya mostrada.
+pub async fn set_discord_detail(detail: DiscordDetail) -> crate::Result<()> {
+    let state = State::get().await?;
+    std::fs::write(state.directories.settings_dir.join(DETAIL_FILE), detail.as_str())?;
+    let _ = state.discord_rpc.refresh().await;
+    Ok(())
+}
+
 pub struct DiscordGuard {
     client: Arc<RwLock<DiscordIpcClient>>,
     connected: Arc<AtomicBool>,
@@ -78,6 +121,10 @@ impl DiscordGuard {
             return Ok(());
         }
 
+        // En el nivel básico no sale el nombre de la instancia ni la versión.
+        let basic = discord_detail().await.map(|level| level == DiscordDetail::Basic).unwrap_or(false);
+        let (details, status) = if basic && details.starts_with("Jugando a ") { ("Jugando a Minecraft", None) } else { (details, status) };
+
         let mut activity = Activity::new()
             .details(details)
             .timestamps(Timestamps::new().start(chrono::Utc::now().timestamp()))
@@ -134,6 +181,11 @@ impl DiscordGuard {
         Ok(())
     }
 
+    /// Vuelve a calcular y mostrar la presencia actual (p. ej. tras cambiar el nivel de detalle).
+    pub async fn refresh(&self) -> crate::Result<()> {
+        self.clear_to_default(true).await
+    }
+
     /// Clear the activity, but if there is a running profile, set the activity to that instead
     pub async fn clear_to_default(
         &self,
@@ -160,5 +212,20 @@ impl DiscordGuard {
                 .await?;
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::DiscordDetail;
+
+    #[test]
+    fn detail_levels_roundtrip_and_reject_unknown_values() {
+        for level in [DiscordDetail::Full, DiscordDetail::Basic] {
+            assert_eq!(DiscordDetail::parse(level.as_str()), Some(level));
+        }
+        assert_eq!(DiscordDetail::parse(" basic\n"), Some(DiscordDetail::Basic), "se tolera el salto de línea final");
+        assert_eq!(DiscordDetail::parse(""), None);
+        assert_eq!(DiscordDetail::parse("todo"), None);
     }
 }
