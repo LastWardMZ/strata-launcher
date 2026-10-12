@@ -13,8 +13,10 @@ const props = withDefaults(
 		/** `false` si se sabe que el vídeo no tiene pista de audio (se oculta el volumen). */
 		hasAudio?: boolean | null
 		autoplay?: boolean
+		/** Limita la altura del vídeo (editor), para que los controles de debajo quepan sin desplazarse. */
+		compact?: boolean
 	}>(),
-	{ duration: null, hasAudio: null, autoplay: false },
+	{ duration: null, hasAudio: null, autoplay: false, compact: false },
 )
 
 const emit = defineEmits<{
@@ -169,7 +171,8 @@ defineExpose({
 <template>
 	<div class="flex w-full flex-col gap-3">
 		<div
-			class="relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-xl border border-solid border-surface-5 bg-black"
+			class="relative mx-auto flex aspect-video w-full items-center justify-center overflow-hidden rounded-xl border border-solid border-surface-5 bg-black"
+			:style="compact ? { width: 'min(100%, calc(42vh * 16 / 9))' } : undefined"
 		>
 			<video
 				ref="video"
@@ -288,10 +291,39 @@ defineExpose({
 					step="0.05"
 					:value="muted ? 0 : volume"
 					aria-label="Volumen"
-					class="w-24 cursor-pointer accent-[var(--color-brand)]"
+					class="volume-range w-24 cursor-pointer"
+					:style="{ '--fill': `${(muted ? 0 : volume) * 100}%` }"
 					@input="setVolume"
 				/>
 			</div>
 		</div>
 	</div>
 </template>
+
+<style scoped>
+.volume-range {
+	appearance: none;
+	height: 1.5rem;
+	background: transparent;
+}
+.volume-range::-webkit-slider-runnable-track {
+	height: 6px;
+	border-radius: 9999px;
+	background: linear-gradient(to right, var(--color-brand) var(--fill), var(--color-divider) var(--fill));
+}
+.volume-range::-webkit-slider-thumb {
+	appearance: none;
+	width: 14px;
+	height: 14px;
+	margin-top: -4px;
+	border: 0;
+	border-radius: 9999px;
+	background: var(--color-contrast);
+	box-shadow: 0 1px 3px rgb(0 0 0 / 0.4);
+}
+.volume-range:focus-visible {
+	outline: 2px solid var(--color-brand);
+	outline-offset: 2px;
+	border-radius: 9999px;
+}
+</style>

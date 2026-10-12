@@ -249,6 +249,7 @@ async function reveal() {
 			:src="src"
 			:duration="video.duration"
 			:has-audio="video.has_audio"
+			compact
 			@loaded="onLoaded"
 			@time="onTime"
 			@ended="previewing = false"
@@ -386,7 +387,9 @@ async function reveal() {
 			<ProgressBar :progress="progress" full-width label="Progreso de la exportación" />
 		</div>
 
-		<div class="flex flex-wrap items-center gap-2">
+		<div
+			class="sticky bottom-0 z-10 -mx-1 flex flex-wrap items-center gap-2 border-0 border-t border-solid border-surface-5 bg-surface-1 px-1 py-3"
+		>
 			<Button type="colored" color="brand" :disabled="!valid || exporting" @click="startExport">
 				Exportar recorte
 			</Button>

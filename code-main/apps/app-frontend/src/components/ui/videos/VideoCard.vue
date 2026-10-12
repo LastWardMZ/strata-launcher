@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { EditIcon, FolderOpenIcon, PlayIcon, TrashIcon, VideoIcon } from '@modrinth/assets'
-import { IconButton, useFormatDateTime } from '@modrinth/ui'
+import { EditIcon, FolderOpenIcon, MoreVerticalIcon, PlayIcon, TrashIcon, VideoIcon } from '@modrinth/assets'
+import { TeleportOverflowMenu, useFormatDateTime } from '@modrinth/ui'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 import {
@@ -20,7 +20,7 @@ const emit = defineEmits<{
 const card = ref<HTMLElement>()
 const poster = ref<string | null>(null)
 const posterFailed = ref(false)
-const formatDate = useFormatDateTime({ dateStyle: 'medium', timeStyle: 'short' })
+const formatDate = useFormatDateTime({ dateStyle: 'medium' })
 let observer: IntersectionObserver | undefined
 let requested = false
 
@@ -54,63 +54,54 @@ onMounted(() => {
 	observer.observe(card.value)
 })
 onBeforeUnmount(() => observer?.disconnect())
-
-function activate(event: KeyboardEvent) {
-	if (event.target !== event.currentTarget || (event.key !== 'Enter' && event.key !== ' ')) return
-	event.preventDefault()
-	emit('play')
-}
 </script>
 
 <template>
-	<article
-		ref="card"
-		role="button"
-		tabindex="0"
-		class="group relative isolate aspect-video min-w-0 cursor-pointer overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-2 p-0 text-left shadow-sm transition-[filter] hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
-		:aria-label="`Reproducir ${video.file_name}`"
-		data-video-card
-		@click="emit('play')"
-		@keydown="activate"
-	>
-		<img
-			v-if="poster"
-			:src="poster"
-			:alt="video.file_name"
-			loading="lazy"
-			decoding="async"
-			draggable="false"
-			class="absolute inset-0 z-[1] h-full w-full object-cover"
-			@error="((poster = null), (posterFailed = true))"
-		/>
-		<div
-			class="absolute inset-0 flex items-center justify-center bg-button-bg"
-			:class="{ 'animate-pulse': !poster && !posterFailed }"
-			aria-hidden="true"
+	<article ref="card" class="group flex min-w-0 flex-col gap-2" data-video-card>
+		<button
+			type="button"
+			class="relative isolate m-0 aspect-video w-full min-w-0 cursor-pointer overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-2 p-0 text-left shadow-sm transition-[filter] hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+			:aria-label="`Reproducir ${video.file_name}`"
+			@click="emit('play')"
 		>
-			<VideoIcon v-if="!poster" class="size-10 text-secondary opacity-60" />
-		</div>
-
-		<div
-			class="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100"
-		>
-			<span class="flex size-14 items-center justify-center rounded-full bg-surface-2 text-contrast shadow">
-				<PlayIcon class="size-7" />
+			<img
+				v-if="poster"
+				:src="poster"
+				:alt="''"
+				loading="lazy"
+				decoding="async"
+				draggable="false"
+				class="absolute inset-0 z-[1] h-full w-full object-cover"
+				@error="((poster = null), (posterFailed = true))"
+			/>
+			<span
+				class="absolute inset-0 flex items-center justify-center bg-button-bg"
+				:class="{ 'animate-pulse': !poster && !posterFailed }"
+				aria-hidden="true"
+			>
+				<VideoIcon v-if="!poster" class="size-10 text-secondary opacity-60" />
 			</span>
-		</div>
+			<span
+				class="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100 motion-reduce:transition-none"
+				aria-hidden="true"
+			>
+				<span class="flex size-14 items-center justify-center rounded-full bg-surface-2 text-contrast shadow">
+					<PlayIcon class="size-7" />
+				</span>
+			</span>
+			<span
+				v-if="video.duration !== null"
+				class="absolute right-2 top-2 z-[3] rounded-md bg-surface-2 px-1.5 py-0.5 text-xs font-semibold tabular-nums text-contrast"
+			>
+				{{ formatClock(video.duration) }}
+			</span>
+		</button>
 
-		<span
-			v-if="video.duration !== null"
-			class="absolute right-2 top-2 z-[3] rounded-md bg-surface-2 px-1.5 py-0.5 text-xs font-semibold tabular-nums text-contrast"
-		>
-			{{ formatClock(video.duration) }}
-		</span>
-
-		<div
-			class="absolute inset-x-0 bottom-0 z-[3] flex items-end justify-between gap-2 bg-gradient-to-t from-surface-1 to-transparent p-3 pt-[120px] text-contrast opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100"
-		>
-			<div class="min-w-0">
-				<div v-tooltip="video.file_name" class="truncate text-sm font-semibold">{{ video.file_name }}</div>
+		<div class="flex min-w-0 items-start gap-2 px-0.5">
+			<div class="min-w-0 flex-1">
+				<div v-tooltip="video.file_name" class="truncate text-sm font-semibold text-contrast">
+					{{ video.file_name }}
+				</div>
 				<div class="truncate text-xs text-secondary">
 					{{ showInstance ? `${video.instance_name} · ` : '' }}{{ formatDate(video.created_at) }}
 				</div>
@@ -118,38 +109,21 @@ function activate(event: KeyboardEvent) {
 					{{ [formatResolution(video), formatFileSize(video.size)].filter(Boolean).join(' · ') }}
 				</div>
 			</div>
-			<div
-				class="flex shrink-0 translate-y-1 gap-1 opacity-0 transition group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100"
-				@click.stop
+			<TeleportOverflowMenu
+				type="quiet"
+				label="Más acciones"
+				class="shrink-0"
+				:options="[
+					{ id: 'trim', label: 'Recortar', action: () => emit('trim') },
+					{ id: 'reveal', label: 'Abrir ubicación', action: () => emit('reveal') },
+					{ id: 'delete', label: 'Eliminar', action: () => emit('delete'), tone: 'red' },
+				]"
 			>
-				<IconButton
-					v-tooltip="'Recortar'"
-					label="Recortar"
-					type="quiet"
-					class="bg-surface-2 text-contrast hover:bg-surface-3"
-					@click="emit('trim')"
-				>
-					<EditIcon />
-				</IconButton>
-				<IconButton
-					v-tooltip="'Abrir ubicación'"
-					label="Abrir ubicación"
-					type="quiet"
-					class="bg-surface-2 text-contrast hover:bg-surface-3"
-					@click="emit('reveal')"
-				>
-					<FolderOpenIcon />
-				</IconButton>
-				<IconButton
-					v-tooltip="'Eliminar'"
-					label="Eliminar"
-					type="quiet"
-					class="bg-surface-2 text-contrast hover:!bg-red hover:!text-[var(--color-accent-contrast)]"
-					@click="emit('delete')"
-				>
-					<TrashIcon />
-				</IconButton>
-			</div>
+				<MoreVerticalIcon />
+				<template #trim><EditIcon /> Recortar</template>
+				<template #reveal><FolderOpenIcon /> Abrir ubicación</template>
+				<template #delete><TrashIcon /> Eliminar</template>
+			</TeleportOverflowMenu>
 		</div>
 	</article>
 </template>
