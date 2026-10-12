@@ -12,17 +12,26 @@ Launcher de Minecraft Java con servidores personales, amigos y partidas P2P, bas
 - **Cuenta propia de Strata**, sin contraseña: tu cuenta es la clave de tu launcher. Nombres de usuario únicos,
   buscador de amigos, solicitudes con privacidad (todos / amigos de amigos / nadie) y bloqueos. El servicio
   (`code-main/apps/strata-accounts`) corre en Cloudflare Workers + D1, gratis y sin servidor propio; guarda solo
-  nombres y amistades.
+  nombres, amistades, biografías y fotos de perfil.
+- **Perfil y amigos al estilo Steam**: foto de perfil (WebP de 128×128, guardada en el servicio de cuentas y visible
+  solo para tus amigos y quien te envía una solicitud), amigos agrupados en *Jugando / En línea / Desconectados* y
+  «Jugando a …» con el nombre de la instancia (se puede desactivar en *Ajustes → Social*), y **«Pedir unirse»** a la
+  partida de un amigo, que él acepta (y te envía la invitación de siempre) o rechaza. Todo lo que es en vivo va por
+  P2P, no por el servidor.
+- **Discord Rich Presence** con la aplicación «Strata Minecraft» (versión del juego, cargador y tiempo de juego).
 - **Chat y partidas P2P** directos entre launchers (el chat y las partidas no pasan por el servidor):
   invitaciones, túneles TCP y mundos LAN o servidores personales compartidos con amigos
   ([iroh](https://github.com/n0-computer/iroh); si no hay conexión directa, por relays públicos cifrados). Sin
   cuenta también se puede añadir amigos pegando su código.
 - **Grabación de partidas** (solo Windows): una tecla configurable inicia y detiene la grabación de Minecraft
   aunque el juego esté en primer plano, con audio del juego (y micrófono opcional) y un indicador «REC» que no sale
-  en el vídeo. Los vídeos aparecen en *Capturas → Vídeos*, con reproductor y un editor para recortarlos. Detalles en
+  en el vídeo. Los vídeos aparecen en *Capturas → Vídeos*, con reproductor y un editor para recortarlos o exportarlos como GIF (hasta 30 s), y una función para **unir** varios
+  vídeos en uno. Detalles en
   [Grabación](#grabación-de-partidas).
 - **Color de acento** a elección del usuario en *Ajustes → Apariencia*.
-- **Sin telemetría** de terceros: sin anuncios, analítica ni informes de errores a servicios externos.
+- **Sin telemetría** de terceros: sin anuncios, analítica ni informes de errores a servicios externos. El
+  diagnóstico de cierres inesperados (*memoria agotada, Java antiguo, mods duplicados…*) se hace en tu equipo con reglas
+  fijas; el registro no sale de él salvo que tú lo compartas.
 - **Actualizaciones automáticas** firmadas desde las Releases de este repositorio.
 
 ## Instalar
