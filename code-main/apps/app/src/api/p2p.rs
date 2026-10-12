@@ -761,12 +761,16 @@ impl Core {
     }
 
     async fn get_conn(&self, friend: &str) -> Result<Connection, String> {
-        let mut conns = self.conns.lock().await;
-        if let Some(conn) = conns.get(friend) {
-            if conn.close_reason().is_none() {
-                return Ok(conn.clone());
+        // El bloqueo se suelta antes de conectar: con un amigo desconectado la conexión tarda hasta 15 s y, si no, las
+        // consultas a todos los demás amigos esperaban en fila detrás de ella.
+        {
+            let mut conns = self.conns.lock().await;
+            if let Some(conn) = conns.get(friend) {
+                if conn.close_reason().is_none() {
+                    return Ok(conn.clone());
+                }
+                conns.remove(friend);
             }
-            conns.remove(friend);
         }
         let hint = self.hints.lock().unwrap().get(friend).cloned();
         let addr = match hint {
@@ -777,7 +781,7 @@ impl Core {
             .await
             .map_err(|_| CONNECT_ERROR.to_string())?
             .map_err(|e| e.to_string())?;
-        conns.insert(friend.to_string(), conn.clone());
+        self.conns.lock().await.insert(friend.to_string(), conn.clone());
         Ok(conn)
     }
 
@@ -1278,6 +1282,10 @@ impl Core {
 
     /// Si el amigo está conectado y a qué juega. Con versiones antiguas (sin `Status`) solo se sabe si está conectado.
     pub async fn presence(&self, id: &str) -> Presence {
+        // Sin conexión no hay nada más que preguntar (y esperar otra vez es lento): se descarta antes de probar `Status`.
+        if self.get_conn(id).await.is_err() {
+            return Presence { online: false, playing: None };
+        }
         let known_legacy = self.legacy_peers.lock().unwrap().get(id).is_some_and(|since| since.elapsed() < LEGACY_PEER_MEMORY);
         if !known_legacy {
             match self.request(id, &Request::Status).await {
@@ -1290,8 +1298,6 @@ impl Core {
                     return Presence { online: true, playing };
                 }
                 Ok(_) => {}
-                // Sin conexión no hay que probar `Ping`: también fallaría, y esperar otra vez es lento.
-                Err(message) if message == CONNECT_ERROR => return Presence { online: false, playing: None },
                 Err(_) => {}
             }
         }
