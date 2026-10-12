@@ -46,6 +46,9 @@ const MAX_STREAMS_PER_CONNECTION: usize = 64;
 /// Mensajes (chat o invitaciones) que se aceptan de un mismo amigo por minuto.
 const MAX_INCOMING_PER_MINUTE: u32 = 60;
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(12);
+const CONNECT_ERROR: &str = "No se pudo conectar con tu amigo (¿está conectado?)";
+/// Cuánto se recuerda que un amigo usa una versión sin `Status` (solo responde a `Ping`).
+const LEGACY_PEER_MEMORY: Duration = Duration::from_secs(600);
 
 #[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Debug)]
 #[serde(rename_all = "snake_case")]
@@ -149,6 +152,8 @@ enum Request {
     Invite { id: String, info: InviteInfo, ts: u64 },
     Tunnel { share_id: String },
     Ping,
+    /// Qué estás haciendo ahora (solo a amigos): sustituye a `Ping` en versiones que lo entienden.
+    Status,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -161,9 +166,28 @@ enum Response {
         name: String,
     },
     Error { message: String },
+    Status {
+        #[serde(default)]
+        playing: Option<Playing>,
+    },
 }
 
-#[derive(Default, Serialize, Deserialize)]
+/// A qué juega ahora este launcher. No se envía nada si el usuario desactiva compartir su actividad.
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
+pub struct Playing {
+    pub title: String,
+    /// Segundos desde 1970 en que empezó a jugar.
+    pub since: u64,
+}
+
+/// Estado de un amigo tal y como lo ve este launcher.
+#[derive(Serialize, Debug, PartialEq)]
+pub struct Presence {
+    pub online: bool,
+    pub playing: Option<Playing>,
+}
+
+#[derive(Serialize, Deserialize)]
 struct Store {
     #[serde(default)]
     name: String,
@@ -172,6 +196,19 @@ struct Store {
     bio: String,
     #[serde(default)]
     friends: Vec<Friend>,
+    /// Mostrar a los amigos a qué se juega ahora.
+    #[serde(default = "yes")]
+    share_activity: bool,
+}
+
+fn yes() -> bool {
+    true
+}
+
+impl Default for Store {
+    fn default() -> Self {
+        Self { name: String::new(), bio: String::new(), friends: Vec::new(), share_activity: true }
+    }
 }
 
 type Notify = Arc<dyn Fn(serde_json::Value) + Send + Sync>;
@@ -199,6 +236,10 @@ pub struct Core {
     /// Ajustes de privacidad de la cuenta que se aplican aquí, en el extremo que recibe.
     friend_requests_none: AtomicBool,
     invites_none: AtomicBool,
+    /// Lo que se está jugando ahora (lo mantiene la app); se entrega a los amigos si el usuario lo permite.
+    activity: Mutex<Option<Playing>>,
+    /// Amigos que no entienden `Status`, con el momento en que se comprobó.
+    legacy_peers: Mutex<HashMap<String, std::time::Instant>>,
     notify: Notify,
 }
 
@@ -349,6 +390,8 @@ impl Core {
             trusted: Mutex::new(HashSet::new()),
             friend_requests_none: AtomicBool::new(false),
             invites_none: AtomicBool::new(false),
+            activity: Mutex::new(None),
+            legacy_peers: Mutex::new(HashMap::new()),
             notify,
         });
         let accepting = core.clone();
@@ -485,6 +528,11 @@ impl Core {
             Request::Ping => {
                 self.require_friend(remote)?;
                 Ok(Response::Ok { accepted: true, name: self.my_name() })
+            }
+            Request::Status => {
+                self.require_friend(remote)?;
+                let playing = if self.store.lock().unwrap().share_activity { self.activity.lock().unwrap().clone() } else { None };
+                Ok(Response::Status { playing })
             }
             Request::FriendRequest { name } => {
                 let name = clean_name(&name);
@@ -661,7 +709,7 @@ impl Core {
         };
         let conn = tokio::time::timeout(Duration::from_secs(15), self.endpoint.connect(addr, ALPN))
             .await
-            .map_err(|_| "No se pudo conectar con tu amigo (¿está conectado?)".to_string())?
+            .map_err(|_| CONNECT_ERROR.to_string())?
             .map_err(|e| e.to_string())?;
         conns.insert(friend.to_string(), conn.clone());
         Ok(conn)
@@ -839,6 +887,7 @@ impl Core {
         {
             Response::Error { message } => Err(message),
             Response::Ok { .. } => Ok((send, recv)),
+            Response::Status { .. } => Err("Respuesta inesperada".into()),
         }
     }
 
@@ -1098,6 +1147,49 @@ impl Core {
         self.request(id, &Request::Ping).await.is_ok()
     }
 
+    /// Fija a qué se juega ahora (`None` si a nada). Lo llama la app a partir de los procesos de Minecraft.
+    pub fn set_activity(&self, playing: Option<Playing>) {
+        *self.activity.lock().unwrap() = playing.and_then(|p| {
+            let title = clean_name(&p.title);
+            (!title.is_empty()).then_some(Playing { title, since: p.since })
+        });
+    }
+
+    pub fn activity_sharing(&self) -> bool {
+        self.store.lock().unwrap().share_activity
+    }
+
+    pub fn set_activity_sharing(&self, enabled: bool) -> Result<(), String> {
+        self.store.lock().unwrap().share_activity = enabled;
+        self.save_store()
+    }
+
+    /// Si el amigo está conectado y a qué juega. Con versiones antiguas (sin `Status`) solo se sabe si está conectado.
+    pub async fn presence(&self, id: &str) -> Presence {
+        let known_legacy = self.legacy_peers.lock().unwrap().get(id).is_some_and(|since| since.elapsed() < LEGACY_PEER_MEMORY);
+        if !known_legacy {
+            match self.request(id, &Request::Status).await {
+                Ok(Response::Status { playing }) => {
+                    // Lo que dice un amigo no es de fiar: se limpia igual que sus nombres.
+                    let playing = playing.and_then(|p| {
+                        let title = clean_name(&p.title);
+                        (!title.is_empty()).then_some(Playing { title, since: p.since.min(now()) })
+                    });
+                    return Presence { online: true, playing };
+                }
+                Ok(_) => {}
+                // Sin conexión no hay que probar `Ping`: también fallaría, y esperar otra vez es lento.
+                Err(message) if message == CONNECT_ERROR => return Presence { online: false, playing: None },
+                Err(_) => {}
+            }
+        }
+        let online = self.request(id, &Request::Ping).await.is_ok();
+        if online {
+            self.legacy_peers.lock().unwrap().insert(id.to_string(), std::time::Instant::now());
+        }
+        Presence { online, playing: None }
+    }
+
     pub fn messages(&self, id: &str) -> Vec<ChatMessage> {
         self.with_chat(id, |m| m.clone())
     }
@@ -1331,6 +1423,15 @@ pub(crate) async fn core<R: tauri::Runtime>(app: &tauri::AppHandle<R>, state: &P
             core.set_port_resolver(Arc::new(|instance_id: String| {
                 Box::pin(async move { detect_lan_port(&instance_id).await.ok().flatten() })
             }));
+            // Lo que se juega ahora (para «Jugando a …» de tus amigos): se refresca cada pocos segundos.
+            let watcher = core.clone();
+            tokio::spawn(async move {
+                loop {
+                    let current = theseus::process::get_all().await.ok().and_then(|all| all.into_iter().min_by_key(|p| p.start_time));
+                    watcher.set_activity(current.map(|p| Playing { title: p.instance_name, since: p.start_time.timestamp().max(0) as u64 }));
+                    tokio::time::sleep(Duration::from_secs(10)).await;
+                }
+            });
             Ok::<_, String>(core)
         })
         .await
@@ -1535,6 +1636,21 @@ pub async fn p2p_block_friend<R: tauri::Runtime>(app: tauri::AppHandle<R>, state
 }
 
 #[tauri::command]
+pub async fn p2p_presence<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>, id: String) -> Result<Presence, String> {
+    Ok(core(&app, &state).await?.presence(&id).await)
+}
+
+#[tauri::command]
+pub async fn p2p_activity_sharing<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>) -> Result<bool, String> {
+    Ok(core(&app, &state).await?.activity_sharing())
+}
+
+#[tauri::command]
+pub async fn p2p_set_activity_sharing<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>, enabled: bool) -> Result<(), String> {
+    core(&app, &state).await?.set_activity_sharing(enabled)
+}
+
+#[tauri::command]
 pub async fn p2p_is_online<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>, id: String) -> Result<bool, String> {
     Ok(core(&app, &state).await?.is_online(&id).await)
 }
@@ -1617,6 +1733,43 @@ mod tests {
         b.accept_friend(&a.info().id).await.unwrap();
         assert_eq!(a.friends()[0].status, FriendStatus::Accepted);
         assert_eq!(b.friends()[0].status, FriendStatus::Accepted);
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn presence_shows_what_a_friend_plays_unless_they_turn_it_off() {
+        let (a, b) = pair().await;
+        befriend(&a, &b).await;
+        let a_id = a.info().id;
+
+        // Sin jugar: conectado, sin actividad.
+        assert_eq!(b.presence(&a_id).await, Presence { online: true, playing: None });
+
+        // Jugando: el amigo ve el nombre (limpio de caracteres invisibles) y la hora de inicio.
+        a.set_activity(Some(Playing { title: "Mi\u{202E}Instancia".into(), since: 1_700_000_000 }));
+        let seen = b.presence(&a_id).await;
+        assert!(seen.online);
+        assert_eq!(seen.playing, Some(Playing { title: "MiInstancia".into(), since: 1_700_000_000 }));
+
+        // Un nombre vacío tras limpiar no se muestra.
+        a.set_activity(Some(Playing { title: "\u{200B}".into(), since: 1 }));
+        assert_eq!(b.presence(&a_id).await.playing, None);
+
+        // Con la actividad desactivada, el amigo sigue viendo que está conectado pero no a qué juega.
+        a.set_activity(Some(Playing { title: "Secreto".into(), since: 1_700_000_000 }));
+        assert!(a.activity_sharing());
+        a.set_activity_sharing(false).unwrap();
+        assert_eq!(b.presence(&a_id).await, Presence { online: true, playing: None });
+        a.set_activity_sharing(true).unwrap();
+        assert!(b.presence(&a_id).await.playing.is_some());
+
+        // Un desconocido que conoce el código no obtiene nada (y no es amigo: se rechaza).
+        let stranger = Core::start(temp("stranger"), silent(), false).await.unwrap();
+        settle().await;
+        assert_eq!(stranger.presence(&a_id).await.playing, None);
+
+        a.shutdown().await;
+        b.shutdown().await;
+        stranger.shutdown().await;
     }
 
     #[tokio::test(flavor = "multi_thread")]

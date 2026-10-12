@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Admonition, Button, Chips } from '@modrinth/ui'
-import { computed } from 'vue'
+import { invoke } from '@tauri-apps/api/core'
+import { computed, onMounted, ref } from 'vue'
 
 import {
 	type FriendPrivacy,
@@ -23,6 +24,29 @@ const searchableOptions = ['yes', 'no'] as const
 const searchableLabels = { yes: 'Sí', no: 'No' }
 
 const searchable = computed(() => (profile.value?.settings.searchable ? 'yes' : 'no'))
+
+// Compartir a qué juegas es un ajuste local de este launcher (se decide aquí, no en el servidor de cuentas).
+const shareActivity = ref<'yes' | 'no'>('yes')
+const activityBusy = ref(false)
+onMounted(async () => {
+	try {
+		shareActivity.value = (await invoke<boolean>('p2p_activity_sharing')) ? 'yes' : 'no'
+	} catch {
+		// Se queda en el valor por defecto.
+	}
+})
+async function setShareActivity(value: 'yes' | 'no' | null) {
+	if (!value || activityBusy.value) return
+	activityBusy.value = true
+	try {
+		await invoke('p2p_set_activity_sharing', { enabled: value === 'yes' })
+		shareActivity.value = value
+	} catch {
+		// Se conserva el valor anterior.
+	} finally {
+		activityBusy.value = false
+	}
+}
 </script>
 
 <template>
@@ -103,6 +127,23 @@ const searchable = computed(() => (profile.value?.settings.searchable ? 'yes' : 
 				<p class="m-0 text-secondary">
 					Si lo desactivas, nadie te encontrará buscando por nombre; solo podrán añadirte quienes
 					sepan tu nombre de usuario exacto.
+				</p>
+			</div>
+
+			<div class="flex flex-col gap-2.5">
+				<h2 class="m-0 text-lg font-semibold text-contrast">Mostrar a qué juego</h2>
+				<Chips
+					:model-value="shareActivity"
+					:items="[...searchableOptions]"
+					:format-label="(value: 'yes' | 'no') => searchableLabels[value]"
+					:disabled-items="activityBusy ? [...searchableOptions] : undefined"
+					:capitalize="false"
+					aria-label="Mostrar a qué juego"
+					@update:model-value="setShareActivity"
+				/>
+				<p class="m-0 text-secondary">
+					Tus amigos ven «Jugando a …» con el nombre de la instancia que tienes abierta. Si lo
+					desactivas, solo verán que estás conectado.
 				</p>
 			</div>
 		</section>

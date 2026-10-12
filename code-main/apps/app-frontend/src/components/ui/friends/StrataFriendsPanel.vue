@@ -25,12 +25,29 @@ const account = useStrataAccount()
 const { loggedIn, social, busy, error, status, profile } = account
 const { avatar } = useProfileAvatar()
 const { avatarOf } = useFriendAvatars()
-const { online } = useFriendPresence(computed(() => social.value.friends.map((friend) => friend.id)))
+const { presence } = useFriendPresence(computed(() => social.value.friends.map((friend) => friend.id)))
 // Quien tiene Strata abierto va primero; dentro de cada grupo, por orden alfabético.
 const byName = (a: { username: string }, b: { username: string }) =>
 	a.username.localeCompare(b.username, undefined, { sensitivity: 'base' })
-const onlineFriends = computed(() => social.value.friends.filter((f) => online.value[f.id]).sort(byName))
-const offlineFriends = computed(() => social.value.friends.filter((f) => !online.value[f.id]).sort(byName))
+const playingFriends = computed(() =>
+	social.value.friends.filter((f) => presence.value[f.id]?.playing).sort(byName),
+)
+const onlineFriends = computed(() =>
+	social.value.friends.filter((f) => presence.value[f.id]?.online && !presence.value[f.id]?.playing).sort(byName),
+)
+const offlineFriends = computed(() => social.value.friends.filter((f) => !presence.value[f.id]?.online).sort(byName))
+const groups = computed(() => [
+	{ key: 'playing' as const, label: 'Jugando', users: playingFriends.value },
+	{ key: 'online' as const, label: 'En línea', users: onlineFriends.value },
+	{ key: 'offline' as const, label: 'Desconectados', users: offlineFriends.value },
+])
+/** «Hace 12 min», «hace 2 h»: cuánto lleva jugando. */
+function sinceText(seconds: number) {
+	const minutes = Math.max(0, Math.round((Date.now() / 1000 - seconds) / 60))
+	if (minutes < 1) return 'ahora mismo'
+	if (minutes < 60) return `desde hace ${minutes} min`
+	return `desde hace ${Math.floor(minutes / 60)} h`
+}
 
 const addModal = ref<InstanceType<typeof ModalWrapper> | null>(null)
 const query = ref('')
@@ -255,10 +272,7 @@ const exactInResults = () =>
 			>
 			para jugar juntos.
 		</p>
-		<template v-for="group in [
-			{ key: 'online', label: 'En línea', users: onlineFriends },
-			{ key: 'offline', label: 'Desconectados', users: offlineFriends },
-		]" :key="group.key">
+		<template v-for="group in groups" :key="group.key">
 			<div v-if="group.users.length" class="flex flex-col gap-0.5">
 				<div class="px-1 pb-1 text-xs font-semibold uppercase tracking-wide text-secondary">
 					{{ group.label }} · {{ group.users.length }}
@@ -268,16 +282,28 @@ const exactInResults = () =>
 					:key="user.id"
 					class="group flex items-center gap-2.5 rounded-xl p-1.5 hover:bg-surface-3 focus-within:bg-surface-3"
 				>
-					<UserAvatar :name="user.username" :src="avatarOf(user)" :size="36" :status="group.key === 'online' ? 'online' : 'offline'" />
+					<UserAvatar
+						:name="user.username"
+						:src="avatarOf(user)"
+						:size="36"
+						:status="group.key === 'offline' ? 'offline' : group.key === 'playing' ? 'playing' : 'online'"
+					/>
 					<div class="min-w-0 flex-1" :title="user.bio || undefined">
 						<div
 							class="truncate font-semibold leading-tight"
-							:class="group.key === 'online' ? 'text-contrast' : 'text-secondary'"
+							:class="group.key === 'offline' ? 'text-secondary' : 'text-contrast'"
 						>
 							{{ user.username }}
 						</div>
-						<div class="truncate text-xs leading-tight text-secondary">
-							{{ group.key === 'online' ? 'En línea' : 'Desconectado' }}
+						<div
+							class="truncate text-xs leading-tight"
+							:class="group.key === 'playing' ? 'text-brand' : 'text-secondary'"
+							:title="group.key === 'playing' ? `${presence[user.id]?.playing?.title} · ${sinceText(presence[user.id]?.playing?.since ?? 0)}` : undefined"
+						>
+							<template v-if="group.key === 'playing' && presence[user.id]?.playing">
+								Jugando a {{ presence[user.id]?.playing?.title }}
+							</template>
+							<template v-else>{{ group.key === 'online' ? 'En línea' : 'Desconectado' }}</template>
 						</div>
 					</div>
 					<TeleportOverflowMenu

@@ -3,12 +3,16 @@ import { onBeforeUnmount, onMounted, ref, type Ref } from 'vue'
 
 const INTERVAL_MS = 30_000
 
+/** A qué juega un amigo ahora (si lo comparte): nombre de su instancia y segundos desde 1970 en que empezó. */
+export type Playing = { title: string; since: number }
+export type Presence = { online: boolean; playing: Playing | null }
+
 /**
- * Quién tiene Strata abierto ahora. Se pregunta directamente a cada amigo (P2P, sin pasar por el
- * servidor de cuentas), solo mientras el componente está en pantalla.
+ * Quién tiene Strata abierto ahora y a qué juega. Se pregunta directamente a cada amigo (P2P, sin pasar por
+ * el servidor de cuentas), solo mientras el componente está en pantalla.
  */
 export function useFriendPresence(ids: Ref<string[]>) {
-	const online = ref<Record<string, boolean>>({})
+	const presence = ref<Record<string, Presence>>({})
 	let timer: ReturnType<typeof setInterval> | undefined
 	let running = false
 
@@ -19,13 +23,13 @@ export function useFriendPresence(ids: Ref<string[]>) {
 			const entries = await Promise.all(
 				ids.value.map(async (id) => {
 					try {
-						return [id, await invoke<boolean>('p2p_is_online', { id })] as const
+						return [id, await invoke<Presence>('p2p_presence', { id })] as const
 					} catch {
-						return [id, false] as const
+						return [id, { online: false, playing: null }] as const
 					}
 				}),
 			)
-			online.value = Object.fromEntries(entries)
+			presence.value = Object.fromEntries(entries)
 		} finally {
 			running = false
 		}
@@ -36,5 +40,5 @@ export function useFriendPresence(ids: Ref<string[]>) {
 		timer = setInterval(() => void check(), INTERVAL_MS)
 	})
 	onBeforeUnmount(() => clearInterval(timer))
-	return { online, refresh: check }
+	return { presence, refresh: check }
 }
