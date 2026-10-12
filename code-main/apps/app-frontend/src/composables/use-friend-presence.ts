@@ -5,7 +5,7 @@ const INTERVAL_MS = 30_000
 
 /** A qué juega un amigo ahora (si lo comparte): nombre de su instancia y segundos desde 1970 en que empezó. */
 export type Playing = { title: string; since: number }
-export type Presence = { online: boolean; playing: Playing | null }
+export type Presence = { online: boolean; playing: Playing | null; busy: boolean }
 
 /**
  * Quién tiene Strata abierto ahora y a qué juega. Se pregunta directamente a cada amigo (P2P, sin pasar por
@@ -25,7 +25,7 @@ export function useFriendPresence(ids: Ref<string[]>) {
 					try {
 						return [id, await invoke<Presence>('p2p_presence', { id })] as const
 					} catch {
-						return [id, { online: false, playing: null }] as const
+						return [id, { online: false, playing: null, busy: false }] as const
 					}
 				}),
 			)

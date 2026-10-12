@@ -11,6 +11,7 @@ const BODY_LIMIT = 16_384
 const AVATAR_BYTES = 24 * 1024
 const AVATAR_BODY_LIMIT = 40_000
 const BASE64 = /^[A-Za-z0-9+/]+={0,2}$/
+const REPORT_REASON_MAX = 300
 const USERNAME = /^[a-zA-Z0-9_]{3,24}$/
 const CODE = /^[0-9a-f]{64}$/
 const SIGNATURE = /^[0-9a-f]{128}$/
@@ -233,6 +234,19 @@ export function createHandler(db) {
 					return { id: wanted, v: owner.avatar_v, image: owner.avatar }
 				}
 				return { id, v: me.avatar_v, image: me.avatar }
+			}
+			case 'POST /report': {
+				// Los límites van antes de buscar al usuario, y la respuesta es la misma exista o no (no sirve para sondear nombres).
+				await limit(`report:${id}`, 5, 3_600_000, 'Has enviado demasiadas denuncias. Inténtalo más tarde.')
+				if (typeof body.username !== 'string') fail(400, 'Indica el usuario que quieres denunciar.')
+				const reason = typeof body.reason === 'string' ? body.reason.trim() : ''
+				if (!reason || reason.length > REPORT_REASON_MAX) fail(400, `Explica el motivo en menos de ${REPORT_REASON_MAX} caracteres.`)
+				const target = await userByName(body.username)
+				// Solo se puede denunciar a quien ya puede mostrarte contenido (amigo o solicitud pendiente).
+				if (target && target.id !== id && (await relationTo(id, target.id)) !== 'none') {
+					await run('INSERT INTO reports(reporter,target,target_name,reason,created) VALUES(?,?,?,?,?)', id, target.id, target.username, reason, Date.now())
+				}
+				return { ok: true }
 			}
 			case 'GET /users/search': {
 				await limit(`search:${id}`, 30, 60_000, 'Estás buscando demasiado deprisa. Espera un momento.')

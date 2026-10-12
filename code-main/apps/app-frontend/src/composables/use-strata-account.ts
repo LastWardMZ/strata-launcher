@@ -122,6 +122,8 @@ export function useStrataAccount() {
 				await invoke('accounts_update', { changes })
 				await reload()
 			}),
+		/** Denuncia a un amigo o a quien te ha enviado una solicitud; el servicio guarda el motivo para revisarlo. */
+		report: (username: string, reason: string) => run(() => invoke('accounts_report', { username, reason })),
 		/** Sube la foto (WebP en base64, sin el prefijo `data:`). */
 		setAvatar: (image: string) =>
 			run(async () => {

@@ -183,6 +183,9 @@ enum Response {
     Status {
         #[serde(default)]
         playing: Option<Playing>,
+        /// «No molestar»: el amigo no quiere invitaciones ni peticiones ahora.
+        #[serde(default)]
+        busy: bool,
     },
 }
 
@@ -199,6 +202,7 @@ pub struct Playing {
 pub struct Presence {
     pub online: bool,
     pub playing: Option<Playing>,
+    pub busy: bool,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -213,6 +217,9 @@ struct Store {
     /// Mostrar a los amigos a qué se juega ahora.
     #[serde(default = "yes")]
     share_activity: bool,
+    /// «No molestar»: no se muestra a qué se juega y se rechazan las peticiones de unirse.
+    #[serde(default)]
+    do_not_disturb: bool,
 }
 
 fn yes() -> bool {
@@ -221,7 +228,7 @@ fn yes() -> bool {
 
 impl Default for Store {
     fn default() -> Self {
-        Self { name: String::new(), bio: String::new(), friends: Vec::new(), share_activity: true }
+        Self { name: String::new(), bio: String::new(), friends: Vec::new(), share_activity: true, do_not_disturb: false }
     }
 }
 
@@ -554,8 +561,12 @@ impl Core {
             }
             Request::Status => {
                 self.require_friend(remote)?;
-                let playing = if self.store.lock().unwrap().share_activity { self.activity.lock().unwrap().clone() } else { None };
-                Ok(Response::Status { playing })
+                let (share, busy) = {
+                    let store = self.store.lock().unwrap();
+                    (store.share_activity && !store.do_not_disturb, store.do_not_disturb)
+                };
+                let playing = if share { self.activity.lock().unwrap().clone() } else { None };
+                Ok(Response::Status { playing, busy })
             }
             Request::FriendRequest { name } => {
                 let name = clean_name(&name);
@@ -684,6 +695,9 @@ impl Core {
                 self.require_friend(remote)?;
                 if self.invites_none.load(Ordering::Relaxed) {
                     return Err("Este usuario no acepta invitaciones".into());
+                }
+                if self.store.lock().unwrap().do_not_disturb {
+                    return Err("Tu amigo tiene activado «No molestar» ahora mismo".into());
                 }
                 if !valid_id(&id) {
                     return Err("Petición no válida".into());
@@ -1271,6 +1285,15 @@ impl Core {
         });
     }
 
+    pub fn do_not_disturb(&self) -> bool {
+        self.store.lock().unwrap().do_not_disturb
+    }
+
+    pub fn set_do_not_disturb(&self, enabled: bool) -> Result<(), String> {
+        self.store.lock().unwrap().do_not_disturb = enabled;
+        self.save_store()
+    }
+
     pub fn activity_sharing(&self) -> bool {
         self.store.lock().unwrap().share_activity
     }
@@ -1284,18 +1307,18 @@ impl Core {
     pub async fn presence(&self, id: &str) -> Presence {
         // Sin conexión no hay nada más que preguntar (y esperar otra vez es lento): se descarta antes de probar `Status`.
         if self.get_conn(id).await.is_err() {
-            return Presence { online: false, playing: None };
+            return Presence { online: false, playing: None, busy: false };
         }
         let known_legacy = self.legacy_peers.lock().unwrap().get(id).is_some_and(|since| since.elapsed() < LEGACY_PEER_MEMORY);
         if !known_legacy {
             match self.request(id, &Request::Status).await {
-                Ok(Response::Status { playing }) => {
+                Ok(Response::Status { playing, busy }) => {
                     // Lo que dice un amigo no es de fiar: se limpia igual que sus nombres.
                     let playing = playing.and_then(|p| {
                         let title = clean_name(&p.title);
                         (!title.is_empty()).then_some(Playing { title, since: p.since.min(now()) })
                     });
-                    return Presence { online: true, playing };
+                    return Presence { online: true, playing, busy };
                 }
                 Ok(_) => {}
                 Err(_) => {}
@@ -1305,7 +1328,7 @@ impl Core {
         if online {
             self.legacy_peers.lock().unwrap().insert(id.to_string(), std::time::Instant::now());
         }
-        Presence { online, playing: None }
+        Presence { online, playing: None, busy: false }
     }
 
     pub fn messages(&self, id: &str) -> Vec<ChatMessage> {
@@ -1774,6 +1797,16 @@ pub async fn p2p_respond_join<R: tauri::Runtime>(app: tauri::AppHandle<R>, state
 }
 
 #[tauri::command]
+pub async fn p2p_do_not_disturb<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>) -> Result<bool, String> {
+    Ok(core(&app, &state).await?.do_not_disturb())
+}
+
+#[tauri::command]
+pub async fn p2p_set_do_not_disturb<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>, enabled: bool) -> Result<(), String> {
+    core(&app, &state).await?.set_do_not_disturb(enabled)
+}
+
+#[tauri::command]
 pub async fn p2p_activity_sharing<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>) -> Result<bool, String> {
     Ok(core(&app, &state).await?.activity_sharing())
 }
@@ -1941,7 +1974,7 @@ mod tests {
         let a_id = a.info().id;
 
         // Sin jugar: conectado, sin actividad.
-        assert_eq!(b.presence(&a_id).await, Presence { online: true, playing: None });
+        assert_eq!(b.presence(&a_id).await, Presence { online: true, playing: None, busy: false });
 
         // Jugando: el amigo ve el nombre (limpio de caracteres invisibles) y la hora de inicio.
         a.set_activity(Some(Playing { title: "Mi\u{202E}Instancia".into(), since: 1_700_000_000 }));
@@ -1957,8 +1990,18 @@ mod tests {
         a.set_activity(Some(Playing { title: "Secreto".into(), since: 1_700_000_000 }));
         assert!(a.activity_sharing());
         a.set_activity_sharing(false).unwrap();
-        assert_eq!(b.presence(&a_id).await, Presence { online: true, playing: None });
+        assert_eq!(b.presence(&a_id).await, Presence { online: true, playing: None, busy: false });
         a.set_activity_sharing(true).unwrap();
+
+        // «No molestar»: se ve conectado y ocupado, sin actividad, y no admite peticiones de unirse.
+        a.share_start("world", "Mi mundo", "1.21.1", 25565).unwrap();
+        a.set_do_not_disturb(true).unwrap();
+        assert_eq!(b.presence(&a_id).await, Presence { online: true, playing: None, busy: true });
+        let refused = b.request_join(&a_id).await.unwrap_err();
+        assert!(refused.contains("No molestar"), "{refused}");
+        assert!(a.join_requests().is_empty());
+        a.set_do_not_disturb(false).unwrap();
+        assert!(!b.presence(&a_id).await.busy);
         assert!(b.presence(&a_id).await.playing.is_some());
 
         // Un desconocido que conoce el código no obtiene nada (y no es amigo: se rechaza).

@@ -312,3 +312,38 @@ test('foto de perfil: límite de cambios por hora y el cuerpo grande solo se adm
 	assert.equal((await call(alice, 'PUT', '/me/avatar', { image: fakeWebp(300) }, { expected: 429 })).code, 'rate-limit')
 	await call(alice, 'PATCH', '/me', { bio: 'x'.repeat(20_000) }, { expected: 413 })
 })
+
+test('denuncias: solo a amigos o solicitudes, con motivo y límite, y sin revelar si el usuario existe', async () => {
+	const { call, register, db } = setup()
+	const alice = await register('Alice_QA')
+	const bob = await register('Bob_QA')
+	await register('Carol_QA')
+	const count = async () => (await db.prepare('SELECT COUNT(*) AS n FROM reports').first()).n
+
+	// Sin motivo, con motivo demasiado largo o sin usuario: error (también cuentan para el límite, por eso otra cuenta).
+	const eve = await register('Eve_QA')
+	await call(eve, 'POST', '/report', { username: 'Bob_QA' }, { expected: 400 })
+	await call(eve, 'POST', '/report', { username: 'Bob_QA', reason: '   ' }, { expected: 400 })
+	await call(eve, 'POST', '/report', { username: 'Bob_QA', reason: 'x'.repeat(301) }, { expected: 400 })
+	await call(eve, 'POST', '/report', { reason: 'spam' }, { expected: 400 })
+
+	// Un desconocido, un nombre que no existe y uno mismo dan la misma respuesta y no guardan nada.
+	const stranger = await call(alice, 'POST', '/report', { username: 'Carol_QA', reason: 'spam' })
+	const missing = await call(alice, 'POST', '/report', { username: 'Nadie_QA', reason: 'spam' })
+	const self = await call(alice, 'POST', '/report', { username: 'Alice_QA', reason: 'spam' })
+	assert.deepEqual([stranger, missing, self], [{ ok: true }, { ok: true }, { ok: true }])
+	assert.equal(await count(), 0)
+
+	// Con una solicitud pendiente, sí se guarda (con quién denuncia a quién y el nombre de ese momento).
+	await call(bob, 'POST', '/friends/request', { username: 'Alice_QA' })
+	await call(alice, 'POST', '/report', { username: 'Bob_QA', reason: '  Me envía spam  ' })
+	const row = await db.prepare('SELECT * FROM reports').first()
+	assert.deepEqual([row.reporter, row.target, row.target_name, row.reason], [alice.code, bob.code, 'Bob_QA', 'Me envía spam'])
+
+	// La denuncia sobrevive a que la cuenta denunciada se borre, y hay un máximo por hora.
+	await call(bob, 'POST', '/me/delete', {})
+	assert.equal(await count(), 1)
+	const dave = await register('Dave_QA')
+	for (let i = 0; i < 5; i++) await call(dave, 'POST', '/report', { username: `Nadie_${i}`, reason: 'x' })
+	assert.equal((await call(dave, 'POST', '/report', { username: 'Nadie_x', reason: 'x' }, { expected: 429 })).code, 'rate-limit')
+})

@@ -298,6 +298,13 @@ pub async fn accounts_avatar<R: tauri::Runtime>(app: tauri::AppHandle<R>, state:
     state.request(&app, &p2p_state, Method::GET, &format!("/avatar?user={id}"), None).await.map_err(|e| e.message)
 }
 
+/// Denuncia a un amigo o a quien te ha enviado una solicitud (el servicio guarda el motivo para su revisión).
+#[tauri::command]
+pub async fn accounts_report<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, p2p_state: tauri::State<'_, P2pState>, username: String, reason: String) -> Result<(), String> {
+    state.request(&app, &p2p_state, Method::POST, "/report", Some(json!({"username": username, "reason": reason}))).await.map_err(|e| e.message)?;
+    Ok(())
+}
+
 #[tauri::command]
 pub async fn accounts_rename<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, AccountsState>, p2p_state: tauri::State<'_, P2pState>, username: String) -> Result<Value, String> {
     let profile = state.request(&app, &p2p_state, Method::POST, "/me/rename", Some(json!({"username": username}))).await.map_err(|e| e.message)?;

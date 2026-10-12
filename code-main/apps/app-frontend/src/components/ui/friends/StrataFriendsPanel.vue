@@ -2,6 +2,7 @@
 import {
 	BanIcon,
 	CheckIcon,
+	FlagIcon,
 	MoreVerticalIcon,
 	PlayIcon,
 	SearchIcon,
@@ -9,9 +10,19 @@ import {
 	UsersIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Button, Chips, IconButton, injectNotificationManager, Input, TeleportOverflowMenu } from '@modrinth/ui'
+import {
+	Button,
+	Chips,
+	IconButton,
+	injectNotificationManager,
+	Input,
+	TeleportOverflowMenu,
+	Textarea,
+	Toggle,
+} from '@modrinth/ui'
 import { invoke } from '@tauri-apps/api/core'
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { getCurrentWindow, UserAttentionType } from '@tauri-apps/api/window'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
@@ -30,11 +41,54 @@ const { avatar } = useProfileAvatar()
 const { addNotification } = injectNotificationManager()
 const nameOf = (id: string) => social.value.friends.find((friend) => friend.id === id)?.username ?? 'Un amigo'
 const { requests: joinRequests, shares: openShares, respond } = useJoinRequests({
-	onRequest: (friend) =>
-		addNotification({ type: 'info', title: 'Quieren unirse a tu partida', text: `${nameOf(friend)} te ha pedido unirse. Respóndele en el panel de amigos.` }),
+	onRequest: (friend) => {
+		addNotification({ type: 'info', title: 'Quieren unirse a tu partida', text: `${nameOf(friend)} te ha pedido unirse. Respóndele en el panel de amigos.` })
+		// Si el launcher está en segundo plano, parpadea en la barra de tareas.
+		if (!document.hasFocus()) void getCurrentWindow().requestUserAttention(UserAttentionType.Informational).catch(() => {})
+	},
 	onDeclined: (friend) =>
 		addNotification({ type: 'info', title: 'Petición rechazada', text: `${nameOf(friend)} no puede unirse ahora mismo.` }),
 })
+// «No molestar»: ajuste local; los amigos ven que estás ocupado y no pueden pedirte unirte.
+const doNotDisturb = ref(false)
+onMounted(async () => {
+	try {
+		doNotDisturb.value = await invoke<boolean>('p2p_do_not_disturb')
+	} catch {
+		// Se queda desactivado.
+	}
+})
+async function setDoNotDisturb(value: boolean) {
+	try {
+		await invoke('p2p_set_do_not_disturb', { enabled: value })
+		doNotDisturb.value = value
+	} catch (cause) {
+		addNotification({ type: 'error', title: 'No se pudo cambiar «No molestar»', text: typeof cause === 'string' ? cause : 'Inténtalo de nuevo.' })
+	}
+}
+
+// Denuncia a un amigo: el motivo se guarda en el servicio de cuentas para revisarlo.
+const reportModal = ref<InstanceType<typeof ModalWrapper> | null>(null)
+const reportTarget = ref('')
+const reportReason = ref('')
+function openReport(username: string) {
+	reportTarget.value = username
+	reportReason.value = ''
+	reportModal.value?.show()
+}
+async function sendReport() {
+	const reason = reportReason.value.trim()
+	if (!reason) return
+	if (await account.report(reportTarget.value, reason)) {
+		reportModal.value?.hide()
+		addNotification({
+			type: 'success',
+			title: 'Denuncia enviada',
+			text: `Gracias. Si quieres dejar de ver a ${reportTarget.value}, también puedes bloquearlo.`,
+		})
+	}
+}
+
 /** Mundo o servidor elegido para cada petición cuando se comparten varios. */
 const chosenShare = ref<Record<string, string>>({})
 const joinError = ref('')
@@ -62,6 +116,7 @@ const byName = (a: { username: string }, b: { username: string }) =>
 const playingFriends = computed(() =>
 	social.value.friends.filter((f) => presence.value[f.id]?.playing).sort(byName),
 )
+const isBusy = (id: string) => !!presence.value[id]?.busy
 const onlineFriends = computed(() =>
 	social.value.friends.filter((f) => presence.value[f.id]?.online && !presence.value[f.id]?.playing).sort(byName),
 )
@@ -211,6 +266,20 @@ const exactInResults = () =>
 		</div>
 	</ModalWrapper>
 
+	<ModalWrapper ref="reportModal" :header="`Denunciar a ${reportTarget}`">
+		<div class="flex min-w-[26rem] max-w-full flex-col gap-3">
+			<p class="m-0 text-sm text-secondary">
+				Cuéntanos qué ha pasado (hasta 300 caracteres). Solo se pueden denunciar amigos y solicitudes recibidas.
+			</p>
+			<Textarea v-model="reportReason" :maxlength="300" :rows="4" aria-label="Motivo de la denuncia" />
+			<p v-if="error" class="m-0 text-sm text-red" role="alert">{{ error }}</p>
+			<div class="flex justify-end gap-2">
+				<Button type="outlined" @click="reportModal?.hide()">Cancelar</Button>
+				<Button type="colored" color="red" :disabled="busy || !reportReason.trim()" @click="sendReport">Enviar denuncia</Button>
+			</div>
+		</div>
+	</ModalWrapper>
+
 	<div v-if="!loggedIn" class="text-sm">
 		<span v-if="status?.offline" class="text-secondary"
 			>No se pudo conectar con el servidor de cuentas.</span
@@ -239,6 +308,10 @@ const exactInResults = () =>
 				</span>
 			</span>
 		</button>
+		<label class="flex cursor-pointer items-center justify-between gap-2 px-1 text-sm text-secondary">
+			<span>No molestar <span class="text-xs">(sin peticiones ni «jugando a»)</span></span>
+			<Toggle :model-value="doNotDisturb" @update:model-value="setDoNotDisturb" />
+		</label>
 		<div class="flex items-center gap-1 -ml-1">
 			<h3 class="m-0 flex-1 pl-1 text-base font-medium text-primary">
 				Amigos · {{ social.friends.length }}
@@ -349,7 +422,15 @@ const exactInResults = () =>
 						:name="user.username"
 						:src="avatarOf(user)"
 						:size="36"
-						:status="group.key === 'offline' ? 'offline' : group.key === 'playing' ? 'playing' : 'online'"
+						:status="
+							group.key === 'offline'
+								? 'offline'
+								: isBusy(user.id)
+									? 'busy'
+									: group.key === 'playing'
+										? 'playing'
+										: 'online'
+						"
 					/>
 					<div class="min-w-0 flex-1" :title="user.bio || undefined">
 						<div
@@ -366,6 +447,7 @@ const exactInResults = () =>
 							<template v-if="group.key === 'playing' && presence[user.id]?.playing">
 								Jugando a {{ presence[user.id]?.playing?.title }}
 							</template>
+							<template v-else-if="group.key === 'online' && isBusy(user.id)">No molestar</template>
 							<template v-else>{{ group.key === 'online' ? 'En línea' : 'Desconectado' }}</template>
 						</div>
 					</div>
@@ -374,15 +456,17 @@ const exactInResults = () =>
 						:label="`Más acciones para ${user.username}`"
 						class="shrink-0 opacity-0 transition-opacity focus-visible:opacity-100 group-hover:opacity-100 group-focus-within:opacity-100"
 						:options="[
-							...(group.key === 'offline'
+							...(group.key === 'offline' || isBusy(user.id)
 								? []
 								: [{ id: 'join', label: 'Pedir unirse a su partida', action: () => askToJoin(user) }]),
+							{ id: 'report', label: 'Denunciar', action: () => openReport(user.username) },
 							{ id: 'remove', label: 'Eliminar amigo', action: () => account.friendAction('remove', user.username) },
 							{ id: 'block', label: 'Bloquear', action: () => account.friendAction('block', user.username), tone: 'red' },
 						]"
 					>
 						<MoreVerticalIcon />
 						<template #join><PlayIcon /> Pedir unirse a su partida</template>
+						<template #report><FlagIcon /> Denunciar</template>
 						<template #remove><XIcon /> Eliminar amigo</template>
 						<template #block><BanIcon /> Bloquear</template>
 					</TeleportOverflowMenu>

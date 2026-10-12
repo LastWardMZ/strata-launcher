@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
-export type PresenceStatus = 'online' | 'offline' | 'playing'
+export type PresenceStatus = 'online' | 'offline' | 'playing' | 'busy'
 
 const props = withDefaults(
 	defineProps<{
@@ -29,7 +29,13 @@ const background = computed(() => {
 	return `hsl(${hash} 42% 32%)`
 })
 const statusText = computed(() =>
-	props.status === 'playing' ? 'jugando' : props.status === 'online' ? 'en línea' : 'desconectado',
+	props.status === 'playing'
+		? 'jugando'
+		: props.status === 'busy'
+			? 'no molestar'
+			: props.status === 'online'
+				? 'en línea'
+				: 'desconectado',
 )
 const dot = computed(() => Math.max(8, Math.round(props.size * 0.3)))
 </script>
@@ -59,7 +65,15 @@ const dot = computed(() => Math.max(8, Math.round(props.size * 0.3)))
 		<span
 			v-if="status"
 			class="absolute -bottom-0.5 -right-0.5 rounded-full border-2 border-solid border-surface-2"
-			:class="status === 'offline' ? 'bg-surface-5' : status === 'playing' ? 'bg-brand' : 'bg-green'"
+			:class="
+				status === 'offline'
+					? 'bg-surface-5'
+					: status === 'playing'
+						? 'bg-brand'
+						: status === 'busy'
+							? 'bg-red'
+							: 'bg-green'
+			"
 			:style="{ width: `${dot}px`, height: `${dot}px` }"
 			aria-hidden="true"
 		/>
