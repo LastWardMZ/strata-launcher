@@ -3,12 +3,14 @@ import {
 	BanIcon,
 	CheckIcon,
 	MoreVerticalIcon,
+	PlayIcon,
 	SearchIcon,
 	UserPlusIcon,
 	UsersIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Button, IconButton, Input, TeleportOverflowMenu } from '@modrinth/ui'
+import { Button, Chips, IconButton, injectNotificationManager, Input, TeleportOverflowMenu } from '@modrinth/ui'
+import { invoke } from '@tauri-apps/api/core'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -16,6 +18,7 @@ import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import UserAvatar from '@/components/ui/friends/UserAvatar.vue'
 import { useFriendAvatars } from '@/composables/use-friend-avatars'
 import { useFriendPresence } from '@/composables/use-friend-presence'
+import { useJoinRequests } from '@/composables/use-join-requests'
 import { useProfileAvatar } from '@/composables/use-profile-avatar'
 import { type Relation, type SearchHit, useStrataAccount } from '@/composables/use-strata-account'
 
@@ -24,6 +27,33 @@ const router = useRouter()
 const account = useStrataAccount()
 const { loggedIn, social, busy, error, status, profile } = account
 const { avatar } = useProfileAvatar()
+const { addNotification } = injectNotificationManager()
+const nameOf = (id: string) => social.value.friends.find((friend) => friend.id === id)?.username ?? 'Un amigo'
+const { requests: joinRequests, shares: openShares, respond } = useJoinRequests({
+	onRequest: (friend) =>
+		addNotification({ type: 'info', title: 'Quieren unirse a tu partida', text: `${nameOf(friend)} te ha pedido unirse. Respóndele en el panel de amigos.` }),
+	onDeclined: (friend) =>
+		addNotification({ type: 'info', title: 'Petición rechazada', text: `${nameOf(friend)} no puede unirse ahora mismo.` }),
+})
+/** Mundo o servidor elegido para cada petición cuando se comparten varios. */
+const chosenShare = ref<Record<string, string>>({})
+const joinError = ref('')
+
+async function answerJoin(friend: string, accept: boolean) {
+	joinError.value = (await respond(friend, accept, accept ? chosenShare.value[friend] : undefined)) ?? ''
+}
+async function askToJoin(user: { id: string; username: string }) {
+	try {
+		await invoke('p2p_request_join', { friend: user.id })
+		addNotification({
+			type: 'success',
+			title: 'Petición enviada',
+			text: `Si ${user.username} acepta, recibirás una invitación en «Chat y partidas».`,
+		})
+	} catch (cause) {
+		addNotification({ type: 'error', title: 'No se pudo pedir unirse', text: typeof cause === 'string' ? cause : 'Inténtalo de nuevo.' })
+	}
+}
 const { avatarOf } = useFriendAvatars()
 const { presence } = useFriendPresence(computed(() => social.value.friends.map((friend) => friend.id)))
 // Quien tiene Strata abierto va primero; dentro de cada grupo, por orden alfabético.
@@ -223,6 +253,39 @@ const exactInResults = () =>
 			</IconButton>
 		</div>
 
+		<div
+			v-for="request in joinRequests"
+			:key="request.id"
+			class="flex flex-col gap-2 rounded-xl border border-solid border-brand bg-brand-highlight p-2.5"
+			role="group"
+			:aria-label="`${nameOf(request.friend)} quiere unirse a tu partida`"
+		>
+			<div class="flex items-center gap-2">
+				<UserAvatar :name="nameOf(request.friend)" :size="32" />
+				<span class="min-w-0 flex-1 text-sm leading-tight text-contrast">
+					<strong>{{ nameOf(request.friend) }}</strong> quiere unirse a tu partida
+				</span>
+			</div>
+			<Chips
+				v-if="openShares.length > 1"
+				:model-value="chosenShare[request.friend] ?? openShares[0].id"
+				:items="openShares.map((share) => share.id)"
+				:format-label="(id: string) => openShares.find((share) => share.id === id)?.title ?? id"
+				:capitalize="false"
+				aria-label="Partida a la que invitar"
+				@update:model-value="(id: string | null | undefined) => id && (chosenShare[request.friend] = id)"
+			/>
+			<div class="flex gap-2">
+				<Button type="colored" color="brand" size="sm" class="flex-1" @click="answerJoin(request.friend, true)">
+					<CheckIcon /> Invitar
+				</Button>
+				<Button type="outlined" size="sm" class="flex-1" @click="answerJoin(request.friend, false)">
+					<XIcon /> Rechazar
+				</Button>
+			</div>
+		</div>
+		<p v-if="joinError" class="m-0 text-sm text-red" role="alert">{{ joinError }}</p>
+
 		<template v-if="social.incoming.length">
 			<div class="text-sm font-semibold text-contrast">
 				Solicitudes recibidas · {{ social.incoming.length }}
@@ -311,11 +374,15 @@ const exactInResults = () =>
 						:label="`Más acciones para ${user.username}`"
 						class="shrink-0 opacity-0 transition-opacity focus-visible:opacity-100 group-hover:opacity-100 group-focus-within:opacity-100"
 						:options="[
+							...(group.key === 'offline'
+								? []
+								: [{ id: 'join', label: 'Pedir unirse a su partida', action: () => askToJoin(user) }]),
 							{ id: 'remove', label: 'Eliminar amigo', action: () => account.friendAction('remove', user.username) },
 							{ id: 'block', label: 'Bloquear', action: () => account.friendAction('block', user.username), tone: 'red' },
 						]"
 					>
 						<MoreVerticalIcon />
+						<template #join><PlayIcon /> Pedir unirse a su partida</template>
 						<template #remove><XIcon /> Eliminar amigo</template>
 						<template #block><BanIcon /> Bloquear</template>
 					</TeleportOverflowMenu>

@@ -46,6 +46,8 @@ const MAX_STREAMS_PER_CONNECTION: usize = 64;
 /// Mensajes (chat o invitaciones) que se aceptan de un mismo amigo por minuto.
 const MAX_INCOMING_PER_MINUTE: u32 = 60;
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(12);
+/// Tiempo mínimo entre dos peticiones de unirse del mismo amigo (también tras un rechazo).
+const JOIN_COOLDOWN_SECS: u64 = 60;
 const CONNECT_ERROR: &str = "No se pudo conectar con tu amigo (¿está conectado?)";
 /// Cuánto se recuerda que un amigo usa una versión sin `Status` (solo responde a `Ping`).
 const LEGACY_PEER_MEMORY: Duration = Duration::from_secs(600);
@@ -154,6 +156,18 @@ enum Request {
     Ping,
     /// Qué estás haciendo ahora (solo a amigos): sustituye a `Ping` en versiones que lo entienden.
     Status,
+    /// «Quiero unirme a tu partida»: el anfitrión acepta (y envía una invitación normal) o rechaza.
+    JoinRequest { id: String },
+    /// El anfitrión rechaza una petición de unirse.
+    JoinDecline { id: String },
+}
+
+/// Petición de unirse pendiente de respuesta (solo en memoria: se pierde al cerrar el launcher).
+#[derive(Clone, Serialize, Debug, PartialEq)]
+pub struct JoinRequestInfo {
+    pub friend: String,
+    pub id: String,
+    pub ts: u64,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -240,6 +254,12 @@ pub struct Core {
     activity: Mutex<Option<Playing>>,
     /// Amigos que no entienden `Status`, con el momento en que se comprobó.
     legacy_peers: Mutex<HashMap<String, std::time::Instant>>,
+    /// Peticiones de unirse recibidas y sin responder, por amigo.
+    join_requests: Mutex<HashMap<String, JoinRequestInfo>>,
+    /// Última petición de unirse aceptada de cada amigo (segundos), para el tiempo de espera.
+    join_cooldown: Mutex<HashMap<String, u64>>,
+    /// Amigos a los que hemos pedido unirnos: solo de ellos se aceptan rechazos.
+    join_outgoing: Mutex<HashSet<String>>,
     notify: Notify,
 }
 
@@ -392,6 +412,9 @@ impl Core {
             invites_none: AtomicBool::new(false),
             activity: Mutex::new(None),
             legacy_peers: Mutex::new(HashMap::new()),
+            join_requests: Mutex::new(HashMap::new()),
+            join_cooldown: Mutex::new(HashMap::new()),
+            join_outgoing: Mutex::new(HashSet::new()),
             notify,
         });
         let accepting = core.clone();
@@ -655,6 +678,49 @@ impl Core {
                     remote,
                     ChatMessage { id, from_me: false, text: String::new(), ts, delivered: true, invite: Some(info) },
                 );
+                Ok(Response::Ok { accepted: true, name: String::new() })
+            }
+            Request::JoinRequest { id } => {
+                self.require_friend(remote)?;
+                if self.invites_none.load(Ordering::Relaxed) {
+                    return Err("Este usuario no acepta invitaciones".into());
+                }
+                if !valid_id(&id) {
+                    return Err("Petición no válida".into());
+                }
+                if !self.shares.lock().unwrap().values().any(|share| share.kind != "instance") {
+                    return Err("Ahora mismo no tiene ninguna partida abierta para unirse".into());
+                }
+                self.allow_incoming(remote)?;
+                let mut pending = self.join_requests.lock().unwrap();
+                // Una petición ya pendiente se da por buena sin avisar otra vez.
+                if pending.contains_key(remote) {
+                    return Ok(Response::Ok { accepted: false, name: String::new() });
+                }
+                let ts = now();
+                {
+                    let mut cooldown = self.join_cooldown.lock().unwrap();
+                    if cooldown.get(remote).is_some_and(|last| ts < last + JOIN_COOLDOWN_SECS) {
+                        return Err("Espera un minuto antes de volver a pedirlo".into());
+                    }
+                    cooldown.insert(remote.to_string(), ts);
+                    // Se acota el mapa: lo antiguo ya no limita nada.
+                    cooldown.retain(|_, last| ts < *last + JOIN_COOLDOWN_SECS);
+                }
+                if pending.len() >= MAX_INCOMING_PENDING {
+                    return Err("Demasiadas peticiones pendientes".into());
+                }
+                pending.insert(remote.to_string(), JoinRequestInfo { friend: remote.to_string(), id: id.clone(), ts });
+                drop(pending);
+                self.emit(serde_json::json!({"type": "join_request", "friend": remote, "id": id}));
+                Ok(Response::Ok { accepted: false, name: String::new() })
+            }
+            Request::JoinDecline { id } => {
+                self.require_friend(remote)?;
+                if !valid_id(&id) || !self.join_outgoing.lock().unwrap().remove(remote) {
+                    return Err("No hay petición".into());
+                }
+                self.emit(serde_json::json!({"type": "join_declined", "friend": remote}));
                 Ok(Response::Ok { accepted: true, name: String::new() })
             }
             Request::Tunnel { .. } => Err("No autorizado".into()),
@@ -1145,6 +1211,52 @@ impl Core {
 
     pub async fn is_online(&self, id: &str) -> bool {
         self.request(id, &Request::Ping).await.is_ok()
+    }
+
+    /// Pide a un amigo unirte a su partida. Falla en el momento si no tiene nada abierto, no admite invitaciones o su
+    /// versión no entiende la petición.
+    pub async fn request_join(&self, friend: &str) -> Result<(), String> {
+        self.require_friend(friend).map_err(|_| "Solo puedes pedírselo a tus amigos".to_string())?;
+        self.join_outgoing.lock().unwrap().insert(friend.to_string());
+        let id = uuid::Uuid::new_v4().to_string();
+        match self.request(friend, &Request::JoinRequest { id }).await {
+            Ok(_) => Ok(()),
+            Err(message) => {
+                self.join_outgoing.lock().unwrap().remove(friend);
+                // Una versión antigua no entiende la petición y no contesta: se explica en vez de mostrar «Tiempo agotado».
+                Err(if message == "Tiempo agotado" { "Tu amigo aún no usa una versión de Strata que admita esto".to_string() } else { message })
+            }
+        }
+    }
+
+    pub fn join_requests(&self) -> Vec<JoinRequestInfo> {
+        let mut all: Vec<JoinRequestInfo> = self.join_requests.lock().unwrap().values().cloned().collect();
+        all.sort_by_key(|request| request.ts);
+        all
+    }
+
+    /// Responde a una petición de unirse. Aceptar envía la invitación de siempre a `share_id` (o a la única partida abierta).
+    pub async fn respond_join(self: &Arc<Self>, friend: &str, accept: bool, share_id: Option<String>) -> Result<(), String> {
+        let request = self.join_requests.lock().unwrap().remove(friend).ok_or("Esa petición ya no está disponible")?;
+        if accept {
+            let share_id = match share_id {
+                Some(id) => id,
+                None => {
+                    let mut open: Vec<Share> = self.shares().into_iter().filter(|share| share.kind != "instance").collect();
+                    open.sort_by(|a, b| a.title.cmp(&b.title));
+                    open.into_iter().next().ok_or("Ya no tienes ninguna partida abierta")?.id
+                }
+            };
+            if let Err(error) = self.invite(friend, &share_id).await {
+                // Si la invitación no se pudo crear, la petición sigue pendiente para poder reintentar.
+                self.join_requests.lock().unwrap().insert(friend.to_string(), request);
+                return Err(error);
+            }
+        } else {
+            // Aviso de cortesía: si no llega, el amigo simplemente no recibe respuesta.
+            let _ = self.request(friend, &Request::JoinDecline { id: request.id }).await;
+        }
+        Ok(())
     }
 
     /// Fija a qué se juega ahora (`None` si a nada). Lo llama la app a partir de los procesos de Minecraft.
@@ -1641,6 +1753,21 @@ pub async fn p2p_presence<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: ta
 }
 
 #[tauri::command]
+pub async fn p2p_request_join<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>, friend: String) -> Result<(), String> {
+    core(&app, &state).await?.request_join(&friend).await
+}
+
+#[tauri::command]
+pub async fn p2p_join_requests<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>) -> Result<Vec<JoinRequestInfo>, String> {
+    Ok(core(&app, &state).await?.join_requests())
+}
+
+#[tauri::command]
+pub async fn p2p_respond_join<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>, friend: String, accept: bool, share_id: Option<String>) -> Result<(), String> {
+    core(&app, &state).await?.respond_join(&friend, accept, share_id).await
+}
+
+#[tauri::command]
 pub async fn p2p_activity_sharing<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>) -> Result<bool, String> {
     Ok(core(&app, &state).await?.activity_sharing())
 }
@@ -1733,6 +1860,72 @@ mod tests {
         b.accept_friend(&a.info().id).await.unwrap();
         assert_eq!(a.friends()[0].status, FriendStatus::Accepted);
         assert_eq!(b.friends()[0].status, FriendStatus::Accepted);
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn join_requests_are_answered_with_a_normal_invite_and_are_rate_limited() {
+        let (host, guest) = pair().await;
+        befriend(&host, &guest).await;
+        let (host_id, guest_id) = (host.info().id, guest.info().id);
+
+        // Sin nada abierto, el que pide lo sabe al instante.
+        let nothing = guest.request_join(&host_id).await.unwrap_err();
+        assert!(nothing.contains("ninguna partida"), "{nothing}");
+        assert!(host.join_requests().is_empty());
+
+        // Una instancia compartida no cuenta: solo mundos y servidores.
+        host.share_start("instance", "Mi pack", "1.21.1", 0).ok();
+        assert!(guest.request_join(&host_id).await.is_err());
+
+        // Con un mundo abierto la petición llega, y repetirla mientras está pendiente no duplica nada.
+        let world = host.share_start("world", "Mi mundo", "1.21.1", 25565).unwrap();
+        guest.request_join(&host_id).await.unwrap();
+        guest.request_join(&host_id).await.unwrap();
+        let pending = host.join_requests();
+        assert_eq!(pending.len(), 1);
+        assert_eq!(pending[0].friend, guest_id);
+
+        // Aceptar envía la invitación de siempre.
+        host.respond_join(&guest_id, true, None).await.unwrap();
+        assert!(host.join_requests().is_empty());
+        let invite = guest.messages(&host_id).into_iter().find_map(|m| m.invite).expect("invitación recibida");
+        assert_eq!(invite.share_id, world.id);
+        assert!(host.respond_join(&guest_id, true, None).await.is_err(), "ya no está pendiente");
+
+        // Tras responder hay que esperar antes de volver a pedirlo.
+        let again = guest.request_join(&host_id).await.unwrap_err();
+        assert!(again.contains("Espera"), "{again}");
+
+        host.shutdown().await;
+        guest.shutdown().await;
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn declined_join_requests_notify_the_guest_and_respect_invite_privacy() {
+        let (host, guest) = pair().await;
+        befriend(&host, &guest).await;
+        let (host_id, guest_id) = (host.info().id, guest.info().id);
+        host.share_start("world", "Mi mundo", "1.21.1", 25565).unwrap();
+
+        // «Nadie» en invitaciones también bloquea las peticiones de unirse.
+        host.set_privacy(false, true);
+        assert!(guest.request_join(&host_id).await.is_err());
+        assert!(host.join_requests().is_empty());
+        host.set_privacy(false, false);
+
+        guest.request_join(&host_id).await.unwrap();
+        assert!(guest.join_outgoing.lock().unwrap().contains(&host_id));
+        host.respond_join(&guest_id, false, None).await.unwrap();
+        assert!(host.join_requests().is_empty());
+        assert!(host.messages(&guest_id).iter().all(|m| m.invite.is_none()), "rechazar no envía invitación");
+        // El rechazo llegó: ya no se espera respuesta de ese amigo.
+        assert!(!guest.join_outgoing.lock().unwrap().contains(&host_id));
+
+        // Un rechazo que no se había pedido se ignora.
+        assert!(host.request(&guest_id, &Request::JoinDecline { id: "abc".into() }).await.is_err());
+
+        host.shutdown().await;
+        guest.shutdown().await;
     }
 
     #[tokio::test(flavor = "multi_thread")]
