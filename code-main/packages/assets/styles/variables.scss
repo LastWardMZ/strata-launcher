@@ -374,7 +374,8 @@ html {
 	--brand-gradient-fade-out-color: linear-gradient(to bottom, rgba(24, 30, 31, 0), #171d1e 80%);
 
 	--color-button-bg-selected: var(--color-brand-highlight);
-	--color-button-text-selected: var(--color-brand);
+	/* El acento sobre su propio resaltado se quedaba en 3,8:1; con un 30 % de blanco supera 4,5:1. */
+	--color-button-text-selected: color-mix(in srgb, var(--color-brand) 70%, white);
 
 	--color-gradient-button-bg: linear-gradient(180deg, #3a3d47 0%, #33363d 100%);
 

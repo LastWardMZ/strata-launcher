@@ -5,20 +5,16 @@ import {
 	Chips,
 	defineMessages,
 	injectNotificationManager,
-	injectPageContext,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
 import { invoke } from '@tauri-apps/api/core'
 import { ref, watch } from 'vue'
 
-import { open_ads_consent_preferences } from '@/helpers/ads.js'
-import { optInAnalytics, optOutAnalytics } from '@/helpers/analytics'
 import { get, set } from '@/helpers/settings.ts'
 
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
-const { adConsentAvailable } = injectPageContext()
 const settings = ref(await get())
 
 // Nivel de detalle de Discord (completo o básico); es un ajuste local, aparte de los demás.
@@ -37,28 +33,6 @@ async function setDiscordDetail(level: string | null | undefined) {
 }
 
 const messages = defineMessages({
-	adsConsentTitle: {
-		id: 'app.ads-consent.title',
-		defaultMessage: 'Your privacy and how ads support Modrinth',
-	},
-	adsConsentIntro: {
-		id: 'app.settings.privacy.ads-consent.intro',
-		defaultMessage:
-			'Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance. You can opt out or manage your preferences below.',
-	},
-	adsConsentManage: {
-		id: 'app.ads-consent.manage',
-		defaultMessage: 'Manage preferences',
-	},
-	telemetryTitle: {
-		id: 'app.settings.privacy.telemetry.title',
-		defaultMessage: 'Telemetry',
-	},
-	telemetryDescription: {
-		id: 'app.settings.privacy.telemetry.description',
-		defaultMessage:
-			"Strata doesn't collect or send usage data, so this setting has no effect. It's kept for compatibility.",
-	},
 	discordRichPresenceTitle: {
 		id: 'app.settings.privacy.discord-rich-presence.title',
 		defaultMessage: 'Discord Rich Presence',
@@ -70,19 +44,9 @@ const messages = defineMessages({
 	},
 })
 
-async function manageAdsPreferences() {
-	await open_ads_consent_preferences().catch(handleError)
-}
-
 watch(
 	settings,
 	async () => {
-		if (settings.value.telemetry) {
-			optInAnalytics()
-		} else {
-			optOutAnalytics()
-		}
-
 		await set(settings.value)
 	},
 	{ deep: true },
@@ -90,34 +54,7 @@ watch(
 </script>
 
 <template>
-	<div v-if="adConsentAvailable">
-		<h2 class="m-0 text-lg font-semibold text-contrast">
-			{{ formatMessage(messages.adsConsentTitle) }}
-		</h2>
-		<div class="mt-2 flex flex-col gap-2.5 items-start">
-			<Button @click="manageAdsPreferences">
-				<Settings2Icon aria-hidden="true" />
-				{{ formatMessage(messages.adsConsentManage) }}
-			</Button>
-			<div>
-				{{ formatMessage(messages.adsConsentIntro) }}
-			</div>
-		</div>
-	</div>
-
-	<div class="mt-8 first:mt-0 flex items-center justify-between gap-4">
-		<div>
-			<h2 class="m-0 text-lg font-semibold text-contrast">
-				{{ formatMessage(messages.telemetryTitle) }}
-			</h2>
-			<p class="m-0 mt-1">
-				{{ formatMessage(messages.telemetryDescription) }}
-			</p>
-		</div>
-		<Toggle id="opt-out-analytics" v-model="settings.telemetry" />
-	</div>
-
-	<div class="mt-4 flex items-center justify-between gap-4">
+	<div class="flex items-center justify-between gap-4">
 		<div>
 			<h2 class="m-0 text-lg font-semibold text-contrast">
 				{{ formatMessage(messages.discordRichPresenceTitle) }}

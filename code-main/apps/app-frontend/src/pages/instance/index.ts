@@ -3,7 +3,7 @@ import Files from './files/index.vue'
 import Index from './layout.vue'
 import Logs from './logs/index.vue'
 import Screenshots from './screenshots/index.vue'
-import Share from './share/index.vue'
+import Share from './share/StrataShare.vue'
 import Worlds from './worlds/index.vue'
 
 export { Content, Files, Index, Logs, Screenshots, Share, Worlds }

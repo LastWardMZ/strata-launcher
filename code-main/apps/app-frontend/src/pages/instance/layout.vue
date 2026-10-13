@@ -497,12 +497,11 @@ const renderMode = computed<'scroll' | 'fixed'>(() =>
 	route.meta.renderMode === 'fixed' ? 'fixed' : 'scroll',
 )
 const isFixedRender = computed(() => renderMode.value === 'fixed')
-const currentUserCanUseSharedInstances = sharedInstanceState.currentUserCanUseSharedInstances
 const showShareTab = computed(() => {
 	const linkType = instance.value?.link?.type
 
+	// Strata comparte por P2P (sin cuenta de Modrinth): la pestaña no depende de ninguna cuenta.
 	return (
-		currentUserCanUseSharedInstances.value &&
 		!instance.value?.quarantined &&
 		instance.value?.shared_instance?.role !== 'member' &&
 		linkType !== 'server_project' &&

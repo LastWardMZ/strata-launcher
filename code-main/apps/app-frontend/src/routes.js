@@ -93,7 +93,7 @@ export default new createRouter({
 				{
 					path: 'share',
 					name: 'InstanceShare',
-					component: () => import('@/pages/instance/share/index.vue'),
+					component: () => import('@/pages/instance/share/StrataShare.vue'),
 				},
 				{
 					path: '',
