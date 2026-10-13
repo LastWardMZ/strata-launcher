@@ -31,6 +31,19 @@ const activityBusy = ref(false)
 // Mundo LAN y avisos sobre el juego: ajustes locales de este launcher.
 const autoShareLan = ref<'yes' | 'no'>('yes')
 const gameToasts = ref<'yes' | 'no'>('yes')
+const gameChat = ref<'yes' | 'no'>('yes')
+async function setGameChat(value: 'yes' | 'no') {
+	if (activityBusy.value) return
+	activityBusy.value = true
+	try {
+		await invoke('p2p_set_game_chat', { gameChat: value === 'yes' })
+		gameChat.value = value
+	} catch {
+		// Se conserva el valor anterior.
+	} finally {
+		activityBusy.value = false
+	}
+}
 async function setGameOptions(next: { autoShareLan?: 'yes' | 'no'; gameToasts?: 'yes' | 'no' }) {
 	if (activityBusy.value) return
 	const lan = next.autoShareLan ?? autoShareLan.value
@@ -61,9 +74,10 @@ async function testToast() {
 
 onMounted(async () => {
 	try {
-		const options = await invoke<{ autoShareLan: boolean; gameToasts: boolean }>('p2p_game_options')
+		const options = await invoke<{ autoShareLan: boolean; gameToasts: boolean; gameChat: boolean }>('p2p_game_options')
 		autoShareLan.value = options.autoShareLan ? 'yes' : 'no'
 		gameToasts.value = options.gameToasts ? 'yes' : 'no'
+		gameChat.value = options.gameChat ? 'yes' : 'no'
 	} catch {
 		// Se quedan en el valor por defecto.
 	}
@@ -213,6 +227,20 @@ async function setShareActivity(value: 'yes' | 'no' | null) {
 					aria-label="Avisos sobre el juego"
 					@update:model-value="(value: 'yes' | 'no' | null) => value && setGameOptions({ gameToasts: value })"
 				/>
+				<h3 class="m-0 mt-2 text-base font-semibold text-contrast">Mostrarlos en el chat de Minecraft</h3>
+				<Chips
+					:model-value="gameChat"
+					:items="[...searchableOptions]"
+					:format-label="(value: 'yes' | 'no') => searchableLabels[value]"
+					:disabled-items="activityBusy ? [...searchableOptions] : undefined"
+					:capitalize="false"
+					aria-label="Mostrar los avisos en el chat de Minecraft"
+					@update:model-value="(value: 'yes' | 'no' | null) => value && setGameChat(value)"
+				/>
+				<p class="m-0 text-secondary">
+					Los avisos también salen en el chat del juego, solo para ti (no se envían al servidor). Funciona en
+					instancias vanilla; si el juego no lo admite, se usa el aviso sobre la ventana.
+				</p>
 				<p class="m-0 text-secondary">
 					Mientras juegas, los mensajes, las invitaciones y las peticiones de unirse de tus amigos salen arriba a la
 					derecha de la ventana de Minecraft. «No molestar» los silencia.

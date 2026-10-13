@@ -355,6 +355,7 @@ fn main() {
             api::p2p::p2p_presence,
             api::p2p::p2p_test_game_toast,
             api::p2p::p2p_game_options,
+            api::p2p::p2p_set_game_chat,
             api::p2p::p2p_set_game_options,
             api::p2p::p2p_do_not_disturb,
             api::p2p::p2p_set_do_not_disturb,

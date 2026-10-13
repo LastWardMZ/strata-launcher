@@ -5,6 +5,7 @@ import com.google.gson.JsonNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class RpcHandlers {
@@ -28,6 +29,19 @@ public class RpcHandlers {
             final B arg2 = TheseusRpc.GSON.fromJson(args[1], arg2Type);
             handler.accept(arg1, arg2);
             return JsonNull.INSTANCE;
+        });
+    }
+
+    /** Como {@link #handler(String, Class, Class, BiConsumer)}, pero devolviendo un resultado al launcher. */
+    public <A, B, R> RpcHandlers handlerReturning(
+            String functionName, Class<A> arg1Type, Class<B> arg2Type, BiFunction<A, B, R> handler) {
+        return addHandler(functionName, args -> {
+            if (args.length != 2) {
+                throw new IllegalArgumentException(functionName + " expected 2 arguments");
+            }
+            final A arg1 = TheseusRpc.GSON.fromJson(args[0], arg1Type);
+            final B arg2 = TheseusRpc.GSON.fromJson(args[1], arg2Type);
+            return TheseusRpc.GSON.toJsonTree(handler.apply(arg1, arg2));
         });
     }
 

@@ -15,6 +15,25 @@ pub async fn get_all() -> crate::Result<Vec<ProcessMetadata>> {
     Ok(processes)
 }
 
+/// Escribe un mensaje local en el chat de cada Minecraft abierto (solo lo ve el jugador). Devuelve en cuántos juegos se
+/// mostró; los que se lanzaron con un agente antiguo, o no están dentro de un mundo, no cuentan.
+pub async fn show_in_game_chat(title: &str, text: &str) -> crate::Result<usize> {
+    let state = State::get().await?;
+    let mut shown = 0;
+    for process in state.process_manager.get_all() {
+        let Some(rpc) = state.process_manager.get_rpc(process.uuid) else {
+            continue;
+        };
+        let call = rpc.call_method_2::<bool>("strata_chat", title, text);
+        if let Ok(Ok(true)) =
+            tokio::time::timeout(std::time::Duration::from_secs(2), call).await
+        {
+            shown += 1;
+        }
+    }
+    Ok(shown)
+}
+
 pub async fn resolve_instance_id(instance: &str) -> crate::Result<String> {
     let state = State::get().await?;
     resolve_instance_id_with_state(instance, &state)

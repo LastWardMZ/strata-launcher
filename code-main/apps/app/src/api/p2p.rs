@@ -226,6 +226,9 @@ struct Store {
     /// Avisos sobre la ventana de Minecraft (mensajes, invitaciones, peticiones y pistas).
     #[serde(default = "yes")]
     game_toasts: bool,
+    /// Mostrar esos avisos también en el chat de Minecraft (solo para el jugador), antes que sobre la ventana.
+    #[serde(default = "yes")]
+    game_chat: bool,
 }
 
 fn yes() -> bool {
@@ -234,7 +237,7 @@ fn yes() -> bool {
 
 impl Default for Store {
     fn default() -> Self {
-        Self { name: String::new(), bio: String::new(), friends: Vec::new(), share_activity: true, do_not_disturb: false, auto_share_lan: true, game_toasts: true }
+        Self { name: String::new(), bio: String::new(), friends: Vec::new(), share_activity: true, do_not_disturb: false, auto_share_lan: true, game_toasts: true, game_chat: true }
     }
 }
 
@@ -1306,6 +1309,15 @@ impl Core {
         self.save_store()
     }
 
+    pub fn game_chat(&self) -> bool {
+        self.store.lock().unwrap().game_chat
+    }
+
+    pub fn set_game_chat(&self, game_chat: bool) -> Result<(), String> {
+        self.store.lock().unwrap().game_chat = game_chat;
+        self.save_store()
+    }
+
     pub fn do_not_disturb(&self) -> bool {
         self.store.lock().unwrap().do_not_disturb
     }
@@ -1629,6 +1641,20 @@ fn toast_text(core: &Core, event: &serde_json::Value) -> Option<(String, String)
     }
 }
 
+/// Enseña un aviso al jugador: en el chat de Minecraft si está activado y el juego lo admite (cualquier instancia, también
+/// vanilla); si no, como aviso sobre la ventana. Devuelve `true` si salió en el chat.
+async fn show_in_game(core: &Core, title: &str, body: &str) -> bool {
+    if core.game_chat() && super::recording::has_game() {
+        if let Ok(shown) = theseus::process::show_in_game_chat(title, body).await {
+            if shown > 0 {
+                return true;
+            }
+        }
+    }
+    super::recording::game_toast(title, body);
+    false
+}
+
 /// Muestra sobre la ventana de Minecraft un aviso del motor P2P (mensaje, invitación o petición de unirse).
 fn game_toast_for_event<R: tauri::Runtime>(app: tauri::AppHandle<R>, event: serde_json::Value) {
     if !matches!(event["type"].as_str(), Some("message" | "join_request")) {
@@ -1641,7 +1667,7 @@ fn game_toast_for_event<R: tauri::Runtime>(app: tauri::AppHandle<R>, event: serd
             return;
         }
         if let Some((title, body)) = toast_text(&core, &event) {
-            super::recording::game_toast(&title, &body);
+            show_in_game(&core, &title, &body).await;
         }
     });
 }
@@ -1700,7 +1726,7 @@ async fn game_watcher(core: Arc<Core>) {
                         if let Ok(share) = core.share_start_with("world", &process.instance_name, &version, port, None, Some(process.instance_id.clone())) {
                             auto_shares.insert(share.id, process.instance_id.clone());
                             if toasts && !core.do_not_disturb() {
-                                super::recording::game_toast("Mundo abierto a LAN", "Tus amigos pueden pedirte unirse desde Strata.");
+                                show_in_game(&core, "Mundo abierto a LAN", "Tus amigos pueden pedirte unirse desde Strata.").await;
                             }
                         }
                     }
@@ -1708,7 +1734,7 @@ async fn game_watcher(core: Arc<Core>) {
                 None if toasts && has_friends && !core.do_not_disturb() && !hinted.contains(&process.uuid) => {
                     if log_tail(&process.instance_id).await.is_some_and(|text| integrated_server_started(&text)) {
                         hinted.insert(process.uuid);
-                        super::recording::game_toast("Estás en un mundo", "Pulsa Esc y «Abrir a LAN»: tus amigos podrán pedirte unirse.");
+                        show_in_game(&core, "Estás en un mundo", "Pulsa Esc y «Abrir a LAN»: tus amigos podrán pedirte unirse.").await;
                     }
                 }
                 _ => {}
@@ -1950,19 +1976,27 @@ pub async fn p2p_respond_join<R: tauri::Runtime>(app: tauri::AppHandle<R>, state
 pub struct GameOptions {
     pub auto_share_lan: bool,
     pub game_toasts: bool,
+    pub game_chat: bool,
 }
 
 /// Botón «Probar aviso»: enseña un aviso de ejemplo sobre Minecraft. Devuelve `false` si no hay ningún juego abierto.
 #[tauri::command]
-pub async fn p2p_test_game_toast() -> bool {
-    super::recording::game_toast("Aviso de prueba", "Así verás los mensajes, las invitaciones y las peticiones de tus amigos mientras juegas.");
-    super::recording::has_game()
+pub async fn p2p_test_game_toast<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>) -> Result<bool, String> {
+    let core = core(&app, &state).await?;
+    show_in_game(&core, "Aviso de prueba", "Así verás los mensajes, las invitaciones y las peticiones de tus amigos mientras juegas.").await;
+    Ok(super::recording::has_game())
 }
 
 #[tauri::command]
 pub async fn p2p_game_options<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>) -> Result<GameOptions, String> {
-    let (auto_share_lan, game_toasts) = core(&app, &state).await?.game_options();
-    Ok(GameOptions { auto_share_lan, game_toasts })
+    let core = core(&app, &state).await?;
+    let (auto_share_lan, game_toasts) = core.game_options();
+    Ok(GameOptions { auto_share_lan, game_toasts, game_chat: core.game_chat() })
+}
+
+#[tauri::command]
+pub async fn p2p_set_game_chat<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>, game_chat: bool) -> Result<(), String> {
+    core(&app, &state).await?.set_game_chat(game_chat)
 }
 
 #[tauri::command]

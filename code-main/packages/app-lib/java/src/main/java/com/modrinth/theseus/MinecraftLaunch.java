@@ -22,6 +22,7 @@ public final class MinecraftLaunch {
                 Integer.getInteger("modrinth.internal.ipc.port"),
                 new RpcHandlers()
                         .handler("set_system_property", String.class, String.class, System::setProperty)
+                        .handlerReturning("strata_chat", String.class, String.class, StrataChat::show)
                         .handler("launch", () -> waitForLaunch.complete(null)));
 
         waitForLaunch.join();
