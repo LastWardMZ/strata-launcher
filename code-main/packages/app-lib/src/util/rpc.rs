@@ -66,7 +66,7 @@ impl RpcServerBuilder {
             address,
             message_sender,
             waiting_responses,
-            abort_handle: join_handle.abort_handle(),
+            _abort_guard: Arc::new(AbortOnDrop(join_handle.abort_handle())),
         })
     }
 }
@@ -76,7 +76,17 @@ pub struct RpcServer {
     address: SocketAddr,
     message_sender: mpsc::UnboundedSender<RpcMessage>,
     waiting_responses: WaitingResponsesMap,
-    abort_handle: AbortHandle,
+    /// Compartido entre clones: el servidor solo se detiene cuando se suelta el último.
+    _abort_guard: Arc<AbortOnDrop>,
+}
+
+#[derive(Debug)]
+struct AbortOnDrop(AbortHandle);
+
+impl Drop for AbortOnDrop {
+    fn drop(&mut self) {
+        self.0.abort();
+    }
 }
 
 impl RpcServer {
@@ -144,12 +154,6 @@ impl RpcServer {
             .into());
         };
         result.and_then(|x| Ok(serde_json::from_value(x)?))
-    }
-}
-
-impl Drop for RpcServer {
-    fn drop(&mut self) {
-        self.abort_handle.abort();
     }
 }
 
