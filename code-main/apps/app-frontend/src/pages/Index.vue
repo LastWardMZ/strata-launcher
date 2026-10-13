@@ -7,6 +7,7 @@ import { computed, inject, ref } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 
 import LibrarySection from '@/components/ui/library/index.vue'
+import PlaytimeSummary from '@/components/ui/library/PlaytimeSummary.vue'
 import { libraryScrollTop } from '@/components/ui/library/view-state'
 import WelcomeScreen from '@/components/ui/WelcomeScreen.vue'
 import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'
@@ -101,6 +102,7 @@ function openPageContextMenu(event: MouseEvent) {
 			:recent-instances="recentInstances"
 		/>
 		<LibrarySection :instances="instances" />
+		<PlaytimeSummary :instances="instances" />
 		<ContextMenu ref="pageOptions" :label="formatMessage(messages.libraryActionsLabel)" />
 	</div>
 </template>

@@ -273,7 +273,7 @@ async function saveServer() {
 					no tienes que pasar códigos a mano.
 				</p>
 				<div class="flex gap-2">
-					<Input :model-value="profile.id" readonly wrapper-class="flex-grow min-w-0" />
+					<Input :model-value="profile.id" readonly aria-label="Tu código de partidas" wrapper-class="flex-grow min-w-0" />
 					<Button type="outlined" @click="copyCode">
 						<CheckIcon v-if="copied" /><CopyIcon v-else />
 						{{ copied ? 'Copiado' : 'Copiar' }}
