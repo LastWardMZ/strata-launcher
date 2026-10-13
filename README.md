@@ -34,6 +34,14 @@ Launcher de Minecraft Java con servidores personales, amigos y partidas P2P, bas
   fijas; el registro no sale de él salvo que tú lo compartas.
 - **Actualizaciones automáticas** firmadas desde las Releases de este repositorio.
 
+## Qué sigue usando de Modrinth
+
+Strata no usa cuentas, hosting, anuncios, planes de pago ni analítica de Modrinth (el código se retiró). Solo consulta
+sus servicios **públicos y gratuitos**, y nada más: la API de contenido (`api.modrinth.com`, para buscar e instalar
+mods, modpacks, shaders…), su CDN de archivos (`cdn.modrinth.com`) y los metadatos de versiones de Minecraft y de
+cargadores (`launcher-meta.modrinth.com`). Los permisos de red de la aplicación se limitan a esos dos primeros
+dominios, a los catálogos de servidores (PaperMC, Purpur, Fabric, NeoForge, Quilt, Mojang) y a los de Strata.
+
 ## Instalar
 
 Descarga `Strata-Setup-<versión>.exe` de la página de [Releases](../../releases/latest) y ejecútalo.
