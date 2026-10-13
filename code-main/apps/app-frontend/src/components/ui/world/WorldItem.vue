@@ -471,6 +471,7 @@ function openContextMenu(event: MouseEvent) {
 			<template v-if="instanceId" #clickable>
 				<router-link
 					class="no-click-animation"
+					:aria-label="getWorldDisplayName(world)"
 					:to="`/instance/${encodeURIComponent(instanceId)}/worlds?highlight=${encodeURIComponent(getWorldIdentifier(world))}`"
 				/>
 			</template>
