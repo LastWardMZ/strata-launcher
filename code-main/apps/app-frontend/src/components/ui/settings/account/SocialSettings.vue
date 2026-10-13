@@ -28,7 +28,45 @@ const searchable = computed(() => (profile.value?.settings.searchable ? 'yes' : 
 // Compartir a qué juegas es un ajuste local de este launcher (se decide aquí, no en el servidor de cuentas).
 const shareActivity = ref<'yes' | 'no'>('yes')
 const activityBusy = ref(false)
+// Mundo LAN y avisos sobre el juego: ajustes locales de este launcher.
+const autoShareLan = ref<'yes' | 'no'>('yes')
+const gameToasts = ref<'yes' | 'no'>('yes')
+async function setGameOptions(next: { autoShareLan?: 'yes' | 'no'; gameToasts?: 'yes' | 'no' }) {
+	if (activityBusy.value) return
+	const lan = next.autoShareLan ?? autoShareLan.value
+	const toasts = next.gameToasts ?? gameToasts.value
+	activityBusy.value = true
+	try {
+		await invoke('p2p_set_game_options', { autoShareLan: lan === 'yes', gameToasts: toasts === 'yes' })
+		autoShareLan.value = lan
+		gameToasts.value = toasts
+	} catch {
+		// Se conservan los valores anteriores.
+	} finally {
+		activityBusy.value = false
+	}
+}
+
+const toastNote = ref('')
+async function testToast() {
+	try {
+		const hasGame = await invoke<boolean>('p2p_test_game_toast')
+		toastNote.value = hasGame
+			? 'Aviso enviado: míralo arriba a la derecha de la ventana de Minecraft.'
+			: 'No hay ningún Minecraft abierto desde Strata: los avisos solo salen sobre el juego.'
+	} catch {
+		toastNote.value = 'No se pudo enviar el aviso.'
+	}
+}
+
 onMounted(async () => {
+	try {
+		const options = await invoke<{ autoShareLan: boolean; gameToasts: boolean }>('p2p_game_options')
+		autoShareLan.value = options.autoShareLan ? 'yes' : 'no'
+		gameToasts.value = options.gameToasts ? 'yes' : 'no'
+	} catch {
+		// Se quedan en el valor por defecto.
+	}
 	try {
 		shareActivity.value = (await invoke<boolean>('p2p_activity_sharing')) ? 'yes' : 'no'
 	} catch {
@@ -145,6 +183,44 @@ async function setShareActivity(value: 'yes' | 'no' | null) {
 					Tus amigos ven «Jugando a …» con el nombre de la instancia que tienes abierta. Si lo
 					desactivas, solo verán que estás conectado.
 				</p>
+			</div>
+
+			<div class="flex flex-col gap-2.5">
+				<h2 class="m-0 text-lg font-semibold text-contrast">Compartir mi mundo LAN con amigos</h2>
+				<Chips
+					:model-value="autoShareLan"
+					:items="[...searchableOptions]"
+					:format-label="(value: 'yes' | 'no') => searchableLabels[value]"
+					:disabled-items="activityBusy ? [...searchableOptions] : undefined"
+					:capitalize="false"
+					aria-label="Compartir mi mundo LAN con amigos"
+					@update:model-value="(value: 'yes' | 'no' | null) => value && setGameOptions({ autoShareLan: value })"
+				/>
+				<p class="m-0 text-secondary">
+					Cuando abres tu mundo a LAN desde Minecraft (Esc → Abrir a LAN), Strata lo ofrece a tus amigos:
+					pueden pedirte unirse y tú decides si aceptas. Se retira solo al cerrar el juego.
+				</p>
+			</div>
+
+			<div class="flex flex-col gap-2.5">
+				<h2 class="m-0 text-lg font-semibold text-contrast">Avisos sobre el juego</h2>
+				<Chips
+					:model-value="gameToasts"
+					:items="[...searchableOptions]"
+					:format-label="(value: 'yes' | 'no') => searchableLabels[value]"
+					:disabled-items="activityBusy ? [...searchableOptions] : undefined"
+					:capitalize="false"
+					aria-label="Avisos sobre el juego"
+					@update:model-value="(value: 'yes' | 'no' | null) => value && setGameOptions({ gameToasts: value })"
+				/>
+				<p class="m-0 text-secondary">
+					Mientras juegas, los mensajes, las invitaciones y las peticiones de unirse de tus amigos salen arriba a la
+					derecha de la ventana de Minecraft. «No molestar» los silencia.
+				</p>
+				<div class="flex flex-wrap items-center gap-3">
+					<Button type="outlined" size="sm" @click="testToast">Probar aviso</Button>
+					<span v-if="toastNote" class="text-sm text-secondary" role="status">{{ toastNote }}</span>
+				</div>
 			</div>
 		</section>
 

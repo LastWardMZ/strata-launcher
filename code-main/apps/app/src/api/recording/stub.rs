@@ -93,3 +93,13 @@ pub async fn recording_merge_start(_paths: Vec<String>) -> Result<String, String
 pub async fn recording_trim_cancel(_job: String) -> Result<(), String> {
     Err(UNSUPPORTED.into())
 }
+
+/// Avisos sobre el juego: solo existen en Windows.
+pub fn game_toast(_title: &str, _body: &str) {}
+pub fn set_game_window(_window: Option<isize>) {}
+pub fn has_game() -> bool {
+    false
+}
+pub fn game_window_for(_pids: &[u32]) -> Option<isize> {
+    None
+}

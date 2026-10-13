@@ -220,6 +220,12 @@ struct Store {
     /// «No molestar»: no se muestra a qué se juega y se rechazan las peticiones de unirse.
     #[serde(default)]
     do_not_disturb: bool,
+    /// Compartir solo con amigos el mundo LAN que abres desde Minecraft (pueden pedirte unirse; tú aceptas).
+    #[serde(default = "yes")]
+    auto_share_lan: bool,
+    /// Avisos sobre la ventana de Minecraft (mensajes, invitaciones, peticiones y pistas).
+    #[serde(default = "yes")]
+    game_toasts: bool,
 }
 
 fn yes() -> bool {
@@ -228,7 +234,7 @@ fn yes() -> bool {
 
 impl Default for Store {
     fn default() -> Self {
-        Self { name: String::new(), bio: String::new(), friends: Vec::new(), share_activity: true, do_not_disturb: false }
+        Self { name: String::new(), bio: String::new(), friends: Vec::new(), share_activity: true, do_not_disturb: false, auto_share_lan: true, game_toasts: true }
     }
 }
 
@@ -1285,6 +1291,21 @@ impl Core {
         });
     }
 
+    /// `(compartir el mundo LAN solo, avisos sobre el juego)`.
+    pub fn game_options(&self) -> (bool, bool) {
+        let store = self.store.lock().unwrap();
+        (store.auto_share_lan, store.game_toasts)
+    }
+
+    pub fn set_game_options(&self, auto_share_lan: bool, game_toasts: bool) -> Result<(), String> {
+        {
+            let mut store = self.store.lock().unwrap();
+            store.auto_share_lan = auto_share_lan;
+            store.game_toasts = game_toasts;
+        }
+        self.save_store()
+    }
+
     pub fn do_not_disturb(&self) -> bool {
         self.store.lock().unwrap().do_not_disturb
     }
@@ -1557,7 +1578,8 @@ pub(crate) async fn core<R: tauri::Runtime>(app: &tauri::AppHandle<R>, state: &P
             let dir = app.path().app_data_dir().map_err(|e| e.to_string())?.join("p2p");
             let handle = app.clone();
             let notify: Notify = Arc::new(move |value| {
-                let _ = handle.emit("p2p-event", value);
+                let _ = handle.emit("p2p-event", value.clone());
+                game_toast_for_event(handle.clone(), value);
             });
             let core = Core::start(dir, notify, true).await?;
             // Los mundos compartidos siguen al puerto LAN actual de su instancia.
@@ -1566,17 +1588,144 @@ pub(crate) async fn core<R: tauri::Runtime>(app: &tauri::AppHandle<R>, state: &P
             }));
             // Lo que se juega ahora (para «Jugando a …» de tus amigos): se refresca cada pocos segundos.
             let watcher = core.clone();
-            tokio::spawn(async move {
-                loop {
-                    let current = theseus::process::get_all().await.ok().and_then(|all| all.into_iter().min_by_key(|p| p.start_time));
-                    watcher.set_activity(current.map(|p| Playing { title: p.instance_name, since: p.start_time.timestamp().max(0) as u64 }));
-                    tokio::time::sleep(Duration::from_secs(10)).await;
-                }
-            });
+            tokio::spawn(game_watcher(watcher));
             Ok::<_, String>(core)
         })
         .await
         .cloned()
+}
+
+/// Texto de un aviso sobre el juego para un evento del motor P2P (`message` o `join_request`), o `None` si no toca avisar.
+fn toast_text(core: &Core, event: &serde_json::Value) -> Option<(String, String)> {
+    let friend = event["friend"].as_str()?;
+    let name = core.friends().into_iter().find(|f| f.id == friend).map(|f| f.name).unwrap_or_else(|| "Un amigo".to_string());
+    match event["type"].as_str()? {
+        "join_request" => Some((format!("{name} quiere unirse"), "Pulsa Alt+Tab para responder en Strata.".to_string())),
+        "message" => {
+            let message = core.messages(friend).into_iter().rev().find(|m| !m.from_me)?;
+            // Un mismo mensaje no avisa dos veces (el evento también salta al marcarlo como entregado, etc.).
+            static LAST: std::sync::Mutex<Option<HashMap<String, String>>> = std::sync::Mutex::new(None);
+            {
+                let mut last = LAST.lock().unwrap();
+                let seen = last.get_or_insert_with(HashMap::new);
+                if seen.get(friend) == Some(&message.id) {
+                    return None;
+                }
+                seen.insert(friend.to_string(), message.id.clone());
+            }
+            Some(match message.invite {
+                Some(invite) => {
+                    let what = match invite.kind.as_str() {
+                        "world" => "Mundo",
+                        "server" => "Servidor",
+                        _ => "Instancia",
+                    };
+                    (format!("{name} te invita"), format!("{what} «{}»", invite.title))
+                }
+                None => (name, message.text),
+            })
+        }
+        _ => None,
+    }
+}
+
+/// Muestra sobre la ventana de Minecraft un aviso del motor P2P (mensaje, invitación o petición de unirse).
+fn game_toast_for_event<R: tauri::Runtime>(app: tauri::AppHandle<R>, event: serde_json::Value) {
+    if !matches!(event["type"].as_str(), Some("message" | "join_request")) {
+        return;
+    }
+    tauri::async_runtime::spawn(async move {
+        let state = app.state::<P2pState>();
+        let Ok(core) = core(&app, &state).await else { return };
+        if !core.game_options().1 || core.do_not_disturb() {
+            return;
+        }
+        if let Some((title, body)) = toast_text(&core, &event) {
+            super::recording::game_toast(&title, &body);
+        }
+    });
+}
+
+/// ¿El registro del juego dice que se abrió un mundo local (servidor integrado)? Solo cuentan las líneas escritas por el
+/// propio juego, igual que con el puerto LAN: nadie puede fingirlo escribiendo en el chat.
+fn integrated_server_started(text: &str) -> bool {
+    text.lines().any(|line| {
+        line.split_once("Starting integrated minecraft server").is_some_and(|(before, _)| {
+            // `[hora] [hilo/INFO] [clase/INFO]: ` y nada más: una línea de chat lleva `[CHAT]` y el nombre del jugador.
+            let before = before.trim_end();
+            before.starts_with('[') && before.ends_with("]:") && before.contains("/INFO]") && !before.contains("[CHAT]") && !before.contains('<')
+        })
+    })
+}
+
+async fn log_tail(instance_id: &str) -> Option<String> {
+    let dir = theseus::instance::get_full_path(instance_id).await.ok()?;
+    let mut file = fs::File::open(dir.join("logs").join("latest.log")).ok()?;
+    let size = file.metadata().ok()?.len();
+    std::io::Seek::seek(&mut file, std::io::SeekFrom::Start(size.saturating_sub(262_144))).ok()?;
+    let mut bytes = Vec::new();
+    std::io::Read::read_to_end(&mut file, &mut bytes).ok()?;
+    Some(String::from_utf8_lossy(&bytes).into_owned())
+}
+
+/// Cada pocos segundos mira qué Minecraft hay en marcha: lo que se juega (para «Jugando a …»), la ventana donde enseñar
+/// los avisos, la pista de abrir el mundo a LAN y, si el usuario lo permite, el mundo LAN que abre (se comparte solo con
+/// sus amigos, que pueden pedirle unirse).
+async fn game_watcher(core: Arc<Core>) {
+    let mut hinted: HashSet<uuid::Uuid> = HashSet::new();
+    // Recursos compartidos por este vigilante (id → instancia): se retiran cuando el juego se cierra.
+    let mut auto_shares: HashMap<String, String> = HashMap::new();
+    loop {
+        let processes = theseus::process::get_all().await.unwrap_or_default();
+        let current = processes.iter().min_by_key(|p| p.start_time);
+        core.set_activity(current.map(|p| Playing { title: p.instance_name.clone(), since: p.start_time.timestamp().max(0) as u64 }));
+
+        let pids: Vec<u32> = processes.iter().filter_map(|p| p.pid).collect();
+        super::recording::set_game_window(super::recording::game_window_for(&pids));
+
+        let (auto_share, toasts) = core.game_options();
+        let has_friends = core.friends().iter().any(|f| f.status == FriendStatus::Accepted);
+        for process in &processes {
+            let lan = detect_lan_port(&process.instance_id).await.ok().flatten();
+            match lan {
+                Some(port) if auto_share && has_friends => {
+                    let already = core.shares().iter().any(|s| s.instance_id.as_deref() == Some(process.instance_id.as_str()) && s.port == port);
+                    if !already {
+                        let version = theseus::instance::get(&process.instance_id)
+                            .await
+                            .ok()
+                            .flatten()
+                            .map(|meta| meta.applied_content_set.game_version)
+                            .unwrap_or_default();
+                        if let Ok(share) = core.share_start_with("world", &process.instance_name, &version, port, None, Some(process.instance_id.clone())) {
+                            auto_shares.insert(share.id, process.instance_id.clone());
+                            if toasts && !core.do_not_disturb() {
+                                super::recording::game_toast("Mundo abierto a LAN", "Tus amigos pueden pedirte unirse desde Strata.");
+                            }
+                        }
+                    }
+                }
+                None if toasts && has_friends && !core.do_not_disturb() && !hinted.contains(&process.uuid) => {
+                    if log_tail(&process.instance_id).await.is_some_and(|text| integrated_server_started(&text)) {
+                        hinted.insert(process.uuid);
+                        super::recording::game_toast("Estás en un mundo", "Pulsa Esc y «Abrir a LAN»: tus amigos podrán pedirte unirse.");
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        let running: HashSet<&str> = processes.iter().map(|p| p.instance_id.as_str()).collect();
+        auto_shares.retain(|share_id, instance_id| {
+            let alive = running.contains(instance_id.as_str());
+            if !alive {
+                core.share_stop(share_id);
+            }
+            alive
+        });
+        hinted.retain(|uuid| processes.iter().any(|p| p.uuid == *uuid));
+        tokio::time::sleep(Duration::from_secs(5)).await;
+    }
 }
 
 /// Frases con las que Minecraft anuncia el puerto al abrir un mundo a LAN. Las dos primeras
@@ -1796,6 +1945,31 @@ pub async fn p2p_respond_join<R: tauri::Runtime>(app: tauri::AppHandle<R>, state
     core(&app, &state).await?.respond_join(&friend, accept, share_id).await
 }
 
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GameOptions {
+    pub auto_share_lan: bool,
+    pub game_toasts: bool,
+}
+
+/// Botón «Probar aviso»: enseña un aviso de ejemplo sobre Minecraft. Devuelve `false` si no hay ningún juego abierto.
+#[tauri::command]
+pub async fn p2p_test_game_toast() -> bool {
+    super::recording::game_toast("Aviso de prueba", "Así verás los mensajes, las invitaciones y las peticiones de tus amigos mientras juegas.");
+    super::recording::has_game()
+}
+
+#[tauri::command]
+pub async fn p2p_game_options<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>) -> Result<GameOptions, String> {
+    let (auto_share_lan, game_toasts) = core(&app, &state).await?.game_options();
+    Ok(GameOptions { auto_share_lan, game_toasts })
+}
+
+#[tauri::command]
+pub async fn p2p_set_game_options<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>, auto_share_lan: bool, game_toasts: bool) -> Result<(), String> {
+    core(&app, &state).await?.set_game_options(auto_share_lan, game_toasts)
+}
+
 #[tauri::command]
 pub async fn p2p_do_not_disturb<R: tauri::Runtime>(app: tauri::AppHandle<R>, state: tauri::State<'_, P2pState>) -> Result<bool, String> {
     Ok(core(&app, &state).await?.do_not_disturb())
@@ -1965,6 +2139,28 @@ mod tests {
 
         host.shutdown().await;
         guest.shutdown().await;
+    }
+
+    #[test]
+    fn opening_a_world_is_read_from_the_game_log_only() {
+        let real = "[12:00:01] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/INFO]: Starting integrated minecraft server version 1.21.1";
+        let old = "[12:00:01] [Server thread/INFO]: Starting integrated minecraft server version 1.12.2";
+        assert!(integrated_server_started(real) && integrated_server_started(old));
+        // El chat de otro jugador no puede simularlo.
+        let chat = "[12:00:05] [Render thread/INFO]: [CHAT] <Bromista> Starting integrated minecraft server version 9";
+        assert!(!integrated_server_started(chat));
+        assert!(!integrated_server_started("[12:00:01] [main/INFO]: Setting user: Steve"));
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn game_options_default_to_on_persist_and_old_stores_still_load() {
+        let (a, _b) = pair().await;
+        assert_eq!(a.game_options(), (true, true));
+        a.set_game_options(false, true).unwrap();
+        assert_eq!(a.game_options(), (false, true));
+        // Un friends.json de una versión anterior (sin los campos nuevos) arranca con ambos activados.
+        let store: Store = serde_json::from_str(r#"{"name":"A","friends":[]}"#).unwrap();
+        assert!(store.auto_share_lan && store.game_toasts && store.share_activity && !store.do_not_disturb);
     }
 
     #[tokio::test(flavor = "multi_thread")]

@@ -27,12 +27,16 @@ mod overlay;
 #[cfg(windows)]
 mod service;
 #[cfg(windows)]
+mod toast;
+#[cfg(windows)]
 mod trim;
 #[cfg(windows)]
 mod win;
 
 #[cfg(windows)]
 pub use service::*;
+#[cfg(windows)]
+pub use toast::{game_window_for, has_game, push as game_toast, set_target as set_game_window};
 
 #[cfg(not(windows))]
 mod stub;
