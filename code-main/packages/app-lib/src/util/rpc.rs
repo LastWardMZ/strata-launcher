@@ -14,8 +14,8 @@ use tokio::task::AbortHandle;
 use tokio_util::codec::{Decoder, LinesCodec, LinesCodecError};
 use uuid::Uuid;
 
-type HandlerFuture = Pin<Box<dyn Send + Future<Output = Result<Value>>>>;
-type HandlerMethod = Box<dyn Send + Sync + Fn(Vec<Value>) -> HandlerFuture>;
+pub(crate) type HandlerFuture = Pin<Box<dyn Send + Future<Output = Result<Value>>>>;
+pub(crate) type HandlerMethod = Box<dyn Send + Sync + Fn(Vec<Value>) -> HandlerFuture>;
 type HandlerMap = HashMap<&'static str, HandlerMethod>;
 type WaitingResponsesMap =
     Arc<Mutex<HashMap<Uuid, oneshot::Sender<Result<Value>>>>>;
@@ -31,8 +31,6 @@ impl RpcServerBuilder {
         }
     }
 
-    // We'll use this function in the future. Please remove this #[allow] when we do.
-    #[allow(dead_code)]
     pub fn handler(
         mut self,
         function_name: &'static str,

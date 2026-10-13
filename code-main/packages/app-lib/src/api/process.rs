@@ -5,7 +5,31 @@ pub use crate::{
     State,
     state::{Hooks, MemorySettings, Settings, WindowSize},
 };
+use std::future::Future;
+use std::pin::Pin;
+use std::sync::OnceLock;
 use uuid::Uuid;
+
+pub type GameFuture<T> = Pin<Box<dyn Future<Output = T> + Send>>;
+
+/// Lo que el juego puede pedirle al launcher desde el comando `/strata <amigo> <texto>`. Lo registra la aplicación (que es
+/// quien tiene la mensajería); sin registrar, el comando responde que Strata no está disponible.
+pub struct GameBridge {
+    /// Nombres de los amigos tal y como se escriben en el comando (sin espacios).
+    pub friends: Box<dyn Fn() -> GameFuture<Vec<String>> + Send + Sync>,
+    /// Envía `texto` al amigo `nombre`; devuelve el nombre completo del amigo o el motivo del fallo.
+    pub send: Box<dyn Fn(String, String) -> GameFuture<Result<String, String>> + Send + Sync>,
+}
+
+static GAME_BRIDGE: OnceLock<GameBridge> = OnceLock::new();
+
+pub fn set_game_bridge(bridge: GameBridge) {
+    let _ = GAME_BRIDGE.set(bridge);
+}
+
+pub(crate) fn game_bridge() -> Option<&'static GameBridge> {
+    GAME_BRIDGE.get()
+}
 
 // Gets each running stored process in the state
 #[tracing::instrument]

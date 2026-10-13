@@ -242,6 +242,10 @@ async function setShareActivity(value: 'yes' | 'no' | null) {
 					instancias vanilla; si el juego no lo admite, se usa el aviso sobre la ventana.
 				</p>
 				<p class="m-0 text-secondary">
+					Para responder sin salir del juego escribe <code>/strata amigo mensaje</code> (con Tab se autocompleta el
+					nombre). El mensaje va a tu amigo por Strata, nunca al servidor.
+				</p>
+				<p class="m-0 text-secondary">
 					Mientras juegas, los mensajes, las invitaciones y las peticiones de unirse de tus amigos salen arriba a la
 					derecha de la ventana de Minecraft. «No molestar» los silencia.
 				</p>

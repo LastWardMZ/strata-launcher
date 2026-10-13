@@ -1598,6 +1598,8 @@ pub(crate) async fn core<R: tauri::Runtime>(app: &tauri::AppHandle<R>, state: &P
             core.set_port_resolver(Arc::new(|instance_id: String| {
                 Box::pin(async move { detect_lan_port(&instance_id).await.ok().flatten() })
             }));
+            // El comando `/strata <amigo> <texto>` del chat de Minecraft escribe a tus amigos desde el juego.
+            theseus::process::set_game_bridge(game_bridge(core.clone()));
             // Lo que se juega ahora (para «Jugando a …» de tus amigos): se refresca cada pocos segundos.
             let watcher = core.clone();
             tokio::spawn(game_watcher(watcher));
@@ -1638,6 +1640,39 @@ fn toast_text(core: &Core, event: &serde_json::Value) -> Option<(String, String)
             })
         }
         _ => None,
+    }
+}
+
+/// Nombre de un amigo tal y como se escribe en `/strata` (los espacios se sustituyen por `_`).
+fn command_name(name: &str) -> String {
+    name.trim().replace(' ', "_")
+}
+
+fn game_bridge(core: Arc<Core>) -> theseus::process::GameBridge {
+    let for_friends = core.clone();
+    theseus::process::GameBridge {
+        friends: Box::new(move || {
+            let core = for_friends.clone();
+            Box::pin(async move {
+                let mut names: Vec<String> =
+                    core.friends().iter().filter(|f| f.status == FriendStatus::Accepted && !f.name.trim().is_empty()).map(|f| command_name(&f.name)).collect();
+                names.sort_by_key(|name| name.to_lowercase());
+                names.dedup();
+                names
+            })
+        }),
+        send: Box::new(move |name, text| {
+            let core = core.clone();
+            Box::pin(async move {
+                let matches: Vec<Friend> =
+                    core.friends().into_iter().filter(|f| f.status == FriendStatus::Accepted && command_name(&f.name).eq_ignore_ascii_case(&name)).collect();
+                match matches.as_slice() {
+                    [] => Err(format!("No tienes ningún amigo llamado «{name}».")),
+                    [friend] => core.send_chat(&friend.id, &text).await.map(|_| friend.name.clone()),
+                    _ => Err(format!("Tienes varios amigos llamados «{name}»: escríbele desde Strata.")),
+                }
+            })
+        }),
     }
 }
 
@@ -2242,6 +2277,23 @@ mod tests {
         a.shutdown().await;
         b.shutdown().await;
         stranger.shutdown().await;
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn game_bridge_lists_friends_and_sends_messages_by_command_name() {
+        let (a, b) = pair().await;
+        let bridge = game_bridge(a.clone());
+        assert!((bridge.friends)().await.is_empty());
+        befriend(&a, &b).await;
+        let key = command_name(&a.friends()[0].name);
+        assert_eq!((bridge.friends)().await, vec![key.clone()]);
+        assert!(!key.contains(' '), "el nombre del comando no lleva espacios");
+
+        let sent = (bridge.send)(key.to_uppercase(), "hola desde el juego".into()).await;
+        assert_eq!(sent, Ok(a.friends()[0].name.clone()), "las mayúsculas no importan");
+        assert!(b.messages(&a.info().id).iter().any(|m| !m.from_me && m.text == "hola desde el juego"));
+        assert!((bridge.send)("nadie".into(), "hola".into()).await.is_err());
+        assert!((bridge.send)(key, "   ".into()).await.is_err(), "un mensaje vacío no se envía");
     }
 
     #[tokio::test(flavor = "multi_thread")]

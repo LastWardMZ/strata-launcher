@@ -19,7 +19,7 @@ use crate::state::{
     JavaVersion, MemorySettings, ProcessMetadata, WindowSize,
 };
 use crate::util::io;
-use crate::util::rpc::RpcServerBuilder;
+use crate::util::rpc::{HandlerFuture, RpcServerBuilder};
 use crate::{State, get_resource_file, process};
 use chrono::Utc;
 use daedalus as d;
@@ -1090,7 +1090,11 @@ pub async fn launch_minecraft(
     let (main_class_keep_alive, main_class_path) =
         get_resource_file!(env "JAVA_JARS_DIR" / "theseus.jar")?;
 
-    let rpc_server = RpcServerBuilder::new().launch().await?;
+    let rpc_server = RpcServerBuilder::new()
+        .handler("strata_friends", Box::new(strata_friends_handler))
+        .handler("strata_send", Box::new(strata_send_handler))
+        .launch()
+        .await?;
 
     command.args(
         args::get_jvm_arguments(
@@ -1293,4 +1297,30 @@ pub async fn launch_minecraft(
             },
         )
         .await
+}
+
+/// El juego pide los nombres de los amigos para el Tab de `/strata`.
+fn strata_friends_handler(_args: Vec<serde_json::Value>) -> HandlerFuture {
+    Box::pin(async {
+        let names = match process::game_bridge() {
+            Some(bridge) => (bridge.friends)().await,
+            None => Vec::new(),
+        };
+        Ok(serde_json::json!(names))
+    })
+}
+
+/// `/strata <amigo> <texto>` desde el juego: responde `["ok", nombre]` o `["err", motivo]`.
+fn strata_send_handler(args: Vec<serde_json::Value>) -> HandlerFuture {
+    Box::pin(async move {
+        let arg = |index: usize| args.get(index).and_then(|value| value.as_str()).unwrap_or_default().to_string();
+        let result = match process::game_bridge() {
+            Some(bridge) => (bridge.send)(arg(0), arg(1)).await,
+            None => Err("Strata no está disponible.".to_string()),
+        };
+        Ok(match result {
+            Ok(name) => serde_json::json!(["ok", name]),
+            Err(reason) => serde_json::json!(["err", reason]),
+        })
+    })
 }
