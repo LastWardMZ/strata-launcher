@@ -3,6 +3,7 @@
 		<template v-if="link" #clickable>
 			<AutoLink
 				:to="link"
+				:aria-label="title"
 				class="rounded-xl no-outline no-click-animation custom-focus-indicator"
 				@mouseenter="$emit('mouseenter')"
 				@mouseleave="$emit('mouseleave')"
