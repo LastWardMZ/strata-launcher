@@ -5,6 +5,7 @@ import {
 	ReportIcon,
 	MoreVerticalIcon,
 	PlayIcon,
+	SendIcon,
 	SearchIcon,
 	UserPlusIcon,
 	UsersIcon,
@@ -107,6 +108,10 @@ async function askToJoin(user: { id: string; username: string }) {
 	} catch (cause) {
 		addNotification({ type: 'error', title: 'No se pudo pedir unirse', text: typeof cause === 'string' ? cause : 'Inténtalo de nuevo.' })
 	}
+}
+/** Abre «Chat y partidas» directamente con la conversación de este amigo. */
+function openChat(id: string) {
+	void router.push({ path: '/friends', query: { chat: id } })
 }
 const { avatarOf } = useFriendAvatars()
 const { presence } = useFriendPresence(computed(() => social.value.friends.map((friend) => friend.id)))
@@ -418,6 +423,12 @@ const exactInResults = () =>
 					:key="user.id"
 					class="group flex items-center gap-2.5 rounded-xl p-1.5 hover:bg-surface-3 focus-within:bg-surface-3"
 				>
+					<button
+						type="button"
+						class="flex min-w-0 flex-1 cursor-pointer items-center gap-2.5 rounded-lg border-0 bg-transparent p-0 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+						:aria-label="`Abrir chat con ${user.username}`"
+						@click="openChat(user.id)"
+					>
 					<UserAvatar
 						:name="user.username"
 						:src="avatarOf(user)"
@@ -451,11 +462,13 @@ const exactInResults = () =>
 							<template v-else>{{ group.key === 'online' ? 'En línea' : 'Desconectado' }}</template>
 						</div>
 					</div>
+					</button>
 					<TeleportOverflowMenu
 						type="quiet"
 						:label="`Más acciones para ${user.username}`"
 						class="shrink-0 opacity-0 transition-opacity focus-visible:opacity-100 group-hover:opacity-100 group-focus-within:opacity-100"
 						:options="[
+							{ id: 'chat', label: 'Enviar mensaje', action: () => openChat(user.id) },
 							...(group.key === 'offline' || isBusy(user.id)
 								? []
 								: [{ id: 'join', label: 'Pedir unirse a su partida', action: () => askToJoin(user) }]),
@@ -465,6 +478,7 @@ const exactInResults = () =>
 						]"
 					>
 						<MoreVerticalIcon />
+						<template #chat><SendIcon /> Enviar mensaje</template>
 						<template #join><PlayIcon /> Pedir unirse a su partida</template>
 						<template #report><ReportIcon /> Denunciar</template>
 						<template #remove><XIcon /> Eliminar amigo</template>

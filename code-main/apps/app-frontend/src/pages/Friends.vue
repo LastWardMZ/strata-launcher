@@ -15,7 +15,8 @@ import {
 import { Admonition, Button, Combobox, EmptyState, Input } from '@modrinth/ui'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 
 import {
 	findMatchingInstance,
@@ -135,7 +136,17 @@ function time(ts: number) {
 
 async function loadFriends() {
 	friends.value = await call<Friend[]>('p2p_friends')
+	await openRequestedChat()
 }
+/** Desde el panel de amigos se llega con `?chat=<id>`: abre esa conversación en cuanto el amigo está en la lista. */
+const route = useRoute()
+async function openRequestedChat() {
+	const id = typeof route.query.chat === 'string' ? route.query.chat : ''
+	if (!id || id === selectedId.value) return
+	const friend = friends.value.find((f) => f.id === id && f.status === 'accepted')
+	if (friend) await select(friend)
+}
+watch(() => route.query.chat, () => void openRequestedChat())
 async function loadShares() {
 	shares.value = await call<Share[]>('p2p_shares')
 }
