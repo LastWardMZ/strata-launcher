@@ -3483,16 +3483,31 @@
 		"message": "Crear una instancia"
 	},
 	"app.welcome-screen.description": {
-		"message": "¿Listo para jugar?"
+		"message": "Crea tu primera instancia y empieza a jugar en pocos clics."
+	},
+	"app.welcome-screen.explore.description": {
+		"message": "Busca modpacks, mods y shaders para instalar."
+	},
+	"app.welcome-screen.explore.title": {
+		"message": "Explora contenido"
+	},
+	"app.welcome-screen.friends.description": {
+		"message": "Crea tu cuenta de Strata para añadir amigos y unirte a sus partidas."
+	},
+	"app.welcome-screen.friends.title": {
+		"message": "Juega con amigos"
 	},
 	"app.welcome-screen.import-from-launcher": {
 		"message": "Importar desde el lanzador"
 	},
-	"app.welcome-screen.import-prompt": {
-		"message": "¿Escapando de otro lanzador?"
-	},
 	"app.welcome-screen.quick-create-hint": {
 		"message": "Pulsa <shortcut>N</shortcut> para crear rápidamente una instancia"
+	},
+	"app.welcome-screen.server.description": {
+		"message": "Aloja tu propio mundo para ti y tus amigos."
+	},
+	"app.welcome-screen.server.title": {
+		"message": "Crea un servidor"
 	},
 	"app.welcome-screen.title": {
 		"message": "Bienvenido a Strata"
