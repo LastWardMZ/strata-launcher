@@ -247,6 +247,20 @@ pub async fn start_join_server(
     instance_id: &str,
     address: &str,
 ) -> Result<ProcessMetadata> {
+    // Si la instancia ya está abierta, el propio juego se conecta (no se puede lanzar dos veces la misma instancia).
+    if let Some(running) = theseus::process::get_by_instance_id(instance_id).await?.into_iter().next() {
+        let target = address.rsplit_once(':').and_then(|(host, port)| Some((host, port.parse::<u16>().ok()?)));
+        if let Some((host, port)) = target {
+            if theseus::process::join_running_game(instance_id, host, port).await? {
+                return Ok(running);
+            }
+        }
+        return Err(theseus::ErrorKind::LauncherError(format!(
+            "Esa instancia ya está abierta y no se pudo conectar sola. Entra en Minecraft → Multijugador → Conexión directa → {address}."
+        ))
+        .as_error()
+        .into());
+    }
     let process = instance::run(
         instance_id,
         QuickPlayType::Server(ServerAddress::Unresolved(address.to_owned())),

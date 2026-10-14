@@ -58,6 +58,25 @@ pub async fn show_in_game_chat(title: &str, text: &str) -> crate::Result<usize> 
     Ok(shown)
 }
 
+/// Hace que el Minecraft ya abierto de esa instancia se conecte a `host:port` (guarda el mundo en el que esté y entra), sin
+/// reiniciarlo. `Ok(false)` si no hay juego abierto de esa instancia o su agente no sabe hacerlo (versión antigua o con mods).
+pub async fn join_running_game(instance_id: &str, host: &str, port: u16) -> crate::Result<bool> {
+    let state = State::get().await?;
+    for process in state.process_manager.get_all() {
+        if process.instance_id != instance_id {
+            continue;
+        }
+        let Some(rpc) = state.process_manager.get_rpc(process.uuid) else {
+            continue;
+        };
+        let call = rpc.call_method_2::<bool>("strata_join", host, port);
+        if let Ok(Ok(true)) = tokio::time::timeout(std::time::Duration::from_secs(3), call).await {
+            return Ok(true);
+        }
+    }
+    Ok(false)
+}
+
 pub async fn resolve_instance_id(instance: &str) -> crate::Result<String> {
     let state = State::get().await?;
     resolve_instance_id_with_state(instance, &state)
