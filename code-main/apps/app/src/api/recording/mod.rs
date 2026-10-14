@@ -44,6 +44,12 @@ pub(crate) fn shift_tab_down() -> bool {
     win::shift_tab_down()
 }
 
+/// ¿Esc pulsada ahora mismo?
+#[cfg(windows)]
+pub(crate) fn escape_down() -> bool {
+    win::escape_down()
+}
+
 /// Ventana que tiene el foco del sistema.
 #[cfg(windows)]
 pub(crate) fn foreground_window() -> isize {

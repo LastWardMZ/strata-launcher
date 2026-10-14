@@ -4,7 +4,7 @@ use std::path::Path;
 use windows::Win32::Foundation::{HWND, LPARAM, POINT, RECT};
 use windows::Win32::Graphics::Gdi::ClientToScreen;
 use windows::Win32::Storage::FileSystem::GetDiskFreeSpaceExW;
-use windows::Win32::UI::Input::KeyboardAndMouse::{GetAsyncKeyState, VK_SHIFT, VK_TAB};
+use windows::Win32::UI::Input::KeyboardAndMouse::{GetAsyncKeyState, VK_ESCAPE, VK_SHIFT, VK_TAB};
 use windows::Win32::UI::WindowsAndMessaging::{
     EnumWindows, GetClassNameW, GetClientRect, GetForegroundWindow, GetWindowThreadProcessId, IsIconic, IsWindow,
     IsWindowVisible, SW_RESTORE, SetForegroundWindow, ShowWindow,
@@ -53,6 +53,13 @@ pub fn shift_tab_down() -> bool {
         (state as u16 & 0x8000) != 0
     };
     down(VK_SHIFT.0 as i32) && down(VK_TAB.0 as i32)
+}
+
+/// ¿Está pulsada la tecla Esc?
+pub fn escape_down() -> bool {
+    // SAFETY: consulta de solo lectura del estado del teclado.
+    let state = unsafe { GetAsyncKeyState(VK_ESCAPE.0 as i32) };
+    (state as u16 & 0x8000) != 0
 }
 
 /// Devuelve el foco a una ventana (la restaura si estaba minimizada).

@@ -121,3 +121,7 @@ pub(crate) fn focus_window(_window: isize) {}
 pub(crate) fn window_area(_window: isize) -> Option<(i32, i32, u32, u32)> {
     None
 }
+
+pub(crate) fn escape_down() -> bool {
+    false
+}

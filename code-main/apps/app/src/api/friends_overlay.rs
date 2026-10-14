@@ -21,22 +21,29 @@ fn debug_any_window() -> bool {
 
 pub fn start_in_background(app: tauri::AppHandle) {
     let _ = std::thread::Builder::new().name("strata-panel-amigos".into()).spawn(move || {
-        let mut was_down = false;
+        let (mut shift_tab_was_down, mut escape_was_down) = (false, false);
         loop {
             std::thread::sleep(Duration::from_millis(40));
-            let down = super::recording::shift_tab_down();
-            let pressed = down && !was_down;
-            was_down = down;
-            if !pressed {
+            let shift_tab = super::recording::shift_tab_down();
+            let escape = super::recording::escape_down();
+            let shift_tab_pressed = shift_tab && !shift_tab_was_down;
+            let escape_pressed = escape && !escape_was_down;
+            (shift_tab_was_down, escape_was_down) = (shift_tab, escape);
+            if !shift_tab_pressed && !escape_pressed {
+                continue;
+            }
+            // Con el panel abierto, Mayús+Tab y Esc lo cierran. Se atiende aquí (y no en la página) para que funcione
+            // aunque el teclado no esté dentro del contenido web.
+            if app.get_webview_window(LABEL).is_some_and(|window| window.is_visible().unwrap_or(false)) {
+                hide_panel(&app, true);
+                continue;
+            }
+            if !shift_tab_pressed {
                 continue;
             }
             let foreground = super::recording::foreground_window();
             let game = if debug_any_window() { Some(foreground) } else { super::recording::game_window() };
             if foreground == 0 || game != Some(foreground) {
-                continue;
-            }
-            // En las pruebas, con el panel ya abierto la pulsación solo la atiende el propio panel (que la usa para cerrarse).
-            if debug_any_window() && app.get_webview_window(LABEL).is_some_and(|window| window.is_visible().unwrap_or(false)) {
                 continue;
             }
             let app = app.clone();
@@ -81,12 +88,16 @@ async fn show(app: &tauri::AppHandle, game: isize) -> Result<(), String> {
 /// pulsado en otra ventana).
 #[tauri::command]
 pub async fn overlay_hide<R: Runtime>(app: tauri::AppHandle<R>, refocus: Option<bool>) -> Result<(), String> {
+    hide_panel(&app, refocus.unwrap_or(true));
+    Ok(())
+}
+
+fn hide_panel<R: Runtime>(app: &tauri::AppHandle<R>, refocus: bool) {
     if let Some(window) = app.get_webview_window(LABEL) {
         let _ = window.hide();
     }
     let game = LAST_GAME.load(Ordering::Relaxed);
-    if refocus.unwrap_or(true) && game != 0 {
+    if refocus && game != 0 {
         super::recording::focus_window(game);
     }
-    Ok(())
 }
