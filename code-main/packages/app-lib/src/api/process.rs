@@ -77,6 +77,29 @@ pub async fn join_running_game(instance_id: &str, host: &str, port: u16) -> crat
     Ok(false)
 }
 
+/// Abre a LAN el mundo en el que está el jugador de esa instancia (como «Abrir a LAN») y devuelve su puerto. `Ok(None)` si no
+/// hay un mundo propio abierto (menú, servidor ajeno) o el agente del juego no lo admite.
+pub async fn open_lan(instance_id: &str) -> crate::Result<Option<u16>> {
+    let state = State::get().await?;
+    for process in state.process_manager.get_all() {
+        if process.instance_id != instance_id {
+            continue;
+        }
+        let Some(rpc) = state.process_manager.get_rpc(process.uuid) else {
+            continue;
+        };
+        let call = rpc.call_method::<i64>("strata_open_lan");
+        if let Ok(Ok(port)) = tokio::time::timeout(std::time::Duration::from_secs(8), call).await {
+            if let Ok(port) = u16::try_from(port) {
+                if port > 0 {
+                    return Ok(Some(port));
+                }
+            }
+        }
+    }
+    Ok(None)
+}
+
 pub async fn resolve_instance_id(instance: &str) -> crate::Result<String> {
     let state = State::get().await?;
     resolve_instance_id_with_state(instance, &state)

@@ -2008,6 +2008,32 @@ pub async fn p2p_respond_join<R: tauri::Runtime>(app: tauri::AppHandle<R>, state
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct OpenWorld {
+    pub instance_id: String,
+    pub port: u16,
+}
+
+/// «Invitar a jugar»: el mundo con el que se está jugando ahora, abierto a LAN. Si ya lo estaba se usa su puerto; si no, se abre
+/// desde el propio juego (como «Abrir a LAN» del menú de pausa), así que invitar es un clic.
+#[tauri::command]
+pub async fn p2p_open_world_for_invite() -> Result<OpenWorld, String> {
+    let processes = theseus::process::get_all().await.map_err(|e| e.to_string())?;
+    if processes.is_empty() {
+        return Err("Abre Minecraft desde Strata y entra en un mundo para invitar a tus amigos.".into());
+    }
+    for process in &processes {
+        if let Ok(Some(port)) = detect_lan_port(&process.instance_id).await {
+            return Ok(OpenWorld { instance_id: process.instance_id.clone(), port });
+        }
+        if let Ok(Some(port)) = theseus::process::open_lan(&process.instance_id).await {
+            return Ok(OpenWorld { instance_id: process.instance_id.clone(), port });
+        }
+    }
+    Err("Entra en un mundo de un jugador para invitar (no se puede desde el menú ni desde un servidor), o ábrelo tú a LAN con Esc → Abrir a LAN.".into())
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct GameOptions {
     pub auto_share_lan: bool,
     pub game_toasts: bool,

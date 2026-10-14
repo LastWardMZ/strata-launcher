@@ -24,6 +24,7 @@ public final class MinecraftLaunch {
                         .handler("set_system_property", String.class, String.class, System::setProperty)
                         .handlerReturning("strata_chat", String.class, String.class, StrataChat::show)
                         .handlerReturning("strata_join", String.class, Integer.class, StrataJoin::join)
+                        .handlerReturning("strata_open_lan", StrataLan::open)
                         .handler("launch", () -> waitForLaunch.complete(null)));
 
         waitForLaunch.join();

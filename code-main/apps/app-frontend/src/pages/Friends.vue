@@ -29,6 +29,7 @@ import {
 } from '@/composables/use-instance-sharing'
 import UserAvatar from '@/components/ui/friends/UserAvatar.vue'
 import { useFriendAvatars } from '@/composables/use-friend-avatars'
+import { inviteToPlay } from '@/composables/use-invite-to-play'
 import { useStrataAccount } from '@/composables/use-strata-account'
 import { getErrorMessage } from '@/helpers/install'
 
@@ -304,6 +305,21 @@ async function shareWorld() {
 async function stopShare(share: Share) {
 	await call('p2p_share_stop', { id: share.id }).catch(fail)
 	await loadShares()
+}
+/** «Invitar a jugar»: abre el mundo a LAN si hace falta y manda la invitación, todo con un clic. */
+const inviting = ref(false)
+async function inviteToPlayNow(friend: Friend) {
+	if (inviting.value) return
+	inviting.value = true
+	try {
+		say(await inviteToPlay(friend.id, friend.name))
+		await loadShares()
+		await loadMessages()
+	} catch (e) {
+		fail(e)
+	} finally {
+		inviting.value = false
+	}
 }
 async function invite(share: Share) {
 	if (!selected.value) return fail('Elige primero un amigo en la lista')
@@ -592,6 +608,14 @@ onUnmounted(() => {
 							<strong class="truncate text-lg text-contrast">{{ selected.name }}</strong>
 						</div>
 						<div class="flex gap-2">
+							<Button
+								type="colored"
+								color="brand"
+								size="sm"
+								:disabled="inviting || selected.status !== 'accepted'"
+								@click="inviteToPlayNow(selected)"
+								><PlayIcon /> Invitar a jugar</Button
+							>
 							<Button type="outlined" size="sm" @click="remove(selected)"
 								><TrashIcon /> Eliminar</Button
 							>

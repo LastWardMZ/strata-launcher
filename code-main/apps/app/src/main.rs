@@ -354,6 +354,7 @@ fn main() {
             api::p2p::p2p_set_bio,
             api::p2p::p2p_presence,
             api::p2p::p2p_test_game_toast,
+            api::p2p::p2p_open_world_for_invite,
             api::p2p::p2p_game_options,
             api::p2p::p2p_set_game_chat,
             api::p2p::p2p_set_game_options,

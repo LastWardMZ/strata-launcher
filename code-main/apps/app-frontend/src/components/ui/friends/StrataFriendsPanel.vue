@@ -29,6 +29,7 @@ import { useRouter } from 'vue-router'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import UserAvatar from '@/components/ui/friends/UserAvatar.vue'
 import { useFriendAvatars } from '@/composables/use-friend-avatars'
+import { inviteToPlay } from '@/composables/use-invite-to-play'
 import { useFriendPresence } from '@/composables/use-friend-presence'
 import { useJoinRequests } from '@/composables/use-join-requests'
 import { useProfileAvatar } from '@/composables/use-profile-avatar'
@@ -107,6 +108,14 @@ async function askToJoin(user: { id: string; username: string }) {
 		})
 	} catch (cause) {
 		addNotification({ type: 'error', title: 'No se pudo pedir unirse', text: typeof cause === 'string' ? cause : 'Inténtalo de nuevo.' })
+	}
+}
+/** «Invitar a jugar» como en Steam: abre tu mundo a LAN si hace falta y le manda la invitación. */
+async function invitePlay(user: { id: string; username: string }) {
+	try {
+		addNotification({ type: 'success', title: 'Invitación enviada', text: await inviteToPlay(user.id, user.username) })
+	} catch (cause) {
+		addNotification({ type: 'error', title: 'No se pudo invitar', text: cause instanceof Error ? cause.message : 'Inténtalo de nuevo.' })
 	}
 }
 /** Abre «Chat y partidas» directamente con la conversación de este amigo. */
@@ -471,6 +480,9 @@ const exactInResults = () =>
 							{ id: 'chat', label: 'Enviar mensaje', action: () => openChat(user.id) },
 							...(group.key === 'offline' || isBusy(user.id)
 								? []
+								: [{ id: 'invite', label: 'Invitar a jugar', action: () => invitePlay(user) }]),
+							...(group.key === 'offline' || isBusy(user.id)
+								? []
 								: [{ id: 'join', label: 'Pedir unirse a su partida', action: () => askToJoin(user) }]),
 							{ id: 'report', label: 'Denunciar', action: () => openReport(user.username) },
 							{ id: 'remove', label: 'Eliminar amigo', action: () => account.friendAction('remove', user.username) },
@@ -479,6 +491,7 @@ const exactInResults = () =>
 					>
 						<MoreVerticalIcon />
 						<template #chat><SendIcon /> Enviar mensaje</template>
+						<template #invite><PlayIcon /> Invitar a jugar</template>
 						<template #join><PlayIcon /> Pedir unirse a su partida</template>
 						<template #report><ReportIcon /> Denunciar</template>
 						<template #remove><XIcon /> Eliminar amigo</template>

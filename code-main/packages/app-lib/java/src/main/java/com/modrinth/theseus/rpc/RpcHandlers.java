@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class RpcHandlers {
     private final Map<String, Function<JsonElement[], JsonElement>> handlers = new HashMap<>();
@@ -43,6 +44,11 @@ public class RpcHandlers {
             final B arg2 = TheseusRpc.GSON.fromJson(args[1], arg2Type);
             return TheseusRpc.GSON.toJsonTree(handler.apply(arg1, arg2));
         });
+    }
+
+    /** Sin argumentos, devolviendo un resultado al launcher. */
+    public <R> RpcHandlers handlerReturning(String functionName, Supplier<R> handler) {
+        return addHandler(functionName, args -> TheseusRpc.GSON.toJsonTree(handler.get()));
     }
 
     private RpcHandlers addHandler(String functionName, Function<JsonElement[], JsonElement> handler) {
