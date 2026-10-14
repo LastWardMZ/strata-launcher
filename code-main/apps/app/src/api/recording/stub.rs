@@ -103,3 +103,21 @@ pub fn has_game() -> bool {
 pub fn game_window_for(_pids: &[u32]) -> Option<isize> {
     None
 }
+
+pub fn game_window() -> Option<isize> {
+    None
+}
+
+pub(crate) fn shift_tab_down() -> bool {
+    false
+}
+
+pub(crate) fn foreground_window() -> isize {
+    0
+}
+
+pub(crate) fn focus_window(_window: isize) {}
+
+pub(crate) fn window_area(_window: isize) -> Option<(i32, i32, u32, u32)> {
+    None
+}

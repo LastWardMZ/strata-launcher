@@ -204,6 +204,7 @@ fn main() {
             api::p2p::start_in_background(app.handle().clone());
             api::accounts::start_in_background(app.handle().clone());
             api::recording::start_in_background(app.handle().clone());
+            api::friends_overlay::start_in_background(app.handle().clone());
             #[cfg(target_os = "macos")]
             {
                 let payload = macos::deep_link::get_or_init_payload(app);
@@ -355,6 +356,7 @@ fn main() {
             api::p2p::p2p_presence,
             api::p2p::p2p_test_game_toast,
             api::p2p::p2p_open_world_for_invite,
+            api::friends_overlay::overlay_hide,
             api::p2p::p2p_game_options,
             api::p2p::p2p_set_game_chat,
             api::p2p::p2p_set_game_options,

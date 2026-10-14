@@ -23,6 +23,7 @@ import {
 	type InstanceMatch,
 	type InstanceRecipe,
 	installRecipe,
+	joinInvite,
 	type LocalInstance,
 	recipeOf,
 	recipeSummary,
@@ -354,28 +355,11 @@ async function refreshInstances() {
 
 async function join(friendId: string, info: InviteInfo) {
 	try {
-		// La instancia de la invitación manda; el desplegable solo se usa con invitaciones antiguas.
-		const match = matchFor(info)
-		if (info.instance && !match) {
-			return fail(`No tienes la instancia «${info.instance.name}». Pulsa «Instalar y unirme».`)
-		}
-		const instance = match?.instance ?? selectedInstance.value
-		const port = await call<number>('p2p_join', { friend: friendId, shareId: info.share_id })
-		joined.value = { ...joined.value, [info.share_id]: port }
-		if (!instance)
-			return say(
-				`Conectado. En Minecraft añade el servidor 127.0.0.1:${port}, o elige una instancia para abrirlo directo.`,
-			)
-		if (!match && info.game_version && instance.game_version !== info.game_version) {
-			return say(
-				`Conectado, pero tu instancia es ${instance.game_version} y la partida es ${info.game_version}. Usa una instancia ${info.game_version} y entra en 127.0.0.1:${port}.`,
-			)
-		}
-		await call('plugin:worlds|start_join_server', {
-			instanceId: instance.id,
-			address: `127.0.0.1:${port}`,
-		})
-		say(`Abriendo "${instance.name}" y entrando a la partida…`)
+		say(
+			await joinInvite(friendId, info, instances.value, selectedInstance.value, (port) => {
+				joined.value = { ...joined.value, [info.share_id]: port }
+			}),
+		)
 	} catch (e) {
 		fail(e)
 	}

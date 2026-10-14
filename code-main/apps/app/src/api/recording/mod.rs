@@ -36,7 +36,32 @@ mod win;
 #[cfg(windows)]
 pub use service::*;
 #[cfg(windows)]
-pub use toast::{game_window_for, has_game, push as game_toast, set_target as set_game_window};
+pub use toast::{game_window, game_window_for, has_game, push as game_toast, set_target as set_game_window};
+
+/// ¿Mayús+Tab pulsadas ahora mismo?
+#[cfg(windows)]
+pub(crate) fn shift_tab_down() -> bool {
+    win::shift_tab_down()
+}
+
+/// Ventana que tiene el foco del sistema.
+#[cfg(windows)]
+pub(crate) fn foreground_window() -> isize {
+    win::foreground_window()
+}
+
+/// Devuelve el foco a una ventana.
+#[cfg(windows)]
+pub(crate) fn focus_window(window: isize) {
+    win::focus(window)
+}
+
+/// Zona útil de una ventana en pantalla: `(x, y, ancho, alto)` en píxeles.
+#[cfg(windows)]
+pub(crate) fn window_area(window: isize) -> Option<(i32, i32, u32, u32)> {
+    let rect = win::client_rect_on_screen(window)?;
+    Some((rect.left, rect.top, (rect.right - rect.left).max(0) as u32, (rect.bottom - rect.top).max(0) as u32))
+}
 
 #[cfg(not(windows))]
 mod stub;

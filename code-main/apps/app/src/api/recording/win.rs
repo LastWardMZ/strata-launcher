@@ -4,9 +4,10 @@ use std::path::Path;
 use windows::Win32::Foundation::{HWND, LPARAM, POINT, RECT};
 use windows::Win32::Graphics::Gdi::ClientToScreen;
 use windows::Win32::Storage::FileSystem::GetDiskFreeSpaceExW;
+use windows::Win32::UI::Input::KeyboardAndMouse::{GetAsyncKeyState, VK_SHIFT, VK_TAB};
 use windows::Win32::UI::WindowsAndMessaging::{
     EnumWindows, GetClassNameW, GetClientRect, GetForegroundWindow, GetWindowThreadProcessId, IsIconic, IsWindow,
-    IsWindowVisible,
+    IsWindowVisible, SW_RESTORE, SetForegroundWindow, ShowWindow,
 };
 use windows::core::{BOOL, PCWSTR};
 
@@ -42,6 +43,27 @@ pub fn client_rect_on_screen(window: isize) -> Option<RECT> {
         }
     }
     Some(RECT { left: origin.x, top: origin.y, right: origin.x + rect.right, bottom: origin.y + rect.bottom })
+}
+
+/// ¿Están pulsadas Mayús y Tab a la vez? Solo mira el teclado: la pulsación sigue llegando al juego.
+pub fn shift_tab_down() -> bool {
+    let down = |key: i32| {
+        // SAFETY: consulta de solo lectura del estado del teclado.
+        let state = unsafe { GetAsyncKeyState(key) };
+        (state as u16 & 0x8000) != 0
+    };
+    down(VK_SHIFT.0 as i32) && down(VK_TAB.0 as i32)
+}
+
+/// Devuelve el foco a una ventana (la restaura si estaba minimizada).
+pub fn focus(window: isize) {
+    // SAFETY: si la ventana ya no existe las llamadas fallan sin más.
+    unsafe {
+        if IsIconic(hwnd(window)).as_bool() {
+            let _ = ShowWindow(hwnd(window), SW_RESTORE);
+        }
+        let _ = SetForegroundWindow(hwnd(window));
+    }
 }
 
 pub fn is_alive(window: isize) -> bool {

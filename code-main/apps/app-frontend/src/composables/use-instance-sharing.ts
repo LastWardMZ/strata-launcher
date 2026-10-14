@@ -1,3 +1,5 @@
+import { invoke } from '@tauri-apps/api/core'
+
 import {
 	install_create_instance,
 	install_create_modpack_instance,
@@ -158,4 +160,41 @@ export async function installRecipe(recipe: InstanceRecipe, timeoutMs = 30 * 60 
 		await sleep(1500)
 	}
 	throw new Error('La instalación está tardando demasiado. Mira el progreso en el panel de tareas.')
+}
+
+/** Lo que hace falta de una invitación a partida para unirse a ella. */
+export type JoinableInvite = {
+	share_id: string
+	game_version: string
+	/** Instancia con la que juega quien invita. */
+	instance?: InstanceRecipe | null
+}
+
+/**
+ * Se une a la partida de un amigo: abre el túnel P2P y entra con la instancia que corresponda. Si esa instancia ya está
+ * abierta, el propio juego se conecta (sin reiniciarlo). Devuelve el texto para enseñar; lanza si no se pudo.
+ */
+export async function joinInvite(
+	friendId: string,
+	info: JoinableInvite,
+	instances: LocalInstance[],
+	fallback: LocalInstance | null = null,
+	onConnected: (port: number) => void = () => {},
+): Promise<string> {
+	// La instancia de la invitación manda; `fallback` solo se usa con invitaciones antiguas.
+	const match = findMatchingInstance(instances, info.instance, info.game_version)
+	if (info.instance && !match) {
+		throw new Error(`No tienes la instancia «${info.instance.name}». Pulsa «Instalar y unirme».`)
+	}
+	const instance = match?.instance ?? fallback
+	const port = await invoke<number>('p2p_join', { friend: friendId, shareId: info.share_id })
+	onConnected(port)
+	if (!instance) {
+		return `Conectado. En Minecraft añade el servidor 127.0.0.1:${port}, o elige una instancia para abrirlo directo.`
+	}
+	if (!match && info.game_version && instance.game_version !== info.game_version) {
+		return `Conectado, pero tu instancia es ${instance.game_version} y la partida es ${info.game_version}. Usa una instancia ${info.game_version} y entra en 127.0.0.1:${port}.`
+	}
+	await invoke('plugin:worlds|start_join_server', { instanceId: instance.id, address: `127.0.0.1:${port}` })
+	return `Entrando a la partida con «${instance.name}»…`
 }

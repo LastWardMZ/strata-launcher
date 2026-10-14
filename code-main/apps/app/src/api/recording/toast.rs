@@ -49,6 +49,8 @@ static DPI: Mutex<i32> = Mutex::new(96);
 static STARTED: AtomicBool = AtomicBool::new(false);
 /// Hay una ventana de Minecraft a la que enseñar los avisos.
 static HAS_TARGET: AtomicBool = AtomicBool::new(false);
+/// La ventana de ese juego (0 si no hay).
+static TARGET_WINDOW: std::sync::atomic::AtomicIsize = std::sync::atomic::AtomicIsize::new(0);
 
 enum Command {
     Target(Option<isize>),
@@ -100,11 +102,17 @@ pub fn push(title: &str, body: &str) {
 /// Ventana del juego sobre la que se muestran los avisos (`None` si no hay ninguno en marcha).
 pub fn set_target(window: Option<isize>) {
     HAS_TARGET.store(window.is_some(), Ordering::Relaxed);
+    TARGET_WINDOW.store(window.unwrap_or(0), Ordering::Relaxed);
     // Sin avisos pendientes no hace falta arrancar el hilo solo para decirle que no hay ventana.
     if window.is_none() && !STARTED.load(Ordering::Relaxed) {
         return;
     }
     let _ = sender().send(Command::Target(window));
+}
+
+/// La ventana del Minecraft en marcha, si la hay.
+pub fn game_window() -> Option<isize> {
+    Some(TARGET_WINDOW.load(Ordering::Relaxed)).filter(|window| *window != 0)
 }
 
 /// ¿Hay ahora mismo un Minecraft en marcha donde enseñar avisos?
