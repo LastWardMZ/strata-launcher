@@ -4,7 +4,7 @@ import { CompassIcon, ExternalIcon, PlusIcon } from '@modrinth/assets'
 import { Admonition, Avatar, Button, LoadingIndicator, useVIntl } from '@modrinth/ui'
 import { renderExternalHtml } from '@modrinth/utils'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import MapInstallModal from '@/components/ui/maps/MapInstallModal.vue'
@@ -40,8 +40,13 @@ function back() {
 	else void router.push({ path: '/browse/map', query: instanceId.value ? { i: instanceId.value } : undefined })
 }
 
-onMounted(async () => {
+/** Carga el mapa de la ruta; se repite si cambia el id (la misma página sirve para todos los mapas). */
+async function load() {
 	const id = Number(route.params.id)
+	loading.value = true
+	failure.value = ''
+	map.value = null
+	shot.value = 0
 	const browse = breadcrumbs.reset({
 		slot: 'browse',
 		id: 'browse:map',
@@ -51,14 +56,19 @@ onMounted(async () => {
 	} satisfies BreadcrumbDefinition)
 	try {
 		if (!Number.isInteger(id) || id <= 0) throw new Error(formatMessage(messages.notFound))
-		map.value = await getMap(id)
-		breadcrumbs.push({ slot: 'project', id: `map:${id}`, label: () => map.value?.name ?? '', to: route.fullPath, visual: { type: 'icon', component: CompassIcon } } satisfies BreadcrumbDefinition, { parent: browse })
+		const loaded = await getMap(id)
+		// Si mientras tanto se pasó a otro mapa, esta respuesta ya no vale.
+		if (Number(route.params.id) !== id) return
+		map.value = loaded
+		breadcrumbs.push({ slot: 'project', id: `map:${id}`, label: () => loaded.name, to: route.fullPath, visual: { type: 'icon', component: CompassIcon } } satisfies BreadcrumbDefinition, { parent: browse })
 	} catch (cause) {
-		failure.value = mapErrorMessage(cause) || formatMessage(messages.notFound)
+		if (Number(route.params.id) === id) failure.value = mapErrorMessage(cause) || formatMessage(messages.notFound)
 	} finally {
-		loading.value = false
+		if (Number(route.params.id) === id) loading.value = false
 	}
-})
+}
+
+watch(() => route.params.id, load, { immediate: true })
 </script>
 
 <template>
