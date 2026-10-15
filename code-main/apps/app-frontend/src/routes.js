@@ -25,6 +25,17 @@ export default new createRouter({
 		},
 		{ path: '/hosting/manage/:id/:section', redirect: '/servers' },
 		{
+			// Mapas de CurseForge: su propia página (otra fuente de datos), con las mismas pestañas.
+			path: '/browse/map',
+			name: 'BrowseMaps',
+			component: () => import('@/pages/BrowseMaps.vue'),
+		},
+		{
+			path: '/maps/:id',
+			name: 'MapProject',
+			component: () => import('@/pages/MapProject.vue'),
+		},
+		{
 			path: '/browse/:projectType',
 			name: 'Discover content',
 			component: () => import('@/pages/Browse.vue'),

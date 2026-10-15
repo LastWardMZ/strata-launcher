@@ -38,6 +38,7 @@ import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
 
+import { messages as mapMessages } from '@/components/ui/maps/messages'
 import { useAppServerBrowse } from '@/composables/browse/use-app-server-browse'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
@@ -727,6 +728,7 @@ const selectableProjectTypes = computed(() => {
 			shown: dataPacks,
 		},
 		{ label: formatMessage(messages.shadersProjectType), href: `/browse/shader${suffix}` },
+		{ label: formatMessage(mapMessages.tab), href: `/browse/map${suffix}` },
 		{
 			label: formatMessage(messages.serversProjectType),
 			href: `/browse/server${suffix}`,

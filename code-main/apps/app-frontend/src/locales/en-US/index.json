@@ -4570,5 +4570,194 @@
 	},
 	"settings.sidebar.label.display": {
 		"message": "Display"
+	},
+	"app.browse.project-type.maps": {
+		"message": "Maps"
+	},
+	"app.maps.discover": {
+		"message": "Discover maps"
+	},
+	"app.maps.search-placeholder": {
+		"message": "Search maps..."
+	},
+	"app.maps.sort-by": {
+		"message": "Sort by"
+	},
+	"app.maps.sort.popular": {
+		"message": "Popular"
+	},
+	"app.maps.sort.updated": {
+		"message": "Recently updated"
+	},
+	"app.maps.sort.downloads": {
+		"message": "Most downloaded"
+	},
+	"app.maps.version-label": {
+		"message": "Version"
+	},
+	"app.maps.any-version": {
+		"message": "Any"
+	},
+	"app.maps.category-label": {
+		"message": "Category"
+	},
+	"app.maps.any-category": {
+		"message": "All"
+	},
+	"app.maps.no-results": {
+		"message": "No maps found. Try other words or filters."
+	},
+	"app.maps.load-error": {
+		"message": "Couldn't load maps"
+	},
+	"app.maps.retry": {
+		"message": "Try again"
+	},
+	"app.maps.install": {
+		"message": "Install"
+	},
+	"app.maps.view-on-curseforge": {
+		"message": "View on CurseForge"
+	},
+	"app.maps.attribution": {
+		"message": "Maps come from CurseForge and belong to their authors. Strata only helps you find and install them."
+	},
+	"app.maps.by-authors": {
+		"message": "by {authors}"
+	},
+	"app.maps.back-to-browse": {
+		"message": "Back to maps"
+	},
+	"app.maps.not-found": {
+		"message": "This map doesn't exist or can't be shown."
+	},
+	"app.maps.description": {
+		"message": "Description"
+	},
+	"app.maps.gallery": {
+		"message": "Gallery"
+	},
+	"app.maps.compatible-versions": {
+		"message": "Compatible versions"
+	},
+	"app.maps.details": {
+		"message": "Details"
+	},
+	"app.maps.authors": {
+		"message": "Authors"
+	},
+	"app.maps.downloads": {
+		"message": "{count} downloads"
+	},
+	"app.maps.updated": {
+		"message": "Updated {date}"
+	},
+	"app.maps.categories": {
+		"message": "Categories"
+	},
+	"app.maps.no-direct-download": {
+		"message": "The author doesn't allow downloads from other apps, so Strata can't install this map. You can download it from CurseForge and add it to your instance's saves folder yourself."
+	},
+	"app.maps.download-on-curseforge": {
+		"message": "Download on CurseForge"
+	},
+	"app.maps.install.title": {
+		"message": "Install {name}"
+	},
+	"app.maps.install.loading-files": {
+		"message": "Looking for the available files..."
+	},
+	"app.maps.install.no-files": {
+		"message": "This map has no files available."
+	},
+	"app.maps.install.choose-instance": {
+		"message": "Choose an instance"
+	},
+	"app.maps.install.recommended": {
+		"message": "Recommended"
+	},
+	"app.maps.install.new-instance": {
+		"message": "Create a new instance"
+	},
+	"app.maps.install.new-instance-hint": {
+		"message": "Vanilla Minecraft {version}, just for this map."
+	},
+	"app.maps.install.no-instances": {
+		"message": "You don't have any instances yet."
+	},
+	"app.maps.install.choose-file": {
+		"message": "File"
+	},
+	"app.maps.install.download": {
+		"message": "Download and install"
+	},
+	"app.maps.install.downloading": {
+		"message": "Downloading and checking the map..."
+	},
+	"app.maps.install.progress-hint": {
+		"message": "You can follow the progress in the tasks panel."
+	},
+	"app.maps.install.creating-instance": {
+		"message": "Creating the instance..."
+	},
+	"app.maps.install.review": {
+		"message": "Ready to install"
+	},
+	"app.maps.install.worlds": {
+		"message": "Worlds in this map"
+	},
+	"app.maps.install.worlds-hint": {
+		"message": "This file has several worlds. Choose the ones you want to install."
+	},
+	"app.maps.install.world-details": {
+		"message": "{size} · {files} files"
+	},
+	"app.maps.install.installs-into": {
+		"message": "It will be added to {instance}. Nothing already there is overwritten."
+	},
+	"app.maps.install.newer-warning": {
+		"message": "This map was made for Minecraft {mapVersion}, which is newer than {instanceVersion}. Opening it in an older version can corrupt the world."
+	},
+	"app.maps.install.newer-confirm": {
+		"message": "I understand it may be corrupted"
+	},
+	"app.maps.install.older-notice": {
+		"message": "This map was made for Minecraft {mapVersion}. Minecraft {instanceVersion} will upgrade it when you open it, and you will not be able to go back to the older version."
+	},
+	"app.maps.install.unknown-version": {
+		"message": "We can't tell which Minecraft version this map needs. If it doesn't open, try another version."
+	},
+	"app.maps.install.blocked": {
+		"message": "Some files were not installed"
+	},
+	"app.maps.install.blocked-text": {
+		"message": "Maps are only worlds. The program files in this one were left out for your safety: {files}"
+	},
+	"app.maps.install.confirm": {
+		"message": "Install"
+	},
+	"app.maps.install.cancel": {
+		"message": "Cancel"
+	},
+	"app.maps.install.close": {
+		"message": "Close"
+	},
+	"app.maps.install.installing": {
+		"message": "Installing the map..."
+	},
+	"app.maps.install.done": {
+		"message": "Map installed"
+	},
+	"app.maps.install.done-text": {
+		"message": "You will find it in the Worlds tab of {instance}."
+	},
+	"app.maps.install.play": {
+		"message": "Play"
+	},
+	"app.maps.install.open-instance": {
+		"message": "Open instance"
+	},
+	"app.maps.install.failed": {
+		"message": "The map couldn't be installed"
 	}
 }
