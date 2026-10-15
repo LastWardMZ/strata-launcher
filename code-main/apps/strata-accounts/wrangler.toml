@@ -10,3 +10,9 @@ database_name = "strata-accounts"
 # Lo rellena scripts/deploy-accounts.ps1 al crear la base de datos (wrangler d1 create).
 database_id = "0ba2a11e-8cad-4345-8534-3713e18b932b"
 migrations_dir = "migrations"
+
+# Mapas de CurseForge (ver README). El secreto CURSEFORGE_API_KEY NO va aquí: `npx wrangler secret put CURSEFORGE_API_KEY`.
+# La caché está desactivada (0) porque las condiciones de CurseForge limitan guardar datos de su API.
+[vars]
+MAPS_CACHE_SEARCH_SECONDS = "0"
+MAPS_CACHE_DETAIL_SECONDS = "0"

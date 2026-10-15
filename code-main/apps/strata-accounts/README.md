@@ -85,3 +85,64 @@ Todas las rutas (salvo `GET /health`) requieren la firma de arriba. Respuestas e
 | `POST /friends/request`, `/friends/accept`, `/friends/remove`, `/block`, `/unblock` | `{username}` |
 
 Los amigos devueltos por `/sync` incluyen su `id`, que es su clave pública y por tanto su código de partidas.
+
+## Mapas de CurseForge (`/maps/…`)
+
+El mismo Worker hace de intermediario de la pestaña **Mapas** de la app. La clave de la API de CurseForge **no puede
+ir en la app** (es de código abierto), así que vive aquí como secreto. Este módulo no usa D1, no guarda nada y no
+registra datos de usuarios; los archivos de los mapas **no pasan por aquí** (la app los descarga directamente del CDN
+de CurseForge).
+
+### Configurar la clave
+
+1. Pide una clave de **terceros** en CurseForge (formulario "3rd Party API key" de Overwolf; la aprueban a mano y
+   avisan por correo). Una cuenta normal no sirve: según su documentación, las cuentas que no son de un desarrollador de
+   juegos y no han pedido clave se eliminan.
+2. Guárdala como secreto (no la pongas nunca en `wrangler.toml` ni en el repositorio):
+
+```powershell
+cd code-main/apps/strata-accounts
+npx wrangler secret put CURSEFORGE_API_KEY
+npx wrangler deploy
+```
+
+Sin la clave, `/maps/…` responde `503 not-configured` y la app lo explica.
+
+### Qué ofrece (solo Minecraft, `gameId` 432, y solo mapas, `classId` 17)
+
+| Ruta | Descripción |
+| --- | --- |
+| `GET /maps/search?q=&version=&category=&sort=&page=` | Búsqueda (`sort`: `popular`, `updated`, `downloads`; 20 por página) |
+| `GET /maps/categories` | Subcategorías de mapas |
+| `GET /maps/mod/<id>` | Ficha: descripción (HTML), imágenes, autores, descargas, fechas |
+| `GET /maps/mod/<id>/files?version=&page=` | Archivos: versiones, tamaño, hashes y URL de descarga (solo del CDN) |
+
+Cualquier `gameId`/`classId` distinto de los permitidos se rechaza con `400`, y un proyecto de otro juego o sección
+responde `404` aunque se conozca su id, para que nadie pueda usar tu clave con otro fin. Los parámetros están
+limitados (texto ≤ 60 caracteres, versión y categoría validadas, páginas acotadas). Hay un límite de **60
+peticiones por minuto y dirección IP** (en memoria, por instancia del Worker: frena abusos sencillos).
+
+### Caché: desactivada por defecto, y por qué
+
+Las condiciones de la **API de terceros de CurseForge** (sección 3.1) dicen que no se puede "guardar o cachear datos
+obtenidos a través de la API". Por eso la caché con la Cache API de Cloudflare está **desactivada** salvo que la
+actives tú, bajo tu responsabilidad:
+
+```toml
+# wrangler.toml
+[vars]
+MAPS_CACHE_SEARCH_SECONDS = "600"   # búsquedas: 10 minutos
+MAPS_CACHE_DETAIL_SECONDS = "3600"  # fichas, archivos y categorías: 1 hora
+```
+
+Confirma antes con CurseForge (o con el texto completo de sus condiciones) que un intermediario con caché es
+aceptable para tu aplicación. Esas mismas condiciones prohíben construir productos que compitan con CurseForge y
+piden que la clave no se comparta con terceros: el Worker nunca devuelve la clave.
+
+### Pendiente de confirmar
+
+- Los números de `sortField` (popular = 2, reciente = 3, descargas = 6) **no aparecen con nombre en la documentación
+  oficial** (solo dice "1 a 12"); salen de clientes de terceros. Comprueba con `GET /maps/search?sort=downloads` que el
+  orden es el esperado (`SORT_FIELDS` en `src/maps.mjs`).
+- El CDN de las descargas se acepta por el sufijo `forgecdn.net` (lo que devuelve la API en la práctica); la
+  documentación oficial no lista los dominios.
