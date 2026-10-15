@@ -13575,6 +13575,7 @@ dependencies = [
  "hyper-util",
  "image",
  "iroh",
+ "md5",
  "native-dialog",
  "objc2-app-kit",
  "paste",
