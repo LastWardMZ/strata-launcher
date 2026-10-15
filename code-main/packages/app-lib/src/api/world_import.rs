@@ -607,21 +607,22 @@ pub async fn install_into_instance(
     let instance_name = crate::instance::get(instance_id).await?.map(|metadata| metadata.instance.name).unwrap_or_else(|| instance_id.to_string());
     let bar = init_loading(LoadingBarType::ZipExtract { instance_id: instance_id.to_string(), instance_name }, 100.0, "Instalando mapa…").await?;
 
-    let report = tokio::task::spawn_blocking(move || {
+    let (result, bar, last) = tokio::task::spawn_blocking(move || {
         let mut last = 0.0;
-        install(&zip_path, &instance_dir, &selected, &Limits::default(), &mut |fraction| {
+        let result = install(&zip_path, &instance_dir, &selected, &Limits::default(), &mut |fraction| {
             let step = (fraction * 100.0 - last).max(0.0);
             if step >= 1.0 {
                 last += step;
                 let _ = emit_loading(&bar, step, None);
             }
-        })
-        .map(|report| (report, bar, last))
+        });
+        (result, bar, last)
     })
     .await
     .map_err(|e| crate::ErrorKind::OtherError(e.to_string()))?;
-    let (report, bar, last) = report?;
+    // La barra se completa siempre (también si falló), para que no se quede a medias en el panel de tareas.
     let _ = emit_loading(&bar, (100.0 - last).max(0.0), None);
+    let report = result?;
 
     if let Some(origin) = origin {
         let state = State::get().await?;

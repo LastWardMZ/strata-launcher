@@ -258,6 +258,7 @@ fn main() {
         .manage(api::local_servers::LocalServerState::default())
         .manage(api::p2p::P2pState::default())
         .manage(api::accounts::AccountsState::default())
+        .manage(api::maps::MapsState::default())
         .manage(api::recording::RecordingState::default())
         .plugin(api::mr_auth::init())
         .plugin(api::onboarding_checklist::init())
@@ -357,6 +358,13 @@ fn main() {
             api::p2p::p2p_test_game_toast,
             api::p2p::p2p_open_world_for_invite,
             api::friends_overlay::overlay_hide,
+            api::maps::maps_search,
+            api::maps::maps_categories,
+            api::maps::maps_get,
+            api::maps::maps_files,
+            api::maps::maps_prepare,
+            api::maps::maps_install,
+            api::maps::maps_discard,
             api::p2p::p2p_game_options,
             api::p2p::p2p_set_game_chat,
             api::p2p::p2p_set_game_options,

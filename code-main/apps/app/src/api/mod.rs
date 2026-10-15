@@ -3,6 +3,7 @@ use serde::{Serialize, Serializer};
 use thiserror::Error;
 
 pub mod local_servers;
+pub mod maps;
 pub mod accounts;
 pub mod discord;
 pub mod friends_overlay;

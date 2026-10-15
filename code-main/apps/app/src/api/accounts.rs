@@ -121,6 +121,29 @@ impl AccountsState {
         Ok(())
     }
 
+    /// Petición pública (sin firma) al mismo servidor de Strata: la pestaña «Mapas» pide aquí los datos de CurseForge
+    /// (`/maps/…`), porque la clave de su API vive solo en el servidor. Devuelve el JSON o el mensaje de error.
+    pub async fn get_public<R: tauri::Runtime>(&self, app: &tauri::AppHandle<R>, path_and_query: &str) -> Result<Value, String> {
+        let server_url = self.load(app).await.server_url;
+        let response = self
+            .client
+            .get(format!("{server_url}{path_and_query}"))
+            .timeout(REQUEST_TIMEOUT)
+            .send()
+            .await
+            .map_err(|_| format!("No se pudo conectar con el servidor de Strata ({server_url})"))?;
+        let status = response.status();
+        let value: Value = response.json().await.unwrap_or(Value::Null);
+        if status.is_success() {
+            return Ok(value);
+        }
+        Err(match value["error"].as_str() {
+            Some(message) => message.to_string(),
+            None if status == reqwest::StatusCode::NOT_FOUND => "Este servidor de Strata no ofrece mapas.".to_string(),
+            None => "No se pudo completar la acción.".to_string(),
+        })
+    }
+
     async fn request<R: tauri::Runtime>(
         &self,
         app: &tauri::AppHandle<R>,
